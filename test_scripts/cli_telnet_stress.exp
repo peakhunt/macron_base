@@ -4,7 +4,7 @@ set test_cnt 0
 
 proc do_cli_telnet {} {
   spawn telnet localhost 9090
-  expect "kjexpr > "
+  expect "macron_bog> "
 
   send "help\r"
 

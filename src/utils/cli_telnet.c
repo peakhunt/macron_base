@@ -223,9 +223,9 @@ void cli_telnet_server_init(cli_server_t* server,  int port, int backlog)
 //
 ////////////////////////////////////////////////////////////////////////////////
 void
-cli_telnet_intf_init(void)
+cli_telnet_intf_init(int port)
 {
-  TRACE(CLI_TELNET, "initializing cli telnet interface\n");
+  TRACE(CLI_TELNET, "initializing cli telnet interface for port %d\n", port);
 
-  cli_telnet_server_init(&_cli_ipv4_server, 9090, 5);
+  cli_telnet_server_init(&_cli_ipv4_server, port, 5);
 }

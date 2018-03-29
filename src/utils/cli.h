@@ -11,6 +11,7 @@
 
 typedef struct 
 {
+  char*           prompt;
   bool            telnet_enabled;
   bool            serial_enabled;
   int             tcp_port;
@@ -38,7 +39,7 @@ typedef struct
   cli_command_handler handler;
 } cli_command_t;
 
-extern void cli_init(cli_command_t* cmds, int num_cmds);
+extern void cli_init(cli_config_t* cfg, cli_command_t* cmds, int num_cmds);
 extern void cli_handle_rx(cli_intf_t* intf, uint8_t* data, int len);
 extern void cli_intf_register(cli_intf_t* intf);
 extern void cli_intf_unregister(cli_intf_t* intf);

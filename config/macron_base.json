@@ -1,11 +1,17 @@
 {
   "cli": {
-    "prompt": "macron_bog>",
-    "eol": "\r\n",
-    "eol_char": "\r",
-    "cli_telnet": [
-    ],
-    "cli_serial": [
-    ]
+    "prompt": "macron_bog> ",
+    "telnet": {
+      "enabled": true,
+      "port": 9090
+    },
+    "serial": {
+      "enabled": false,
+      "serial_port": "/dev/ttyUSB0",
+      "baud": 115200,
+      "data_bit": 8,
+      "stop_bit": 1,
+      "parity": "none"
+    }
   }
 }

@@ -6,8 +6,8 @@
 
 #include "cli.h"
 
-extern void cli_telnet_intf_init(void);
-extern void cli_serial_intf_init(void);
+extern void cli_telnet_intf_init(int port);
+extern void cli_serial_intf_init(const char* port, SerialConfig* scfg);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -54,7 +54,7 @@ static cli_command_t*   _user_commands;
 static int              _num_user_commands;
 
 static char             _print_buffer[CLI_MAX_COLUMNS_PER_LINE + 1];
-static char             _prompt[]  = CLI_EOL"kjexpr > ";
+static char             _prompt[128 + 8];
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -156,7 +156,7 @@ cli_printf(cli_intf_t* intf, const char* fmt, ...)
 static inline void
 cli_prompt(cli_intf_t* intf)
 {
-  intf->put_tx_data(intf, _prompt, sizeof(_prompt) -1);
+  intf->put_tx_data(intf, _prompt, strlen(_prompt));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -165,13 +165,22 @@ cli_prompt(cli_intf_t* intf)
 //
 ////////////////////////////////////////////////////////////////////////////////
 void
-cli_init(cli_command_t* cmds, int num_cmds)
+cli_init(cli_config_t* cfg, cli_command_t* cmds, int num_cmds)
 {
   _user_commands      = cmds;
   _num_user_commands  = num_cmds;
 
-  cli_telnet_intf_init();
-  //cli_serial_intf_init();
+  snprintf(_prompt, 128,"\r\n%s", cfg->prompt);
+
+  if(cfg->telnet_enabled)
+  {
+    cli_telnet_intf_init(cfg->tcp_port);
+  }
+
+  if(cfg->serial_enabled)
+  {
+    cli_serial_intf_init(cfg->serial_port, &cfg->serial_cfg);
+  }
 }
 
 void

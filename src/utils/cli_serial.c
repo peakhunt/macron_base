@@ -87,17 +87,12 @@ cli_serial_initialize(cli_serial_if_t* intf, const char* device, const SerialCon
 //
 ////////////////////////////////////////////////////////////////////////////////
 void
-cli_serial_intf_init(void)
+cli_serial_intf_init(const char* port, SerialConfig* scfg)
 {
-  const SerialConfig    cfg1 = 
-  {
-    .baud       = B115200,
-    .data_bit   = 8,
-    .stop_bit   = 1,
-    .parity     = SerialParity_None,
-  };
-
   TRACE(CLI_TELNET, "initializing cli serial interfaces\n");
+  TRACE(CLI_TELNET, "port : %s\n", port);
+  TRACE(CLI_TELNET, "parameter : %d, %d, %d, %d\n",
+      scfg->baud, scfg->data_bit, scfg->stop_bit, scfg->parity);
 
-  cli_serial_initialize(&_serial_if1, "/dev/ttyUSB5",  &cfg1);
+  cli_serial_initialize(&_serial_if1, port, scfg);
 }

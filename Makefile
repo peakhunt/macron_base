@@ -3,7 +3,7 @@ include Rules.mk
 #######################################
 # list of source files
 ########################################
-C_SOURCES =                                         \
+LIB_UTILS_SOURCES =                                 \
 src/utils/cmd_option.c                              \
 src/utils/thread_queue.c                            \
 src/utils/thread.c                                  \
@@ -34,8 +34,10 @@ src/utils/hex_dump.c                                \
 src/utils/trace.c                                   \
 src/utils/debug_log.c
 
-MAIN_C_SOURCE =                                     \
-src/app/main.c
+APP_SOURCES =                                       \
+src/app/main.c                                      \
+src/app/app_cli.c                                   \
+src/app/app_config.c
 
 TEST_C_SOURCE =                                     \
 test/cmd_option_test.c
@@ -98,11 +100,11 @@ all: $(BUILD_DIR)/$(TARGET)
 #######################################
 # build rules
 #######################################
-TARGET_SOURCES := $(C_SOURCES) $(MAIN_C_SOURCE)
+TARGET_SOURCES := $(LIB_UTILS_SOURCES) $(APP_SOURCES)
 OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(TARGET_SOURCES:.c=.o)))
 vpath %.c $(sort $(dir $(TARGET_SOURCES)))
 
-TEST_SOURCES := $(C_SOURCES) $(TEST_C_SOURCE) $(TEST_MAIN_C_SOURCE)
+TEST_SOURCES := $(LIB_UTILS_SOURCES) $(TEST_C_SOURCE) $(TEST_MAIN_C_SOURCE)
 TEST_OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(TEST_SOURCES:.c=.o)))
 vpath %.c $(sort $(dir $(TEST_SOURCES)))
 

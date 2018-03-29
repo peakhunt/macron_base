@@ -2,10 +2,11 @@
 #include "common_def.h"
 #include "cmd_option.h"
 #include "debug_log.h"
-#include "cli.h"
 #include "utils.h"
 #include "evloop_thread.h"
 #include "trace.h"
+#include "app_config.h"
+#include "app_cli.h"
 
 static void main_thread_init(evloop_thread_t* thrd);
 
@@ -36,7 +37,7 @@ static evloop_thread_t      _main_thread =
 static void
 main_thread_init(evloop_thread_t* thrd)
 {
-  cli_init(NULL, 0);
+  app_cli_init();
 }
 
 static void
@@ -65,6 +66,7 @@ main(int argc, char** argv)
   }
 
   debug_log_init(option->foreground ? NULL : "./debug.out");
+  app_config_init(NULL);
 
   debug_log("starting system\n");
 
