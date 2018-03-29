@@ -29,7 +29,7 @@ src/utils/udp_socket.c                              \
 src/utils/cli.c                                     \
 src/utils/cli_telnet.c                              \
 src/utils/cli_serial.c                              \
-src/protocols/telnet/telnet_reader.c                \
+src/utils/telnet_reader.c                           \
 src/debug/hex_dump.c                                \
 src/debug/trace.c                                   \
 src/debug_log/debug_log.c
@@ -57,7 +57,6 @@ C_DEFS  = -DTRACE_ENABLED
 C_INCLUDES =                              \
 -Isrc/utils                               \
 -Isrc/debug_log                           \
--Isrc/protocols/telnet                    \
 -I$(LIBEV_DIR)/include
 
 LIBS = -lev -lpthread -lm
