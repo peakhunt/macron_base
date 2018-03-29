@@ -1,0 +1,11 @@
+{
+  "cli": {
+    "prompt": "macron_bog>",
+    "eol": "\r\n",
+    "eol_char": "\r",
+    "cli_telnet": [
+    ],
+    "cli_serial": [
+    ]
+  }
+}
