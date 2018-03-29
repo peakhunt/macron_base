@@ -79,6 +79,11 @@ tcp_connector_connect(tcp_connector_t* conn, struct sockaddr* addr, socklen_t ad
   }
 
   ret = connect(conn->sd, addr, addrlen);
+  //
+  // guess we better defer success event till the next loop.
+  // user code will be much cleaner this way
+  //
+#if 0
   if(ret == 0)
   {
     // immediately connected
@@ -86,6 +91,9 @@ tcp_connector_connect(tcp_connector_t* conn, struct sockaddr* addr, socklen_t ad
     // using unix domain protocol
     return tcp_connector_success;
   }
+#else
+  UNUSED(ret);
+#endif
 
   if(errno != EINPROGRESS)
   {

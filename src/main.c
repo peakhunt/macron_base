@@ -3,7 +3,7 @@
 #include "cmd_option.h"
 #include "debug_log.h"
 #include "cli.h"
-#include "thread.h"
+#include "utils.h"
 #include "evloop_thread.h"
 #include "trace.h"
 
@@ -54,6 +54,8 @@ main(int argc, char** argv)
 {
   const cmd_option* option;
 
+  lib_utils_init();
+
   cmd_opt_handle(argc, argv);
   option = cmd_opt_get();
 
@@ -62,7 +64,6 @@ main(int argc, char** argv)
     go_daemon();
   }
 
-  thread_specific_init();
   debug_log_init(option->foreground ? NULL : "./debug.out");
 
   debug_log("starting system\n");
