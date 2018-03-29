@@ -30,9 +30,9 @@ src/utils/cli.c                                     \
 src/utils/cli_telnet.c                              \
 src/utils/cli_serial.c                              \
 src/utils/telnet_reader.c                           \
-src/debug/hex_dump.c                                \
-src/debug/trace.c                                   \
-src/debug_log/debug_log.c
+src/utils/hex_dump.c                                \
+src/utils/trace.c                                   \
+src/utils/debug_log.c
 
 MAIN_C_SOURCE =                                     \
 src/main.c
@@ -56,7 +56,6 @@ C_DEFS  = -DTRACE_ENABLED
 #######################################
 C_INCLUDES =                              \
 -Isrc/utils                               \
--Isrc/debug_log                           \
 -I$(LIBEV_DIR)/include
 
 LIBS = -lev -lpthread -lm
