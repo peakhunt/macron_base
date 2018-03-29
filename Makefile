@@ -18,6 +18,7 @@ src/utils/sbuf.c                                    \
 src/utils/config_reader.c                           \
 src/utils/utils.c                                   \
 src/utils/stream.c                                  \
+src/utils/serial.c                                  \
 src/sock/sock_util.c                                \
 src/sock/tcp_server.c                               \
 src/sock/tcp_server_ipv4.c                          \
@@ -25,7 +26,6 @@ src/sock/tcp_server_unix_domain.c                   \
 src/sock/tcp_connector.c                            \
 src/sock/tcp_auto_connector.c                       \
 src/sock/udp_socket.c                               \
-src/serial/serial.c                                 \
 src/utils/cli.c                                     \
 src/utils/cli_telnet.c                              \
 src/utils/cli_serial.c                              \
@@ -58,7 +58,6 @@ C_INCLUDES =                              \
 -Isrc/common                              \
 -Isrc/utils                               \
 -Isrc/sock                                \
--Isrc/serial                              \
 -Isrc/debug_log                           \
 -Isrc/protocols/telnet                    \
 -I$(LIBEV_DIR)/include

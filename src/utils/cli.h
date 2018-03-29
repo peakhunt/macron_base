@@ -2,11 +2,21 @@
 #define __CLI_DEF_H__
 
 #include "common_def.h"
+#include "serial.h"
 #include "list.h"
 
 #define CLI_COMMAND_MAX_ARGS          16
 #define CLI_RX_BUFFER_LENGTH          252
 #define CLI_MAX_COMMAND_LEN           252
+
+typedef struct 
+{
+  bool            telnet_enabled;
+  bool            serial_enabled;
+  int             tcp_port;
+  char*           serial_port;
+  SerialConfig    serial_cfg;
+} cli_config_t;
 
 typedef struct __cli_intf cli_intf_t;
 
