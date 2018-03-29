@@ -35,7 +35,7 @@ src/utils/trace.c                                   \
 src/utils/debug_log.c
 
 MAIN_C_SOURCE =                                     \
-src/main.c
+src/app/main.c
 
 TEST_C_SOURCE =                                     \
 test/cmd_option_test.c
