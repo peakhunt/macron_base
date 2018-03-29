@@ -98,7 +98,7 @@ LDFLAGS +=  $(LIBDIR) $(LIBS)
 all: $(BUILD_DIR)/$(TARGET)
 
 #######################################
-# build rules
+# target source setup
 #######################################
 TARGET_SOURCES := $(LIB_UTILS_SOURCES) $(APP_SOURCES)
 OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(TARGET_SOURCES:.c=.o)))
@@ -108,25 +108,50 @@ TEST_SOURCES := $(LIB_UTILS_SOURCES) $(TEST_C_SOURCE) $(TEST_MAIN_C_SOURCE)
 TEST_OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(TEST_SOURCES:.c=.o)))
 vpath %.c $(sort $(dir $(TEST_SOURCES)))
 
+JSON_GEN_SOURCES := $(LIB_UTILS_SOURCES) src/app/json_gen_patch.c
+JSON_GEN_OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(JSON_GEN_SOURCES:.c=.o)))
+vpath %.c $(sort $(dir $(JSON_GEN_SOURCES)))
+
+#######################################
+# C source build rule
+#######################################
 $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR)
 	@echo "[CC]         $(notdir $<)"
 	$Q$(CC) -c $(CFLAGS) $< -o $@
 
+#######################################
+# main target
+#######################################
 $(BUILD_DIR)/$(TARGET): $(OBJECTS) Makefile
 	@echo "[LD]         $(TARGET)"
 	$Q$(CC) $(OBJECTS) $(LDFLAGS) -o $@
-
-$(BUILD_DIR)/test_$(TARGET): $(TEST_OBJECTS) Makefile
-	@echo "[LD]         test_$(TARGET)"
-	$Q$(CC) $(TEST_OBJECTS) $(LDFLAGS) -lcunit -o $@
-	$(BUILD_DIR)/test_$(TARGET)
 
 $(BUILD_DIR):
 	@echo "MKDIR          $(BUILD_DIR)"
 	$Qmkdir $@
 
-.PHONY:
+#######################################
+# test target
+#######################################
+$(BUILD_DIR)/test_$(TARGET): $(TEST_OBJECTS) Makefile
+	@echo "[LD]         test_$(TARGET)"
+	$Q$(CC) $(TEST_OBJECTS) $(LDFLAGS) -lcunit -o $@
+	$(BUILD_DIR)/test_$(TARGET)
+
 test: $(BUILD_DIR)/test_$(TARGET)
+	
+# separation mark. \t is above there. be careful
+
+#######################################
+# json_gen_patch
+#######################################
+$(BUILD_DIR)/json_gen_patch: $(JSON_GEN_OBJECTS) Makefile
+	@echo "[LD]         json_gen_patch"
+	$Q$(CC) $(JSON_GEN_OBJECTS) $(LDFLAGS) -o $@
+
+json_gen_patch: $(BUILD_DIR)/json_gen_patch
+	
+# separation mark. \t is above there. be careful
 
 
 #######################################
