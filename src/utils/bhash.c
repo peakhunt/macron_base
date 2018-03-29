@@ -1,8 +1,6 @@
 //
 // a simple generic bucket hash implementation
 //
-// all rights reserved, Intellian Technologies, 2012
-//
 // Revision History
 // - Oct/22/2012 initial release by hkim
 //
