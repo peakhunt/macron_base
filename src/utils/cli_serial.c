@@ -89,9 +89,9 @@ cli_serial_initialize(cli_serial_if_t* intf, const char* device, const SerialCon
 void
 cli_serial_intf_init(const char* port, SerialConfig* scfg)
 {
-  TRACE(CLI_TELNET, "initializing cli serial interfaces\n");
-  TRACE(CLI_TELNET, "port : %s\n", port);
-  TRACE(CLI_TELNET, "parameter : %d, %d, %d, %d\n",
+  TRACE(CLI_SERIAL, "initializing cli serial interfaces\n");
+  TRACE(CLI_SERIAL, "port : %s\n", port);
+  TRACE(CLI_SERIAL, "parameter : %d, %d, %d, %d\n",
       scfg->baud, scfg->data_bit, scfg->stop_bit, scfg->parity);
 
   cli_serial_initialize(&_serial_if1, port, scfg);
