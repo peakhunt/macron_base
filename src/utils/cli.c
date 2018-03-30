@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
+#include "trace.h"
 
 #include "cli.h"
 
@@ -27,6 +28,8 @@ extern void cli_serial_intf_init(const char* port, SerialConfig* scfg);
 ////////////////////////////////////////////////////////////////////////////////
 static void cli_command_help(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_version(cli_intf_t* intf, int argc, const char** argv);
+static void cli_command_trace_status(cli_intf_t* intf, int argc, const char** argv);
+static void cli_command_trace_set(cli_intf_t* intf, int argc, const char** argv);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -42,11 +45,20 @@ static cli_command_t    _core_commands[] =
     "show this command",
     cli_command_help,
   },
-
   {
     "version",
     "show version",
     cli_command_version,
+  },
+  {
+    "trace_status",
+    "show debug trace status",
+    cli_command_trace_status,
+  },
+  {
+    "trace_set",
+    "enable/disable trace on a component",
+    cli_command_trace_set,
   },
 };
 
@@ -86,6 +98,53 @@ cli_command_version(cli_intf_t* intf, int argc, const char** argv)
 {
   cli_printf(intf, CLI_EOL);
   cli_printf(intf, "%s"CLI_EOL, VERSION);
+}
+
+static void
+cli_command_trace_status(cli_intf_t* intf, int argc, const char** argv)
+{
+  int num_trace_str;
+  const char** trace_str = trace_get_strs(&num_trace_str);
+
+  for(int i = 0; i < num_trace_str; i++)
+  {
+    cli_printf(intf, "%-20s:        %s"CLI_EOL,
+        trace_str[i],
+        trace_is_on(i) ? "enabled" : "disabled");
+  }
+}
+
+static void
+cli_command_trace_set(cli_intf_t* intf, int argc, const char** argv)
+{
+  int trace_ndx;
+
+  cli_printf(intf, CLI_EOL);
+
+  if(argc != 3 || 
+     !(strcmp(argv[1], "on") == 0 || strcmp(argv[1], "off") == 0))
+  {
+    cli_printf(intf, "invalid argument!!!"CLI_EOL CLI_EOL);
+    cli_printf(intf, "%s on|off component"CLI_EOL, argv[0]);
+    return;
+  }
+
+  trace_ndx = trace_get_str_ndx(argv[2]);
+  if(trace_ndx == -1)
+  {
+    cli_printf(intf, "unknown component: %s"CLI_EOL, argv[2]);
+    return;
+  }
+
+  if(strcmp(argv[1], "on") == 0)
+  {
+    cli_printf(intf, "enabled trace for %s"CLI_EOL, argv[2]);
+    trace_on(trace_ndx);
+  }
+  else {
+    cli_printf(intf, "disabled trace for %s"CLI_EOL, argv[2]);
+    trace_off(trace_ndx);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -58,6 +58,7 @@ C_DEFS  = -DTRACE_ENABLED
 #######################################
 C_INCLUDES =                              \
 -Isrc/utils                               \
+-Isrc/app                                 \
 -I$(LIBEV_DIR)/include
 
 LIBS = -lev -lpthread -lm

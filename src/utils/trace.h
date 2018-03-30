@@ -4,6 +4,7 @@
 #include "common_def.h"
 #include "debug_log.h"
 #include "hex_dump.h"
+#include "app_trace.h"
 
 #define TRACE_COMP(__component__)           (__TRACE__ ## __component__)
 #define TRACE_ON(__component__)             trace_on(TRACE_COMP(__component__))
@@ -49,6 +50,7 @@ enum {
   TRACE_DEF(MB_RTU_MASTER),
   TRACE_DEF(MB_TCP_MASTER),
   TRACE_DEF(MB_MASTER),
+  APP_TRACE_DEFS
   __TRACE_MAX,
 } trace_item_t;
 
@@ -58,5 +60,7 @@ extern void trace_init(uint32_t* inits, int num_elem);
 extern void trace_on(uint32_t);
 extern void trace_off(uint32_t);
 extern bool trace_is_on(uint32_t);
+extern int  trace_get_str_ndx(const char* name);
+extern const char** trace_get_strs(int* num_elem);
 
 #endif /* !__TRACE_DEF_H__ */
