@@ -70,7 +70,7 @@ main(int argc, char** argv)
 
   debug_log("starting system\n");
 
-  trace_init(_initial_trace_setup, sizeof(_initial_trace_setup)/sizeof(uint32_t));
+  trace_init(_initial_trace_setup, NARRAY(_initial_trace_setup));
 
   evloop_default(&_main_thread);
 }

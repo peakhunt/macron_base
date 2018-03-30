@@ -82,7 +82,7 @@ cli_command_help(cli_intf_t* intf, int argc, const char** argv)
 
   for(i = 0; i < sizeof(_core_commands)/sizeof(cli_command_t); i++)
   {
-    cli_printf(intf, "%-10s: ", _core_commands[i].command);
+    cli_printf(intf, "%-20s: ", _core_commands[i].command);
     cli_printf(intf, "%s"CLI_EOL, _core_commands[i].help_str);
   }
 
