@@ -11,10 +11,11 @@
 
 set -e
 
-MACRON_BOG="/home/hkim/macron_base/build/macron_bog"
+NAME="macron_bog"
+PROG_PATH="/home/hkim/macron_base/build/macron_bog"
 
 # Check for daemon presence
-[ -x "$MACRON_BOG" ] || exit 0
+[ -x "$PROG_PATH" ] || exit 0
 
 OPTIONS=""
 MODULES=""
@@ -24,13 +25,13 @@ MODULES=""
 
 case "$1" in
   start)
-    log_begin_msg "Starting macron_bog..."
-    start-stop-daemon --start --quiet --oknodo --exec "$MACRON_BOG" -- $OPTIONS
+    log_begin_msg "Starting ${NAME}..."
+    start-stop-daemon --start --quiet --oknodo --exec "$PROG_PATH" -- $OPTIONS
     log_end_msg $?
     ;;
   stop)
-    log_begin_msg "Stopping macron_bog..."
-    start-stop-daemon --stop --quiet --oknodo --retry 2 --exec "$MACRON_BOG"
+    log_begin_msg "Stopping ${NAME}..."
+    start-stop-daemon --stop --quiet --oknodo --retry 2 --exec "$PROG_PATH"
     log_end_msg $?
     ;;
   restart)
@@ -39,11 +40,11 @@ case "$1" in
     $0 start
     ;;
   reload|force-reload)
-    log_begin_msg "Reloading macron_bog..."
-    start-stop-daemon --stop --signal 1 --exec "$MACRON_BOG"
+    log_begin_msg "Reloading ${NAME}..."
+    start-stop-daemon --stop --signal 1 --exec "$PROG_PATH"
     log_end_msg $?
     ;;
   *)
-    log_success_msg "Usage: /etc/init.d/macron_bog {start|stop|restart|reload|force-reload}"
+    log_success_msg "Usage: /etc/init.d/$0 {start|stop|restart|reload|force-reload}"
     exit 1
 esac
