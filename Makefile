@@ -81,6 +81,7 @@ endif
 #######################################
 BUILD_DIR = build
 TARGET    = macron_bog
+MIGRATION = config_migration
 
 #######################################
 # compile & link flags
@@ -95,7 +96,7 @@ LDFLAGS +=  $(LIBDIR) $(LIBS)
 #######################################
 # build target
 #######################################
-all: $(BUILD_DIR)/$(TARGET)
+all: $(BUILD_DIR)/$(TARGET) $(BUILD_DIR)/$(MIGRATION)
 
 #######################################
 # target source setup
@@ -108,9 +109,9 @@ TEST_SOURCES := $(LIB_UTILS_SOURCES) $(TEST_C_SOURCE) $(TEST_MAIN_C_SOURCE)
 TEST_OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(TEST_SOURCES:.c=.o)))
 vpath %.c $(sort $(dir $(TEST_SOURCES)))
 
-JSON_GEN_SOURCES := $(LIB_UTILS_SOURCES) src/app/json_gen_patch.c
-JSON_GEN_OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(JSON_GEN_SOURCES:.c=.o)))
-vpath %.c $(sort $(dir $(JSON_GEN_SOURCES)))
+MIGRATION_SOURCES := $(LIB_UTILS_SOURCES) src/app/config_migration.c
+MIGRATION_OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(MIGRATION_SOURCES:.c=.o)))
+vpath %.c $(sort $(dir $(MIGRATION_SOURCES)))
 
 #######################################
 # C source build rule
@@ -123,7 +124,7 @@ $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR)
 # main target
 #######################################
 $(BUILD_DIR)/$(TARGET): $(OBJECTS) Makefile
-	@echo "[LD]         $(TARGET)"
+	@echo "[LD]         $@"
 	$Q$(CC) $(OBJECTS) $(LDFLAGS) -o $@
 
 $(BUILD_DIR):
@@ -134,7 +135,7 @@ $(BUILD_DIR):
 # test target
 #######################################
 $(BUILD_DIR)/test_$(TARGET): $(TEST_OBJECTS) Makefile
-	@echo "[LD]         test_$(TARGET)"
+	@echo "[LD]         $@"
 	$Q$(CC) $(TEST_OBJECTS) $(LDFLAGS) -lcunit -o $@
 	$(BUILD_DIR)/test_$(TARGET)
 
@@ -143,16 +144,11 @@ test: $(BUILD_DIR)/test_$(TARGET)
 # separation mark. \t is above there. be careful
 
 #######################################
-# json_gen_patch
+# config_migration
 #######################################
-$(BUILD_DIR)/json_gen_patch: $(JSON_GEN_OBJECTS) Makefile
-	@echo "[LD]         json_gen_patch"
-	$Q$(CC) $(JSON_GEN_OBJECTS) $(LDFLAGS) -o $@
-
-json_gen_patch: $(BUILD_DIR)/json_gen_patch
-	
-# separation mark. \t is above there. be careful
-
+$(BUILD_DIR)/config_migration: $(MIGRATION_OBJECTS) Makefile
+	@echo "[LD]         $@"
+	$Q$(CC) $(MIGRATION_OBJECTS) $(LDFLAGS) -o $@
 
 #######################################
 # clean up

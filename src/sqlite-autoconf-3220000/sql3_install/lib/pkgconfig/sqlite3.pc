@@ -1,0 +1,13 @@
+# Package Information for pkg-config
+
+prefix=/home/hkim/macron_base/src/sqlite-autoconf-3220000/sql3_install
+exec_prefix=/home/hkim/macron_base/src/sqlite-autoconf-3220000/sql3_install
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: SQLite
+Description: SQL database engine
+Version: 3.22.0
+Libs: -L${libdir} -lsqlite3
+Libs.private: -lz -ldl -lpthread 
+Cflags: -I${includedir}

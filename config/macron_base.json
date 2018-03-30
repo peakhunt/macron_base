@@ -1,4 +1,9 @@
 {
+  "schema": {
+    "version": 1,
+    "last_update": "Mar/30/2018"
+  },
+
   "cli": {
     "prompt": "macron_bog> ",
     "telnet": {
