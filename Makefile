@@ -34,6 +34,18 @@ src/utils/hex_dump.c                                \
 src/utils/trace.c                                   \
 src/utils/debug_log.c
 
+LIB_MODBUS_SOURCES =                                \
+src/modbus/modbus_util.c                            \
+src/modbus/mbap_reader.c                            \
+src/modbus/modbus_rtu_request_handler.c             \
+src/modbus/modbus_func_coils.c                      \
+src/modbus/modbus_func_discrete.c                   \
+src/modbus/modbus_func_holding.c                    \
+src/modbus/modbus_func_input.c                      \
+src/modbus/modbus_tcp_slave.c                       \
+src/modbus/modbus_rtu_slave.c                       \
+src/modbus/modbus_crc.c
+
 APP_SOURCES =                                       \
 src/app/main.c                                      \
 src/app/app_cli.c                                   \
@@ -58,6 +70,7 @@ C_DEFS  = -DTRACE_ENABLED
 #######################################
 C_INCLUDES =                              \
 -Isrc/utils                               \
+-Isrc/modbus                              \
 -Isrc/app                                 \
 -I$(LIBEV_DIR)/include
 
@@ -102,7 +115,7 @@ all: $(BUILD_DIR)/$(TARGET) $(BUILD_DIR)/$(MIGRATION)
 #######################################
 # target source setup
 #######################################
-TARGET_SOURCES := $(LIB_UTILS_SOURCES) $(APP_SOURCES)
+TARGET_SOURCES := $(LIB_UTILS_SOURCES) $(LIB_MODBUS_SOURCES) $(APP_SOURCES)
 OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(TARGET_SOURCES:.c=.o)))
 vpath %.c $(sort $(dir $(TARGET_SOURCES)))
 

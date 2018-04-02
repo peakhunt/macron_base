@@ -1,0 +1,12 @@
+
+
+        modbus User
+            |
+            |
+            |
+    =====================
+      modbus_slave_ctx
+                                <--------   ModbusTCPSlave
+      user supplied 
+      callbacks
+    =====================
