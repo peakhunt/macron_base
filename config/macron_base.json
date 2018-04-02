@@ -18,5 +18,26 @@
       "stop_bit": 1,
       "parity": "none"
     }
-  }
+  },
+
+  "modbus_slave_list" : [
+    {
+      "protocol": "tcp",
+      "address" : 15,
+      "param" : {
+        "port"    : 8080
+      }
+    },
+    {
+      "protocol": "rtu",
+      "address" : 16,
+      "param" : {
+        "serial_port": "/dev/ttyUSB0",
+        "baud": 115200,
+        "data_bit": 8,
+        "stop_bit": 1,
+        "parity": "none"
+      }
+    }
+  ]
 }
