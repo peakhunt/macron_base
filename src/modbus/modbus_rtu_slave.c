@@ -299,8 +299,17 @@ modbus_rtu_stream_callback(stream_t* stream, stream_event_t evt)
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void
-modbus_rtu_slave_init(ModbusRTUSlave* slave, uint8_t device_addr, int fd)
+modbus_rtu_slave_init(ModbusRTUSlave* slave, uint8_t device_addr, const char* port, SerialConfig* cfg)
 {
+  int   fd;
+
+  fd = serial_init(port, cfg);
+  if(fd < 0)
+  {
+    TRACE(MB_RTU_SLAVE, "failed to initialize serial %s\n", port);
+    return;
+  }
+
   slave->stream.cb    = modbus_rtu_stream_callback;
   stream_init_with_fd(&slave->stream, fd, slave->rx_bounce_buf, 128, MB_SER_RTU_PDU_SIZE_MAX * 3);
 

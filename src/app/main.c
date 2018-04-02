@@ -7,12 +7,14 @@
 #include "trace.h"
 #include "app_config.h"
 #include "app_cli.h"
+#include "app_modbus.h"
 
 static void main_thread_init(evloop_thread_t* thrd);
 
 static uint32_t   _initial_trace_setup[] =
 {
   TRACE_COMP(MAIN),
+  TRACE_COMP(APP_START),
   TRACE_COMP(TEST),
   TRACE_COMP(TASK),
   TRACE_COMP(SOCK_ERR),
@@ -38,6 +40,7 @@ static void
 main_thread_init(evloop_thread_t* thrd)
 {
   app_cli_init();
+  app_modbus_init();
 }
 
 static void

@@ -68,6 +68,14 @@ app_config_get_serial_parity(cJSON* node, const char* name)
   exit(APP_CONFIG_ERROR_EXIT_VALUE);
 }
 
+static inline void
+app_config_get_serial_cfg(cJSON* node, SerialConfig* scfg)
+{
+  scfg->baud = app_config_get_int(node, "baud");
+  scfg->data_bit = app_config_get_int(node, "data_bit");
+  scfg->stop_bit = app_config_get_int(node, "stop_bit");
+  scfg->parity = app_config_get_serial_parity(node, "parity");
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -111,8 +119,57 @@ app_config_get_cli_config(cli_config_t* cli_cfg)
   node = app_config_get_node(cli, "serial");
   cli_cfg->serial_enabled = app_config_get_bool(node, "enabled");
   cli_cfg->serial_port = app_config_get_str(node, "serial_port");
-  cli_cfg->serial_cfg.baud = app_config_get_int(node, "baud");
-  cli_cfg->serial_cfg.data_bit = app_config_get_int(node, "data_bit");
-  cli_cfg->serial_cfg.stop_bit = app_config_get_int(node, "stop_bit");
-  cli_cfg->serial_cfg.parity = app_config_get_serial_parity(node, "parity");
+
+  app_config_get_serial_cfg(node, &cli_cfg->serial_cfg);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Modbus Slave configuration parameter
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int
+app_config_get_num_modbus_slaves(void)
+{
+  cJSON   *slave_list;
+
+  slave_list = app_config_get_node(_jroot, "modbus_slave_list");
+
+  return cJSON_GetArraySize(slave_list);
+}
+
+void
+app_config_get_modbus_slaves_at(int ndx, app_modbus_slave_config_t* cfg)
+{
+  cJSON       *slave_list,
+              *node,
+              *param;
+  const char  *str;
+
+  slave_list = app_config_get_node(_jroot, "modbus_slave_list");
+  node = cJSON_GetArrayItem(slave_list, ndx);
+
+  str = app_config_get_str(node, "protocol");
+  if(strcmp(str, "tcp") == 0)
+  {
+    cfg->protocol = app_modbus_slave_type_tcp;
+  }
+  else
+  {
+    cfg->protocol = app_modbus_slave_type_rtu;
+  }
+
+  cfg->address = (uint16_t)app_config_get_int(node, "address");
+
+  param = app_config_get_node(node, "param");
+
+  if(cfg->protocol == app_modbus_slave_type_tcp)
+  {
+    cfg->tcp_port = app_config_get_int(param, "port");
+  }
+  else
+  {
+    cfg->serial_port = app_config_get_str(param, "serial_port");
+    app_config_get_serial_cfg(param, &cfg->serial_cfg);
+  }
 }

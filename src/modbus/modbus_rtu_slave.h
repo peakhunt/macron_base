@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "evloop_timer.h"
 #include "watcher.h"
-
+#include "serial.h"
 #include "modbus_slave.h"
 #include "stream.h"
 
@@ -61,7 +61,7 @@ typedef struct
   stream_t              stream;
 } ModbusRTUSlave;
 
-extern void modbus_rtu_slave_init(ModbusRTUSlave* slave, uint8_t device_addr, int fd);
+extern void modbus_rtu_slave_init(ModbusRTUSlave* slave, uint8_t device_addr, const char* port, SerialConfig* cfg);
 extern void modbus_rtu_slave_start(ModbusRTUSlave* slave);
 extern void modbus_rtu_slave_stop(ModbusRTUSlave* slave);
 

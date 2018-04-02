@@ -49,6 +49,7 @@ src/modbus/modbus_crc.c
 APP_SOURCES =                                       \
 src/app/main.c                                      \
 src/app/app_cli.c                                   \
+src/app/app_modbus.c                                \
 src/app/app_config.c
 
 TEST_C_SOURCE =                                     \

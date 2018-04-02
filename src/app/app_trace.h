@@ -4,10 +4,10 @@
 #include "trace.h"
 
 #define APP_TRACE_DEFS  \
-  TRACE_DEF(APP_TEST_1),
+  TRACE_DEF(APP_START),
 
 #define APP_TRACE_STRS  \
-  "APP_TEST_1"
+  "APP_START"
 
 
 #endif /*!__APP_TRACE_DEF_H__ */

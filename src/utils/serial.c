@@ -20,14 +20,14 @@ check_serial_config(const SerialConfig* config)
 {
   static const int allowed_bauds[] = 
   {
-    B1200,
-    B2400,
-    B4800,
-    B9600,
-    B19200,
-    B38400,
-    B57600,
-    B115200,
+    1200,
+    2400,
+    4800,
+    9600,
+    19200,
+    38400,
+    57600,
+    115200,
   };
   int i;
 
@@ -54,6 +54,34 @@ check_serial_config(const SerialConfig* config)
   return FALSE;
 }
 
+static int
+get_serial_baudrate(int baud)
+{
+  static const int _bauds[] = 
+  {
+    B1200,
+    B2400,
+    B4800,
+    B9600,
+    B19200,
+    B38400,
+    B57600,
+    B115200,
+  };
+  int i;
+
+
+  for(i = 0; i < NARRAY(_bauds); i++)
+  {
+    if(baud == _bauds[i])
+    {
+      return _bauds[i];
+    }
+  }
+
+  return B9600;
+}
+
 static void
 set_serial_attribute(int fd, const SerialConfig* config)
 {
@@ -67,8 +95,8 @@ set_serial_attribute(int fd, const SerialConfig* config)
   tty.c_oflag       = 0;     // output option
 
   // speed
-  cfsetospeed(&tty, config->baud);
-  cfsetispeed(&tty, config->baud);
+  cfsetospeed(&tty, get_serial_baudrate(config->baud));
+  cfsetispeed(&tty, get_serial_baudrate(config->baud));
 
   // databit
   tty.c_cflag |= (config->data_bit == 7 ? 0 : CS8);
