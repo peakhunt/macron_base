@@ -32,6 +32,7 @@ src/utils/cli_serial.c                              \
 src/utils/telnet_reader.c                           \
 src/utils/hex_dump.c                                \
 src/utils/trace.c                                   \
+src/utils/lookup_table.c                            \
 src/utils/debug_log.c
 
 LIB_MODBUS_SOURCES =                                \
@@ -53,7 +54,8 @@ src/app/app_modbus.c                                \
 src/app/app_config.c
 
 TEST_C_SOURCE =                                     \
-test/cmd_option_test.c
+test/cmd_option_test.c                              \
+test/lookup_table_test.c
 
 TEST_MAIN_C_SOURCE =                                \
 test/test_main.c
