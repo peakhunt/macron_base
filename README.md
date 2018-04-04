@@ -2,5 +2,7 @@
 
 library dependencies
 
+core --> modbus
+     --> utils 
 
 modbus ---> utils --->  libev

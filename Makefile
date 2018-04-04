@@ -48,6 +48,10 @@ src/modbus/modbus_rtu_slave.c                       \
 src/modbus/modbus_regs.c                            \
 src/modbus/modbus_crc.c
 
+LIB_CORE_SOURCES =                                  \
+src/core/channel.c                                  \
+src/core/channel_manager.c
+
 APP_SOURCES =                                       \
 src/app/main.c                                      \
 src/app/app_cli.c                                   \
@@ -120,11 +124,11 @@ all: $(BUILD_DIR)/$(TARGET) $(BUILD_DIR)/$(MIGRATION)
 #######################################
 # target source setup
 #######################################
-TARGET_SOURCES := $(LIB_UTILS_SOURCES) $(LIB_MODBUS_SOURCES) $(APP_SOURCES)
+TARGET_SOURCES := $(LIB_UTILS_SOURCES) $(LIB_MODBUS_SOURCES) $(LIB_CORE_SOURCES) $(APP_SOURCES)
 OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(TARGET_SOURCES:.c=.o)))
 vpath %.c $(sort $(dir $(TARGET_SOURCES)))
 
-TEST_SOURCES := $(LIB_UTILS_SOURCES) $(TEST_C_SOURCE) $(TEST_MAIN_C_SOURCE) $(LIB_MODBUS_SOURCES)
+TEST_SOURCES := $(LIB_UTILS_SOURCES) $(TEST_C_SOURCE) $(TEST_MAIN_C_SOURCE) $(LIB_MODBUS_SOURCES) $(LIB_CORE_SOURCES)
 TEST_OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(TEST_SOURCES:.c=.o)))
 vpath %.c $(sort $(dir $(TEST_SOURCES)))
 
