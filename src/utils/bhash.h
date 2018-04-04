@@ -31,10 +31,12 @@ typedef struct hash_context
    int32_t            key_offset;       /** hash key offset                    */
    int32_t            key_size;         /** hash key size                      */
    hash_func          calc_hash;        /** hash function to use               */
-   struct list_head* buckets;           /** bucket list                        */
+   struct list_head*  buckets;          /** bucket list                        */
 } BHashContext;
 
 extern void bhash_init(BHashContext* hash, struct list_head* buckets, int32_t numBuckets,
+    int32_t hash_offset, int32_t key_offset, int32_t key_size, hash_func func);
+extern void bhash_init_malloc(BHashContext* hash, int32_t numBuckets,
     int32_t hash_offset, int32_t key_offset, int32_t key_size, hash_func func);
 extern void bhash_deinit(BHashContext* hash);
 extern int32_t bhash_add(BHashContext* hash, void* element);

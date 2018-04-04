@@ -21,6 +21,8 @@ void test_cmd_options1(void)
   cmd_opt_handle(3, argv);
 
   CU_ASSERT(opt->foreground == TRUE);
+
+  CU_PASS("test_cmd_options1() succeeded");
 }
 
 void

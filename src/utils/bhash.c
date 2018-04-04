@@ -1,10 +1,3 @@
-//
-// a simple generic bucket hash implementation
-//
-// Revision History
-// - Oct/22/2012 initial release by hkim
-//
-//
 #include <stdlib.h>
 #include <string.h>
 #include "bhash.h"
@@ -89,6 +82,20 @@ bhash_init(BHashContext* hash, struct list_head* buckets, int32_t numBuckets, in
   {
     INIT_LIST_HEAD(&hash->buckets[i]);
   }
+}
+
+void
+bhash_init_malloc(BHashContext* hash, int32_t numBuckets,
+    int32_t hash_offset, int32_t key_offset, int32_t key_size, hash_func func)
+{
+  struct list_head* buckets;
+
+  //
+  // FIXME a flag to mark malloc for deinit
+  //
+  buckets = (struct list_head*)malloc(sizeof(struct list_head) * numBuckets);
+
+  bhash_init(hash, buckets, numBuckets, hash_offset, key_offset, key_size, func);
 }
 
 /**

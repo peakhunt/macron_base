@@ -7,7 +7,7 @@
 
 void test_lookup_table(void)
 {
-  #define SIZE        1024
+  #define SIZE        5000000
 
   lookup_table_t      table;
   float               v;
@@ -22,21 +22,29 @@ void test_lookup_table(void)
   lookup_table_build_btree(&table);
 
   v = lookup_table_interpolate(&table, 5.5);
-  printf("5.5 => %.2f\n", v);
+  CU_ASSERT(v == 550.00f);
+
   v = lookup_table_interpolate(&table, 0.5);
-  printf("0.5 => %.2f\n", v);
+  CU_ASSERT(v == 50.00f);
+
   v = lookup_table_interpolate(&table, 9.5);
-  printf("9.5 => %.2f\n", v);
+  CU_ASSERT(v == 950.00f);
+
   v = lookup_table_interpolate(&table, 7.5);
-  printf("7.5 => %.2f\n", v);
+  CU_ASSERT(v == 750.00f);
+
   v = lookup_table_interpolate(&table, SIZE - 1);
-  printf("%d => %.2f\n", SIZE - 1, v);
+  CU_ASSERT(v == 499999904.00f);
+
   v = lookup_table_interpolate(&table, SIZE);
-  printf("%d => %.2f\n", SIZE, v);
+  CU_ASSERT(v == 500000000.00f);
+
   v = lookup_table_interpolate(&table, -1);
-  printf("-1 => %.2f\n", v);
+  CU_ASSERT(v == -100.00f);
 
   lookup_table_deinit(&table);
+
+  CU_PASS("test_lookup_table() succeeded");
 
 }
 
