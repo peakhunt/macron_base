@@ -2,10 +2,16 @@
 #include <stdio.h>
 #include <string.h>
 #include "lookup_table.h"
+#include "math_util.h"
 
 #define LEFT_NODE(n)      ( 2 * n + 1)
 #define RIGHT_NODE(n)     ( 2 * n + 2)
 
+////////////////////////////////////////////////////////////////////////////////
+//
+// private utilities
+//
+////////////////////////////////////////////////////////////////////////////////
 static void
 __build_binary_tree(lookup_table_t* table, int start, int end, int current)
 {
@@ -24,6 +30,11 @@ __build_binary_tree(lookup_table_t* table, int start, int end, int current)
   __build_binary_tree(table, mid + 1, end, RIGHT_NODE(current));
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//
+// public interfaces
+//
+////////////////////////////////////////////////////////////////////////////////
 void
 lookup_table_init(lookup_table_t* table, int size)
 {
@@ -111,38 +122,8 @@ lookup_table_interpolate(lookup_table_t* table, float v)
   first   = ndx < adj ? &table->items[ndx] : &table->items[adj];
   second  = ndx < adj ? &table->items[adj] : &table->items[ndx];
 
-  // FIXME
-  (void)first;
-  (void)second;
-  return 0.0f;
+  return linear_interpolate_float(
+              first->v1, first->v2,
+              second->v1, second->v2,
+              v);
 }
-
-#if 0
-int
-main()
-{
-//#define SIZE      500000
-#define SIZE      32
-
-  lookup_table_t      table;
-
-  lookup_table_init(&table, SIZE);
-
-  for(int i = 0; i < SIZE; i++)
-  {
-    lookup_table_add(&table, i, i * 100, i);
-  }
-
-  lookup_table_build_btree(&table);
-
-  lookup_table_interpolate(&table, 5.5);
-  lookup_table_interpolate(&table, 0.5);
-  lookup_table_interpolate(&table, 9.5);
-  lookup_table_interpolate(&table, 7.5);
-  lookup_table_interpolate(&table, SIZE - 1);
-  lookup_table_interpolate(&table, SIZE);
-  lookup_table_interpolate(&table, -1);
-
-  lookup_table_deinit(&table);
-}
-#endif

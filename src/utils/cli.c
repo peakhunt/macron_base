@@ -16,7 +16,7 @@ extern void cli_serial_intf_init(const char* port, SerialConfig* scfg);
 //
 ////////////////////////////////////////////////////////////////////////////////
 #define CLI_MAX_COLUMNS_PER_LINE          512
-#define VERSION                           "KongjaExpress CLI V1.0"
+#define VERSION                           "Macron Base CLI V1.0"
 
 #define CLI_EOL                           "\r\n"
 #define CLI_EOL_CHAR                      '\r'
