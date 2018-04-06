@@ -1,0 +1,318 @@
+{
+  "schema": {
+    "version": 1,
+    "last_update": "Mar/30/2018"
+  },
+
+  "cli": {
+    "prompt": "macron_bog> ",
+    "telnet": {
+      "enabled": true,
+      "port": 9090
+    },
+    "serial": {
+      "enabled": false,
+      "serial_port": "/dev/ttyUSB0",
+      "baud": 115200,
+      "data_bit": 8,
+      "stop_bit": 1,
+      "parity": "none"
+    }
+  },
+
+  "modbus_slave_list" : [
+    {
+      "protocol": "tcp",
+      "address" : 15,
+      "param" : {
+        "port"    : 8080
+      },
+      "regs": "test_reg_setup1"
+    },
+    {
+      "protocol": "rtu",
+      "address" : 16,
+      "param" : {
+        "serial_port": "/dev/ttyUSB0",
+        "baud": 115200,
+        "data_bit": 8,
+        "stop_bit": 1,
+        "parity": "none"
+      },
+      "regs": "test_reg_setup1"
+    }
+  ],
+
+  "channels": [
+    {
+      "name": "test digital input channel #1",
+      "chnl_num": 1,
+      "chnl_type": "digital",
+      "chnl_dir": "input"
+    },
+    {
+      "name": "test digital input channel #2",
+      "chnl_num": 2,
+      "chnl_type": "digital",
+      "chnl_dir": "input"
+    },
+    {
+      "name": "test digital input channel #3",
+      "chnl_num": 3,
+      "chnl_type": "digital",
+      "chnl_dir": "input"
+    },
+    {
+      "name": "test digital input channel #4",
+      "chnl_num": 4,
+      "chnl_type": "digital",
+      "chnl_dir": "input"
+    },
+    {
+      "name": "test digital input channel #5",
+      "chnl_num": 5,
+      "chnl_type": "digital",
+      "chnl_dir": "input"
+    },
+    {
+      "name": "test digital output channel #6",
+      "chnl_num": 6,
+      "chnl_type": "digital",
+      "chnl_dir": "output"
+    },
+    {
+      "name": "test digital output channel #7",
+      "chnl_num": 7,
+      "chnl_type": "digital",
+      "chnl_dir": "output"
+    },
+    {
+      "name": "test digital output channel #8",
+      "chnl_num": 8,
+      "chnl_type": "digital",
+      "chnl_dir": "output"
+    },
+    {
+      "name": "test digital output channel #9",
+      "chnl_num": 9,
+      "chnl_type": "digital",
+      "chnl_dir": "output"
+    },
+    {
+      "name": "test digital output channel #10",
+      "chnl_num": 10,
+      "chnl_type": "digital",
+      "chnl_dir": "output"
+    },
+    {
+      "name": "test analog input channel #11",
+      "chnl_num": 11,
+      "chnl_type": "analog",
+      "chnl_dir": "input"
+    },
+    {
+      "name": "test analog input channel #12",
+      "chnl_num": 12,
+      "chnl_type": "analog",
+      "chnl_dir": "input"
+    },
+    {
+      "name": "test analog input channel #13",
+      "chnl_num": 13,
+      "chnl_type": "analog",
+      "chnl_dir": "input"
+    },
+    {
+      "name": "test analog input channel #14",
+      "chnl_num": 14,
+      "chnl_type": "analog",
+      "chnl_dir": "input"
+    },
+    {
+      "name": "test analog input channel #15",
+      "chnl_num": 15,
+      "chnl_type": "analog",
+      "chnl_dir": "input"
+    },
+    {
+      "name": "test analog output channel #16",
+      "chnl_num": 16,
+      "chnl_type": "analog",
+      "chnl_dir": "output"
+    },
+    {
+      "name": "test analog output channel #17",
+      "chnl_num": 17,
+      "chnl_type": "analog",
+      "chnl_dir": "output"
+    },
+    {
+      "name": "test analog output channel #18",
+      "chnl_num": 18,
+      "chnl_type": "analog",
+      "chnl_dir": "output"
+    },
+    {
+      "name": "test analog output channel #19",
+      "chnl_num": 19,
+      "chnl_type": "analog",
+      "chnl_dir": "output"
+    },
+    {
+      "name": "test analog output channel #20",
+      "chnl_num": 20,
+      "chnl_type": "analog",
+      "chnl_dir": "output"
+    },
+    {
+      "name": "test analog output channel #21",
+      "chnl_num": 21,
+      "chnl_type": "analog",
+      "chnl_dir": "output"
+    },
+    {
+      "name": "test analog output channel #22",
+      "chnl_num": 22,
+      "chnl_type": "analog",
+      "chnl_dir": "output"
+    },
+    {
+      "name": "test analog output channel #23",
+      "chnl_num": 23,
+      "chnl_type": "analog",
+      "chnl_dir": "output"
+    },
+    {
+      "name": "test analog output channel #24",
+      "chnl_num": 24,
+      "chnl_type": "analog",
+      "chnl_dir": "output"
+    },
+    {
+      "name": "test analog output channel #25",
+      "chnl_num": 25,
+      "chnl_type": "analog",
+      "chnl_dir": "output"
+    },
+    {
+      "name": "test analog output channel #26",
+      "chnl_num": 26,
+      "chnl_type": "analog",
+      "chnl_dir": "output"
+    },
+    {
+      "name": "test analog output channel #27",
+      "chnl_num": 27,
+      "chnl_type": "analog",
+      "chnl_dir": "output"
+    },
+    {
+      "name": "test analog output channel #28",
+      "chnl_num": 28,
+      "chnl_type": "analog",
+      "chnl_dir": "output"
+    },
+    {
+      "name": "test analog output channel #29",
+      "chnl_num": 29,
+      "chnl_type": "analog",
+      "chnl_dir": "output"
+    },
+    {
+      "name": "test analog output channel #30",
+      "chnl_num": 30,
+      "chnl_type": "analog",
+      "chnl_dir": "output"
+    },
+    {
+      "name": "test analog output channel #31",
+      "chnl_num": 31,
+      "chnl_type": "analog",
+      "chnl_dir": "input"
+    },
+    {
+      "name": "test analog output channel #32",
+      "chnl_num": 32,
+      "chnl_type": "analog",
+      "chnl_dir": "input"
+    },
+    {
+      "name": "test analog output channel #33",
+      "chnl_num": 33,
+      "chnl_type": "analog",
+      "chnl_dir": "input"
+    },
+    {
+      "name": "test analog output channel #34",
+      "chnl_num": 34,
+      "chnl_type": "analog",
+      "chnl_dir": "input"
+    },
+    {
+      "name": "test analog output channel #35",
+      "chnl_num": 35,
+      "chnl_type": "analog",
+      "chnl_dir": "input"
+    },
+    {
+      "name": "test analog output channel #36",
+      "chnl_num": 36,
+      "chnl_type": "analog",
+      "chnl_dir": "input"
+    },
+    {
+      "name": "test analog output channel #37",
+      "chnl_num": 37,
+      "chnl_type": "analog",
+      "chnl_dir": "input"
+    },
+    {
+      "name": "test analog output channel #38",
+      "chnl_num": 38,
+      "chnl_type": "analog",
+      "chnl_dir": "input"
+    },
+    {
+      "name": "test analog output channel #39",
+      "chnl_num": 39,
+      "chnl_type": "analog",
+      "chnl_dir": "input"
+    },
+    {
+      "name": "test analog output channel #04",
+      "chnl_num": 40,
+      "chnl_type": "analog",
+      "chnl_dir": "input"
+    }
+  ],
+
+  "io_channels": {
+    "modbus_reg_list" : {
+      "test_reg_setup1" : [
+        { "io_chnl": 1,  "reg": "coil", "address": 1001, "channel": 1 },
+        { "io_chnl": 2,  "reg": "coil", "address": 1002, "channel": 2 },
+        { "io_chnl": 3,  "reg": "coil", "address": 1003, "channel": 3 },
+        { "io_chnl": 4,  "reg": "coil", "address": 1004, "channel": 4 },
+        { "io_chnl": 5,  "reg": "coil", "address": 1005, "channel": 5 },
+
+        { "io_chnl": 6,  "reg": "disc", "address": 1001, "channel": 6 },
+        { "io_chnl": 7,  "reg": "disc", "address": 1002, "channel": 7 },
+        { "io_chnl": 8,  "reg": "disc", "address": 1003, "channel": 8 },
+        { "io_chnl": 9,  "reg": "disc", "address": 1004, "channel": 9 },
+        { "io_chnl": 10, "reg": "disc", "address": 1005, "channel": 10},
+
+        { "io_chnl": 11, "reg": "hold", "address": 1001, "channel": 11},
+        { "io_chnl": 12, "reg": "hold", "address": 1002, "channel": 12},
+        { "io_chnl": 13, "reg": "hold", "address": 1003, "channel": 13},
+        { "io_chnl": 14, "reg": "hold", "address": 1004, "channel": 14},
+        { "io_chnl": 15, "reg": "hold", "address": 1005, "channel": 15},
+
+        { "io_chnl": 16, "reg": "inpt", "address": 1001, "channel": 16},
+        { "io_chnl": 17, "reg": "inpt", "address": 1002, "channel": 17},
+        { "io_chnl": 18, "reg": "inpt", "address": 1003, "channel": 18},
+        { "io_chnl": 19, "reg": "inpt", "address": 1004, "channel": 19},
+        { "io_chnl": 20, "reg": "inpt", "address": 1005, "channel": 20}
+      ]
+    }
+  }
+}
