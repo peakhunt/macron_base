@@ -160,9 +160,10 @@ $(BUILD_DIR):
 $(BUILD_DIR)/test_$(TARGET): $(TEST_OBJECTS) Makefile
 	@echo "[LD]         $@"
 	$Q$(CC) $(TEST_OBJECTS) $(LDFLAGS) -lcunit -o $@
-	$(BUILD_DIR)/test_$(TARGET)
 
+.PHONY: test
 test: $(BUILD_DIR)/test_$(TARGET)
+	$(BUILD_DIR)/test_$(TARGET)
 	
 # separation mark. \t is above there. be careful
 
