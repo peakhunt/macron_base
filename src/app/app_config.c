@@ -173,3 +173,56 @@ app_config_get_modbus_slaves_at(int ndx, app_modbus_slave_config_t* cfg)
     app_config_get_serial_cfg(param, &cfg->serial_cfg);
   }
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// channel loading
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int
+app_config_get_num_channels(void)
+{
+  cJSON       *channels;
+
+  channels = app_config_get_node(_jroot, "channels");
+
+  return cJSON_GetArraySize(channels);
+}
+
+void
+app_config_get_channel_at(int ndx, app_channel_config_t* chnl_cfg)
+{
+  cJSON       *channels,
+              *node;
+
+  const char* str;
+
+  channels = app_config_get_node(_jroot, "channels");
+  node = cJSON_GetArrayItem(channels, ndx);
+
+  chnl_cfg->chnl_num = app_config_get_int(node, "chnl_num");
+
+  str = app_config_get_str(node, "chnl_type");
+  if(strcmp(str, "digital") == 0)
+  {
+    chnl_cfg->chnl_type = channel_type_digital;
+  }
+  else
+  {
+    chnl_cfg->chnl_type = channel_type_analog;
+  }
+
+  str = app_config_get_str(node, "chnl_dir");
+  if(strcmp(str, "input") == 0)
+  {
+    chnl_cfg->chnl_dir = channel_direction_in;
+  }
+  else if(strcmp(str, "output") == 0)
+  {
+    chnl_cfg->chnl_dir = channel_direction_out;
+  }
+  else
+  {
+    chnl_cfg->chnl_dir = channel_direction_virtual;
+  }
+}

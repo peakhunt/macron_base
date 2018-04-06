@@ -54,6 +54,7 @@ src/core/channel_manager.c
 
 APP_SOURCES =                                       \
 src/app/main.c                                      \
+src/app/app_core.c                                  \
 src/app/app_cli.c                                   \
 src/app/app_modbus.c                                \
 src/app/app_config.c
@@ -80,6 +81,7 @@ C_DEFS  = -DTRACE_ENABLED
 C_INCLUDES =                              \
 -Isrc/utils                               \
 -Isrc/modbus                              \
+-Isrc/core                                \
 -Isrc/app                                 \
 -I$(LIBEV_DIR)/include
 
