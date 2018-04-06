@@ -24,6 +24,7 @@ const char* _trace_comp_strs[] =
   "MB_RTU_MASTER",
   "MB_TCP_MASTER",
   "MB_MASTER",
+  CORE_TRACE_STRS
   APP_TRACE_STRS
 };
 

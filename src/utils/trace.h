@@ -4,6 +4,7 @@
 #include "common_def.h"
 #include "debug_log.h"
 #include "hex_dump.h"
+#include "core_trace.h"
 #include "app_trace.h"
 
 #define TRACE_COMP(__component__)           (__TRACE__ ## __component__)
@@ -50,6 +51,7 @@ enum {
   TRACE_DEF(MB_RTU_MASTER),
   TRACE_DEF(MB_TCP_MASTER),
   TRACE_DEF(MB_MASTER),
+  CORE_TRACE_DEFS
   APP_TRACE_DEFS
   __TRACE_MAX,
 } trace_item_t;
