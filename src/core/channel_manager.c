@@ -215,3 +215,20 @@ channel_manager_update_output(void)
     pthread_mutex_unlock(&_chnl_mgr_lock);
   }
 }
+
+void
+channel_manager_update_lookup_table(uint32_t chnl_num, lookup_table_t* lookup_table)
+{
+  channel_t* chnl;
+
+  chnl = channel_manager_chnl_get(chnl_num);
+  if(chnl == NULL)
+  {
+    debug_log("%s can't find channel %d\n", __func__, chnl_num);
+    return;
+  }
+
+  channel_set_lookup_table(chnl, lookup_table);
+
+  channel_manager_chnl_put(chnl);
+}
