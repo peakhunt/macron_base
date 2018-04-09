@@ -23,6 +23,7 @@ struct __modbus_slave_ctx
                             uint16_t usNRegs, MBRegisterMode eMode);
   MBErrorCode           (*discrete_cb)(ModbusSlaveCTX* ctx, uint8_t addr, uint8_t * pucRegBuffer, uint16_t usAddress,
                             uint16_t usNRegs);
+  void*                 priv;
 };
 
 static inline void

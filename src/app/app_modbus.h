@@ -3,6 +3,7 @@
 
 #include "common_def.h"
 #include "serial.h"
+#include "modbus_regs.h"
 
 typedef enum
 {
@@ -17,6 +18,7 @@ typedef struct
   int                         tcp_port;
   char*                       serial_port;
   SerialConfig                serial_cfg;
+  int                         reg_group;
 } app_modbus_slave_config_t;
 
 extern void app_modbus_init(void);

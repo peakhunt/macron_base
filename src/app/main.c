@@ -9,6 +9,7 @@
 #include "app_cli.h"
 #include "app_modbus.h"
 #include "app_core.h"
+#include "io_channel_map.h"
 
 static void main_thread_init(evloop_thread_t* thrd);
 
@@ -26,8 +27,8 @@ static uint32_t   _initial_trace_setup[] =
   TRACE_COMP(CLI_TELNET),
   TRACE_COMP(CLI_SERIAL),
   TRACE_COMP(CLI),
-  TRACE_COMP(MB_TCP_SLAVE),
-  TRACE_COMP(MBAP),
+  //TRACE_COMP(MB_TCP_SLAVE),
+  //TRACE_COMP(MBAP),
   TRACE_COMP(MB_RTU_SLAVE),
   TRACE_COMP(MB_RTU_MASTER),
   TRACE_COMP(MB_TCP_MASTER),
@@ -43,6 +44,8 @@ static evloop_thread_t      _main_thread =
 static void
 main_thread_init(evloop_thread_t* thrd)
 {
+  io_channel_map_init();
+
   app_core_init();
   app_cli_init();
   app_modbus_init();

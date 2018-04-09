@@ -27,7 +27,7 @@
       "param" : {
         "port"    : 8080
       },
-      "regs": "test_reg_setup1"
+      "regs": "testRegSet1"
     },
     {
       "protocol": "rtu",
@@ -39,7 +39,7 @@
         "stop_bit": 1,
         "parity": "none"
       },
-      "regs": "test_reg_setup1"
+      "regs": "testRegSet1"
     }
   ],
 
@@ -30047,32 +30047,35 @@
   ],
 
   "io_channels": {
-    "modbus_reg_list" : {
-      "test_reg_setup1" : [
-        { "io_chnl": 1,  "reg": "coil", "address": 1001, "channel": 1 },
-        { "io_chnl": 2,  "reg": "coil", "address": 1002, "channel": 2 },
-        { "io_chnl": 3,  "reg": "coil", "address": 1003, "channel": 3 },
-        { "io_chnl": 4,  "reg": "coil", "address": 1004, "channel": 4 },
-        { "io_chnl": 5,  "reg": "coil", "address": 1005, "channel": 5 },
+    "modbus_reg_list" : [
+      {
+        "name": "testRegSet1",
+        "regs": [
+          { "reg": "coil", "address": 1001, "channel": 1 },
+          { "reg": "coil", "address": 1002, "channel": 2 },
+          { "reg": "coil", "address": 1003, "channel": 3 },
+          { "reg": "coil", "address": 1004, "channel": 4 },
+          { "reg": "coil", "address": 1005, "channel": 5 },
 
-        { "io_chnl": 6,  "reg": "disc", "address": 1001, "channel": 6 },
-        { "io_chnl": 7,  "reg": "disc", "address": 1002, "channel": 7 },
-        { "io_chnl": 8,  "reg": "disc", "address": 1003, "channel": 8 },
-        { "io_chnl": 9,  "reg": "disc", "address": 1004, "channel": 9 },
-        { "io_chnl": 10, "reg": "disc", "address": 1005, "channel": 10},
+          { "reg": "disc", "address": 1001, "channel": 6 },
+          { "reg": "disc", "address": 1002, "channel": 7 },
+          { "reg": "disc", "address": 1003, "channel": 8 },
+          { "reg": "disc", "address": 1004, "channel": 9 },
+          { "reg": "disc", "address": 1005, "channel": 10},
 
-        { "io_chnl": 11, "reg": "hold", "address": 1001, "channel": 11},
-        { "io_chnl": 12, "reg": "hold", "address": 1002, "channel": 12},
-        { "io_chnl": 13, "reg": "hold", "address": 1003, "channel": 13},
-        { "io_chnl": 14, "reg": "hold", "address": 1004, "channel": 14},
-        { "io_chnl": 15, "reg": "hold", "address": 1005, "channel": 15},
+          { "reg": "hold", "address": 1001, "channel": 11},
+          { "reg": "hold", "address": 1002, "channel": 12},
+          { "reg": "hold", "address": 1003, "channel": 13},
+          { "reg": "hold", "address": 1004, "channel": 14},
+          { "reg": "hold", "address": 1005, "channel": 15},
 
-        { "io_chnl": 16, "reg": "inpt", "address": 1001, "channel": 16},
-        { "io_chnl": 17, "reg": "inpt", "address": 1002, "channel": 17},
-        { "io_chnl": 18, "reg": "inpt", "address": 1003, "channel": 18},
-        { "io_chnl": 19, "reg": "inpt", "address": 1004, "channel": 19},
-        { "io_chnl": 20, "reg": "inpt", "address": 1005, "channel": 20}
-      ]
-    }
+          { "reg": "inpt", "address": 1001, "channel": 16},
+          { "reg": "inpt", "address": 1002, "channel": 17},
+          { "reg": "inpt", "address": 1003, "channel": 18},
+          { "reg": "inpt", "address": 1004, "channel": 19},
+          { "reg": "inpt", "address": 1005, "channel": 20}
+        ]
+      }
+    ]
   }
 }

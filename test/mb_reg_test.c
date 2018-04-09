@@ -9,8 +9,7 @@ void
 test_modbus_regs(void)
 {
   modbus_register_list_t      mb_regs;
-  uint32_t                    io_chnl = 0,
-                              chnl = 0;
+  uint32_t                    chnl = 0;
   modbus_register_t*          r;
   int i;
 
@@ -18,20 +17,11 @@ test_modbus_regs(void)
 
   for(int  i = 0; i < 10; i++)
   {
-    modbus_register_list_add(&mb_regs, modbus_reg_coil,     io_chnl++, i, chnl++);
-    modbus_register_list_add(&mb_regs, modbus_reg_discrete, io_chnl++, i, chnl++);
-    modbus_register_list_add(&mb_regs, modbus_reg_holding,  io_chnl++, i, chnl++);
-    modbus_register_list_add(&mb_regs, modbus_reg_input,    io_chnl++, i, chnl++);
+    modbus_register_list_add(&mb_regs, modbus_reg_coil,     i, chnl++);
+    modbus_register_list_add(&mb_regs, modbus_reg_discrete, i, chnl++);
+    modbus_register_list_add(&mb_regs, modbus_reg_holding,  i, chnl++);
+    modbus_register_list_add(&mb_regs, modbus_reg_input,    i, chnl++);
   }
-
-  for(i = 0; i < io_chnl; i++)
-  {
-    r = modbus_register_list_lookup_by_io_chnl(&mb_regs, i);
-    CU_ASSERT(r != NULL);
-  }
-
-  r = modbus_register_list_lookup_by_io_chnl(&mb_regs, io_chnl + 1);
-  CU_ASSERT(r == NULL);
 
   for(i = 0; i < 10; i++)
   {

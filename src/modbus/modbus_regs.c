@@ -14,13 +14,6 @@ modbus_register_list_init(modbus_register_list_t* mb_list)
 
   mb_list->num_regs = 0;
 
-  bhash_init_malloc(&mb_list->hash_by_io_chnl,
-      MODBUS_REGS_NUM_BUCKETS, 
-      offsetof(modbus_register_t, bh_by_io_chnl),
-      offsetof(modbus_register_t, io_chnl_num),
-      sizeof(uint32_t),
-      NULL);
-
   bhash_init_malloc(&mb_list->hash_by_mb_addr,
       MODBUS_REGS_NUM_BUCKETS, 
       offsetof(modbus_register_t, bh_by_mb_addr),
@@ -31,7 +24,7 @@ modbus_register_list_init(modbus_register_list_t* mb_list)
 
 void
 modbus_register_list_add(modbus_register_list_t* mb_list,
-    modbus_reg_type_t reg_type, uint32_t io_chnl, uint32_t mb_addr, uint32_t chnl_num)
+    modbus_reg_type_t reg_type, uint32_t mb_addr, uint32_t chnl_num)
 {
   modbus_register_t*    reg;
 
@@ -39,21 +32,13 @@ modbus_register_list_add(modbus_register_list_t* mb_list,
 
   INIT_LIST_HEAD(&reg->le);
 
-  reg->io_chnl_num          = io_chnl;
   reg->mb_addr.mb_address   = mb_addr;
   reg->mb_addr.reg_type     = reg_type;
   reg->chnl_num             = chnl_num;
 
-  bhash_add(&mb_list->hash_by_io_chnl, (void*)reg);
   bhash_add(&mb_list->hash_by_mb_addr, (void*)reg);
 
   list_add_tail(&reg->le, &mb_list->regs_list);
-}
-
-modbus_register_t*
-modbus_register_list_lookup_by_io_chnl(modbus_register_list_t* mb_list, uint32_t io_chnl)
-{
-  return (modbus_register_t*)bhash_lookup(&mb_list->hash_by_io_chnl, (void*)&io_chnl);
 }
 
 modbus_register_t*

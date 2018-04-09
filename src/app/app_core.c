@@ -29,8 +29,7 @@ app_core_udpate(evloop_timer_t* t, void* arg)
   //
   channel_manager_update_output();
 
-  evloop_timer_start(&_update_timer, 0.025, 0);
-  //evloop_timer_start(&_update_timer, 0.001, 0);
+  evloop_timer_start(&_update_timer, 0.010, 0);
 }
 
 static void
