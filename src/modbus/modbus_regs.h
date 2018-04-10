@@ -15,12 +15,19 @@ typedef enum
   modbus_reg_input
 } modbus_reg_type_t;
 
+typedef enum
+{
+  modbus_reg_op_read,
+  modbus_reg_op_write
+} modbus_reg_op_t;
+
 typedef struct
 {
   uint32_t              slave_id;
   uint32_t              mb_address;
   modbus_reg_type_t     reg_type;
 } modbus_address_t;
+
 
 typedef struct
 {

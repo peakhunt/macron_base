@@ -4,7 +4,6 @@
 #include "common_def.h"
 #include "cli.h"
 #include "app_modbus_slave.h"
-#include "io_channel_map.h"
 #include "app_core.h"
 
 extern void app_config_init(const char* cfg_file);
