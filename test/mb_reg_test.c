@@ -17,38 +17,38 @@ test_modbus_regs(void)
 
   for(int  i = 0; i < 10; i++)
   {
-    modbus_register_list_add(&mb_regs, modbus_reg_coil,     i, chnl++);
-    modbus_register_list_add(&mb_regs, modbus_reg_discrete, i, chnl++);
-    modbus_register_list_add(&mb_regs, modbus_reg_holding,  i, chnl++);
-    modbus_register_list_add(&mb_regs, modbus_reg_input,    i, chnl++);
+    modbus_register_list_add(&mb_regs, 0, modbus_reg_coil,     i, chnl++);
+    modbus_register_list_add(&mb_regs, 0, modbus_reg_discrete, i, chnl++);
+    modbus_register_list_add(&mb_regs, 0, modbus_reg_holding,  i, chnl++);
+    modbus_register_list_add(&mb_regs, 0, modbus_reg_input,    i, chnl++);
   }
 
   for(i = 0; i < 10; i++)
   {
-    r = modbus_register_list_lookup_by_mb_type_addr(&mb_regs, modbus_reg_coil, i);
+    r = modbus_register_list_lookup_by_mb_type_addr(&mb_regs, 0, modbus_reg_coil, i);
     CU_ASSERT(r != NULL);
 
-    r = modbus_register_list_lookup_by_mb_type_addr(&mb_regs, modbus_reg_discrete, i);
+    r = modbus_register_list_lookup_by_mb_type_addr(&mb_regs, 0, modbus_reg_discrete, i);
     CU_ASSERT(r != NULL);
 
-    r = modbus_register_list_lookup_by_mb_type_addr(&mb_regs, modbus_reg_holding, i);
+    r = modbus_register_list_lookup_by_mb_type_addr(&mb_regs, 0, modbus_reg_holding, i);
     CU_ASSERT(r != NULL);
 
-    r = modbus_register_list_lookup_by_mb_type_addr(&mb_regs, modbus_reg_input, i);
+    r = modbus_register_list_lookup_by_mb_type_addr(&mb_regs, 0, modbus_reg_input, i);
     CU_ASSERT(r != NULL);
   }
 
   i = 10;
-  r = modbus_register_list_lookup_by_mb_type_addr(&mb_regs, modbus_reg_coil, i);
+  r = modbus_register_list_lookup_by_mb_type_addr(&mb_regs, 0, modbus_reg_coil, i);
   CU_ASSERT(r == NULL);
 
-  r = modbus_register_list_lookup_by_mb_type_addr(&mb_regs, modbus_reg_discrete, i);
+  r = modbus_register_list_lookup_by_mb_type_addr(&mb_regs, 0, modbus_reg_discrete, i);
   CU_ASSERT(r == NULL);
 
-  r = modbus_register_list_lookup_by_mb_type_addr(&mb_regs, modbus_reg_holding, i);
+  r = modbus_register_list_lookup_by_mb_type_addr(&mb_regs, 0, modbus_reg_holding, i);
   CU_ASSERT(r == NULL);
 
-  r = modbus_register_list_lookup_by_mb_type_addr(&mb_regs, modbus_reg_input, i);
+  r = modbus_register_list_lookup_by_mb_type_addr(&mb_regs, 0, modbus_reg_input, i);
   CU_ASSERT(r == NULL);
 
   CU_PASS("test_modbus_regs() succeeded");
