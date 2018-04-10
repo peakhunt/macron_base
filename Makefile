@@ -45,6 +45,10 @@ src/modbus/modbus_func_holding.c                    \
 src/modbus/modbus_func_input.c                      \
 src/modbus/modbus_tcp_slave.c                       \
 src/modbus/modbus_rtu_slave.c                       \
+src/modbus/modbus_master.c                          \
+src/modbus/modbus_rtu_master.c                      \
+src/modbus/modbus_tcp_master.c                      \
+src/modbus/modbus_rtu_response_handler.c            \
 src/modbus/modbus_regs.c                            \
 src/modbus/modbus_crc.c
 
