@@ -60,8 +60,7 @@ APP_SOURCES =                                       \
 src/app/main.c                                      \
 src/app/app_core.c                                  \
 src/app/app_cli.c                                   \
-src/app/app_modbus.c                                \
-src/app/io_channel_map.c                            \
+src/app/app_modbus_slave.c                          \
 src/app/app_config.c
 
 TEST_C_SOURCE =                                     \

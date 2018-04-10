@@ -1,5 +1,5 @@
-#ifndef __APP_MODBUS_DEF_H__
-#define __APP_MODBUS_DEF_H__
+#ifndef __APP_MODBUS_SLAVE_DEF_H__
+#define __APP_MODBUS_SLAVE_DEF_H__
 
 #include "common_def.h"
 #include "serial.h"
@@ -21,6 +21,6 @@ typedef struct
   int                         reg_group;
 } app_modbus_slave_config_t;
 
-extern void app_modbus_init(void);
+extern void app_modbus_slave_init(void);
 
-#endif /* !__APP_MODBUS_DEF_H__ */
+#endif /* !__APP_MODBUS_SLAVE_DEF_H__ */

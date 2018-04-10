@@ -1,15 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "common_def.h"
-#include "app_modbus.h"
+#include "app_modbus_slave.h"
 #include "app_config.h"
 #include "list.h"
 #include "trace.h"
-#include "io_channel_map.h"
 #include "channel_manager.h"
 #include "modbus_rtu_slave.h"
 #include "modbus_tcp_slave.h"
 #include "modbus_util.h"
+#include "modbus_regs.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -22,6 +22,7 @@ typedef struct
   app_modbus_slave_type_t mb_type;
   ModbusSlaveCTX          *ctx;
   int                     reg_group;
+  modbus_register_list_t  reg_map;
 } app_modbus_slave_t;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -37,14 +38,20 @@ LIST_HEAD(_modbus_slaves);
 //
 ////////////////////////////////////////////////////////////////////////////////
 static int32_t
-__get_mapped_channel(int group, modbus_reg_type_t reg_type, uint32_t addr)
+__get_mapped_channel(app_modbus_slave_t* slave, uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t addr)
 {
-  modbus_address_t    mb_addr;
+  modbus_register_t*  reg;
 
-  mb_addr.mb_address    = addr;
-  mb_addr.reg_type      = reg_type;
+  reg = modbus_register_list_lookup_by_mb_type_addr(&slave->reg_map,
+                                                    slave_id,
+                                                    reg_type,
+                                                    addr);
 
-  return io_channel_map_lookup_modbus(group, &mb_addr);
+  if(reg == NULL)
+  {
+    return -1;
+  }
+  return reg->chnl_num;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -71,7 +78,7 @@ __handle_modbus_u16(ModbusSlaveCTX* ctx, modbus_reg_type_t reg_type, uint8_t* bu
 
   for(; current_addr <= end_addr; current_addr++, buffer += 2)
   {
-    chnl_num = __get_mapped_channel(app_slave->reg_group, reg_type, current_addr);
+    chnl_num = __get_mapped_channel(app_slave, 0, reg_type, current_addr);
     if(chnl_num == -1)
     {
       TRACE(MAIN, "no channel mapping for %d:%d:%d\n", app_slave->reg_group, reg_type, current_addr);
@@ -124,7 +131,7 @@ __handle_modbus_u1(ModbusSlaveCTX* ctx, modbus_reg_type_t reg_type, uint8_t* buf
 
   for(bit_ndx = 0; current_addr <= end_addr; current_addr++, bit_ndx++)
   {
-    chnl_num = __get_mapped_channel(app_slave->reg_group, reg_type, current_addr);
+    chnl_num = __get_mapped_channel(app_slave, 0, reg_type, current_addr);
     if(chnl_num == -1)
     {
       TRACE(MAIN, "no channel mapping for %d:%d\n", reg_type, current_addr);
@@ -165,7 +172,7 @@ app_discrete_cb(ModbusSlaveCTX* ctx, uint8_t addr, uint8_t * pucRegBuffer,
 // utilities
 //
 ////////////////////////////////////////////////////////////////////////////////
-static void
+static app_modbus_slave_t*
 alloc_init_modbus_slave(app_modbus_slave_config_t* cfg)
 {
   app_modbus_slave_t*   slave;
@@ -219,12 +226,14 @@ alloc_init_modbus_slave(app_modbus_slave_config_t* cfg)
 
   slave->ctx = ctx;
   ctx->priv = (void*)slave;
-  
+
+  modbus_register_list_init(&slave->reg_map);
   list_add_tail(&slave->le, &_modbus_slaves);
-  return;
+  return slave;
 
 failed:
   exit(-1);
+  return NULL;
 }
 
 static void
@@ -232,6 +241,7 @@ app_modbus_load_slaves(void)
 {
   app_modbus_slave_config_t   cfg;
   int                         num_slaves,
+                              num_regs,
                               i;
   app_modbus_slave_t*         slave;
 
@@ -240,7 +250,7 @@ app_modbus_load_slaves(void)
   // init phase
   for( i = 0; i < num_slaves; i++)
   {
-    app_config_get_modbus_slaves_at(i, &cfg);
+    app_config_get_modbus_slave_at(i, &cfg);
 
     if(cfg.protocol == app_modbus_slave_type_tcp)
     {
@@ -250,7 +260,20 @@ app_modbus_load_slaves(void)
     {
       TRACE(APP_START, "initializing modbus rtu slave, port %s\n", cfg.serial_port);
     }
-    alloc_init_modbus_slave(&cfg);
+
+    slave = alloc_init_modbus_slave(&cfg);
+
+    // load registers
+    num_regs = app_config_get_modbus_slave_num_regs(i);
+    for(int reg_ndx = 0; reg_ndx < num_regs; reg_ndx++)
+    {
+      uint32_t            chnl;
+      modbus_address_t    reg;
+
+      app_config_get_modbus_slave_reg(i, reg_ndx, &reg, &chnl);
+      modbus_register_list_add(&slave->reg_map,
+          reg.slave_id, reg.reg_type, reg.mb_address, chnl);
+    }
   }
 
   // start phase
@@ -274,7 +297,7 @@ app_modbus_load_slaves(void)
 //
 ////////////////////////////////////////////////////////////////////////////////
 void
-app_modbus_init(void)
+app_modbus_slave_init(void)
 {
   app_modbus_load_slaves();
 }

@@ -7,9 +7,8 @@
 #include "trace.h"
 #include "app_config.h"
 #include "app_cli.h"
-#include "app_modbus.h"
+#include "app_modbus_slave.h"
 #include "app_core.h"
-#include "io_channel_map.h"
 
 static void main_thread_init(evloop_thread_t* thrd);
 
@@ -44,11 +43,9 @@ static evloop_thread_t      _main_thread =
 static void
 main_thread_init(evloop_thread_t* thrd)
 {
-  io_channel_map_init();
-
   app_core_init();
   app_cli_init();
-  app_modbus_init();
+  app_modbus_slave_init();
 }
 
 static void

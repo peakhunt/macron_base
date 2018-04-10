@@ -24,7 +24,7 @@ modbus_register_list_init(modbus_register_list_t* mb_list)
 
 void
 modbus_register_list_add(modbus_register_list_t* mb_list,
-    modbus_reg_type_t reg_type, uint32_t mb_addr, uint32_t chnl_num)
+    uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t mb_addr, uint32_t chnl_num)
 {
   modbus_register_t*    reg;
 
@@ -32,6 +32,7 @@ modbus_register_list_add(modbus_register_list_t* mb_list,
 
   INIT_LIST_HEAD(&reg->le);
 
+  reg->mb_addr.slave_id     = slave_id;
   reg->mb_addr.mb_address   = mb_addr;
   reg->mb_addr.reg_type     = reg_type;
   reg->chnl_num             = chnl_num;
@@ -43,10 +44,11 @@ modbus_register_list_add(modbus_register_list_t* mb_list,
 
 modbus_register_t*
 modbus_register_list_lookup_by_mb_type_addr(modbus_register_list_t* mb_list,
-    modbus_reg_type_t reg_type, uint32_t mb_addr)
+    uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t mb_addr)
 {
   modbus_address_t  a;
 
+  a.slave_id      = slave_id;
   a.mb_address    = mb_addr;
   a.reg_type      = reg_type;
 

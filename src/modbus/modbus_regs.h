@@ -17,6 +17,7 @@ typedef enum
 
 typedef struct
 {
+  uint32_t              slave_id;
   uint32_t              mb_address;
   modbus_reg_type_t     reg_type;
 } modbus_address_t;
@@ -38,9 +39,9 @@ typedef struct
 
 extern void modbus_register_list_init(modbus_register_list_t* mb_list);
 extern void modbus_register_list_add(modbus_register_list_t* mb_list,
-    modbus_reg_type_t reg_type, uint32_t mb_addr, uint32_t chnl_num);
+    uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t mb_addr, uint32_t chnl_num);
 extern modbus_register_t* modbus_register_list_lookup_by_mb_type_addr(modbus_register_list_t* mb_list,
-    modbus_reg_type_t reg_type, uint32_t mb_addr);
+    uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t mb_addr);
 
 
 #endif /* !__MODBUS_REGS_DEF_H__ */

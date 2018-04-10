@@ -79,30 +79,32 @@ app_config_get_serial_cfg(cJSON* node, SerialConfig* scfg)
 }
 
 static inline void
-app_config_get_modbus_reg_cfg(cJSON* node, io_channel_map_modbus_t* cfg)
+app_config_get_modbus_reg_cfg(cJSON* node, modbus_address_t* mb_reg, uint32_t* chnl)
 {
   const char*   str;
+
+  mb_reg->slave_id    = (uint32_t)app_config_get_int(node, "slave");
 
   str = app_config_get_str(node, "reg");
   if(strcmp(str, "coil") == 0)
   {
-    cfg->mb_addr.reg_type = modbus_reg_coil;
+    mb_reg->reg_type = modbus_reg_coil;
   }
   else if(strcmp(str, "disc") == 0)
   {
-    cfg->mb_addr.reg_type = modbus_reg_discrete;
+    mb_reg->reg_type = modbus_reg_discrete;
   }
   else if(strcmp(str, "hold") == 0)
   {
-    cfg->mb_addr.reg_type = modbus_reg_holding;
+    mb_reg->reg_type = modbus_reg_holding;
   }
   else
   {
-    cfg->mb_addr.reg_type = modbus_reg_input;
+    mb_reg->reg_type = modbus_reg_input;
   }
 
-  cfg->mb_addr.mb_address = (uint32_t)app_config_get_int(node, "address");
-  cfg->chnl_num           = app_config_get_int(node, "channel");
+  mb_reg->mb_address  = (uint32_t)app_config_get_int(node, "address");
+  *chnl               = app_config_get_int(node, "channel");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -157,87 +159,6 @@ app_config_get_cli_config(cli_config_t* cli_cfg)
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int
-app_config_get_num_modbus_reg_list(void)
-{
-  cJSON   *io_channels,
-          *modbus_reg_list;
-
-  io_channels     = app_config_get_node(_jroot, "io_channels");
-  modbus_reg_list = app_config_get_node(io_channels, "modbus_reg_list");
-
-  return cJSON_GetArraySize(modbus_reg_list);
-}
-
-int
-app_config_get_num_modbus_regs_for_a_group(int ndx)
-{
-  cJSON   *io_channels,
-          *modbus_reg_list,
-          *group,
-          *regs;
-
-  io_channels     = app_config_get_node(_jroot, "io_channels");
-  modbus_reg_list = app_config_get_node(io_channels, "modbus_reg_list");
-  group           = cJSON_GetArrayItem(modbus_reg_list, ndx);
-  regs            = app_config_get_node(group, "regs");
-  return cJSON_GetArraySize(regs);
-}
-
-void
-app_config_get_modbus_reg_in_group(int group_ndx, int reg_ndx, io_channel_map_modbus_t* cfg)
-{
-  cJSON   *io_channels,
-          *modbus_reg_list,
-          *group,
-          *regs,
-          *reg;
-
-  io_channels     = app_config_get_node(_jroot, "io_channels");
-  modbus_reg_list = app_config_get_node(io_channels, "modbus_reg_list");
-  group           = cJSON_GetArrayItem(modbus_reg_list, group_ndx);
-  regs            = app_config_get_node(group, "regs");
-  reg             = cJSON_GetArrayItem(regs, reg_ndx);
-
-  app_config_get_modbus_reg_cfg(reg, cfg);
-}
-
-int
-app_config_get_modbus_reg_group_ndx(const char* name)
-{
-  cJSON   *io_channels,
-          *modbus_reg_list,
-          *group;
-  int     num_group;
-  const char* group_name;
-
-  io_channels     = app_config_get_node(_jroot, "io_channels");
-  modbus_reg_list = app_config_get_node(io_channels, "modbus_reg_list");
-
-  num_group =  cJSON_GetArraySize(modbus_reg_list);
-
-  for(int i = 0; i < num_group; i++)
-  {
-    group = cJSON_GetArrayItem(modbus_reg_list, i);
-    group_name = app_config_get_str(group, "name");
-
-    if(strcmp(group_name, name) == 0)
-    {
-      return i;
-    }
-  }
-
-  debug_log("configuration error no modbus register group %s\n", name);
-  exit(APP_CONFIG_ERROR_EXIT_VALUE);
-
-  return -1;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Modbus Slave configuration parameter
-//
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int
 app_config_get_num_modbus_slaves(void)
 {
   cJSON   *slave_list;
@@ -248,7 +169,7 @@ app_config_get_num_modbus_slaves(void)
 }
 
 void
-app_config_get_modbus_slaves_at(int ndx, app_modbus_slave_config_t* cfg)
+app_config_get_modbus_slave_at(int ndx, app_modbus_slave_config_t* cfg)
 {
   cJSON       *slave_list,
               *node,
@@ -281,9 +202,36 @@ app_config_get_modbus_slaves_at(int ndx, app_modbus_slave_config_t* cfg)
     cfg->serial_port = app_config_get_str(param, "serial_port");
     app_config_get_serial_cfg(param, &cfg->serial_cfg);
   }
+}
 
-  str = app_config_get_str(node, "regs");
-  cfg->reg_group = app_config_get_modbus_reg_group_ndx(str);
+int
+app_config_get_modbus_slave_num_regs(int slave_ndx)
+{
+  cJSON       *slave_list,
+              *slave,
+              *reg_map;
+
+  slave_list  = app_config_get_node(_jroot, "modbus_slave_list");
+  slave       = cJSON_GetArrayItem(slave_list, slave_ndx);
+  reg_map     = app_config_get_node(slave, "reg_map");
+
+  return cJSON_GetArraySize(reg_map);
+}
+
+void
+app_config_get_modbus_slave_reg(int slave_ndx, int reg_ndx, modbus_address_t* mb_reg, uint32_t* chnl)
+{
+  cJSON       *slave_list,
+              *slave,
+              *reg_map,
+              *reg;
+
+  slave_list  = app_config_get_node(_jroot, "modbus_slave_list");
+  slave       = cJSON_GetArrayItem(slave_list, slave_ndx);
+  reg_map     = app_config_get_node(slave, "reg_map");
+  reg         = cJSON_GetArrayItem(reg_map, reg_ndx);
+
+  app_config_get_modbus_reg_cfg(reg, mb_reg, chnl);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
