@@ -21,7 +21,6 @@ typedef struct
   struct list_head        le;
   app_modbus_slave_type_t mb_type;
   ModbusSlaveCTX          *ctx;
-  int                     reg_group;
   modbus_register_list_t  reg_map;
 } app_modbus_slave_t;
 
@@ -30,7 +29,7 @@ typedef struct
 // module privates
 //
 ////////////////////////////////////////////////////////////////////////////////
-LIST_HEAD(_modbus_slaves);
+static LIST_HEAD(_modbus_slaves);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -81,7 +80,7 @@ __handle_modbus_u16(ModbusSlaveCTX* ctx, modbus_reg_type_t reg_type, uint8_t* bu
     chnl_num = __get_mapped_channel(app_slave, 0, reg_type, current_addr);
     if(chnl_num == -1)
     {
-      TRACE(MAIN, "no channel mapping for %d:%d:%d\n", app_slave->reg_group, reg_type, current_addr);
+      TRACE(MAIN, "no channel mapping for %d:%d\n", reg_type, current_addr);
       return MB_ENORES;
     }
 
@@ -182,13 +181,12 @@ alloc_init_modbus_slave(app_modbus_slave_config_t* cfg)
   if(slave == NULL)
   {
     TRACE(APP_START,"failed to alloc app_modbus_slave_t\n");
-      goto failed;
+    goto failed;
   }
 
   INIT_LIST_HEAD(&slave->le);
 
   slave->mb_type    = cfg->protocol;
-  slave->reg_group  = cfg->reg_group;
 
   if(slave->mb_type == app_modbus_slave_type_tcp)
   {

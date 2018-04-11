@@ -32,6 +32,7 @@ typedef struct
 } ModbusTCPMaster;
 
 extern void modbus_tcp_master_init(ModbusTCPMaster* master, struct sockaddr_in*  server_addr);
+extern void modbus_tcp_master_init_with_ip_port(ModbusTCPMaster* master, const char* dest_ip, int dest_port);
 extern void modbus_tcp_master_start(ModbusTCPMaster* master);
 extern void modbus_tcp_master_stop(ModbusTCPMaster* master);
 

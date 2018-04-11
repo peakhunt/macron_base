@@ -145,6 +145,17 @@ modbus_tcp_master_tcp_connector_callback(tcp_auto_connector_t* con, int sd)
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void
+modbus_tcp_master_init_with_ip_port(ModbusTCPMaster* master, const char* dest_ip, int dest_port)
+{
+  struct sockaddr_in    server_addr;
+
+  server_addr.sin_addr.s_addr  = inet_addr(dest_ip);
+  server_addr.sin_port         = htons(dest_port);
+
+  modbus_tcp_master_init(master, &server_addr);
+}
+
+void
 modbus_tcp_master_init(ModbusTCPMaster* master, struct sockaddr_in*  server_addr)
 {
   master->ctx.pdu_offset    = 7;

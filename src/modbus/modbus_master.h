@@ -29,6 +29,8 @@ struct __modbus_master_ctx
   void (*coil_cb)(ModbusMasterCTX* ctx, uint8_t slave, uint16_t addr, uint16_t nreg, uint8_t* regs,
       MBRegisterMode mode);
   void (*discrete_cb)(ModbusMasterCTX* ctx, uint8_t slave, uint16_t addr, uint16_t nreg, uint8_t* regs);
+
+  void* priv;
 };
 
 

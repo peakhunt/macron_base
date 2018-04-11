@@ -96,9 +96,8 @@
       "interval": 50,
       "timeout": 2000,
       "protocol": "tcp",
-      "dest_ip": "192.168.227.211",
+      "dest_ip": "192.168.10.1",
       "dest_port": 9000,
-      "regs": "testRegSet2",
       "reg_map": [
         { "slave": 1,   "reg": "coil", "address": 1005, "channel": 200    },
         { "slave": 1,   "reg": "coil", "address": 1006, "channel": 201    },

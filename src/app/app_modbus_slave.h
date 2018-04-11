@@ -8,7 +8,7 @@
 typedef enum
 {
   app_modbus_slave_type_tcp,
-  app_modbus_slave_type_rtu,
+  app_modbus_slave_type_rtu
 } app_modbus_slave_type_t;
 
 typedef struct
@@ -18,7 +18,6 @@ typedef struct
   int                         tcp_port;
   char*                       serial_port;
   SerialConfig                serial_cfg;
-  int                         reg_group;
 } app_modbus_slave_config_t;
 
 extern void app_modbus_slave_init(void);

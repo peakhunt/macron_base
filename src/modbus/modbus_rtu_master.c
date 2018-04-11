@@ -119,8 +119,17 @@ t35_timeout_handler(evloop_timer_t* te, void* unused)
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void
-modbus_rtu_master_init(ModbusRTUMaster* master, int fd)
+modbus_rtu_master_init(ModbusRTUMaster* master, const char* port, SerialConfig* cfg)
 {
+  int   fd;
+
+  fd = serial_init(port, cfg);
+  if(fd < 0)
+  {
+    TRACE(MB_RTU_MASTER, "failed to initialize serial %s\n", port);
+    return;
+  }
+
   master->ctx.pdu_offset    = 1;
   master->ctx.request       = modbus_rtu_master_request;
   mb_master_ctx_init(&master->ctx);

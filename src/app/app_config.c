@@ -78,31 +78,40 @@ app_config_get_serial_cfg(cJSON* node, SerialConfig* scfg)
   scfg->parity = app_config_get_serial_parity(node, "parity");
 }
 
-static inline void
-app_config_get_modbus_reg_cfg(cJSON* node, modbus_address_t* mb_reg, uint32_t* chnl)
+static inline modbus_reg_type_t
+app_config_get_modbus_reg_type(cJSON* node, const char* name)
 {
-  const char*   str;
+  const char* str;
+  modbus_reg_type_t   ret;
 
-  mb_reg->slave_id    = (uint32_t)app_config_get_int(node, "slave");
+  str = app_config_get_str(node, name);
 
-  str = app_config_get_str(node, "reg");
   if(strcmp(str, "coil") == 0)
   {
-    mb_reg->reg_type = modbus_reg_coil;
+    ret = modbus_reg_coil;
   }
   else if(strcmp(str, "disc") == 0)
   {
-    mb_reg->reg_type = modbus_reg_discrete;
+    ret = modbus_reg_discrete;
   }
   else if(strcmp(str, "hold") == 0)
   {
-    mb_reg->reg_type = modbus_reg_holding;
+    ret = modbus_reg_holding;
   }
   else
   {
-    mb_reg->reg_type = modbus_reg_input;
+    ret = modbus_reg_input;
   }
 
+  return ret;
+}
+
+static inline void
+app_config_get_modbus_reg_cfg(cJSON* node, modbus_address_t* mb_reg, uint32_t* chnl)
+{
+  mb_reg->slave_id    = (uint32_t)app_config_get_int(node, "slave");
+
+  mb_reg->reg_type = app_config_get_modbus_reg_type(node, "reg");
   mb_reg->mb_address  = (uint32_t)app_config_get_int(node, "address");
   *chnl               = app_config_get_int(node, "channel");
 }
@@ -233,6 +242,126 @@ app_config_get_modbus_slave_reg(int slave_ndx, int reg_ndx, modbus_address_t* mb
 
   app_config_get_modbus_reg_cfg(reg, mb_reg, chnl);
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Modbus Master configuration parameter
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int
+app_config_get_num_modbus_masters(void)
+{
+  cJSON   *master_list;
+
+  master_list = app_config_get_node(_jroot, "modbus_master_list");
+
+  return cJSON_GetArraySize(master_list);
+}
+
+void
+app_config_get_modbus_master_at(int ndx, app_modbus_master_config_t* cfg)
+{
+  cJSON       *master_list,
+              *node,
+              *param;
+  const char  *str;
+
+  master_list = app_config_get_node(_jroot, "modbus_master_list");
+  node = cJSON_GetArrayItem(master_list, ndx);
+
+  cfg->interval = (uint32_t)app_config_get_int(node, "interval");
+  cfg->timeout  = (uint32_t)app_config_get_int(node, "timeout");
+
+  str = app_config_get_str(node, "protocol");
+  if(strcmp(str, "tcp") == 0)
+  {
+    cfg->protocol   = app_modbus_master_type_tcp;
+    cfg->dest_ip    = app_config_get_str(node, "dest_ip");
+    cfg->dest_port  = app_config_get_int(node, "dest_port");
+  }
+  else
+  {
+    cfg->protocol = app_modbus_master_type_rtu;
+    param = app_config_get_node(node, "param");
+    cfg->serial_port = app_config_get_str(param, "serial_port");
+    app_config_get_serial_cfg(param, &cfg->serial_cfg);
+  }
+}
+
+int
+app_config_get_modbus_master_num_regs(int master_ndx)
+{
+  cJSON       *master_list,
+              *master,
+              *reg_map;
+
+  master_list = app_config_get_node(_jroot, "modbus_master_list");
+  master      = cJSON_GetArrayItem(master_list, master_ndx);
+  reg_map     = app_config_get_node(master, "reg_map");
+
+  return cJSON_GetArraySize(reg_map);
+}
+
+void
+app_config_get_modbus_master_reg(int master_ndx, int reg_ndx, modbus_address_t* mb_reg, uint32_t* chnl)
+{
+  cJSON     *master_list,
+            *master,
+            *reg_map,
+            *reg;
+
+  master_list = app_config_get_node(_jroot, "modbus_master_list");
+  master      = cJSON_GetArrayItem(master_list, master_ndx);
+  reg_map     = app_config_get_node(master, "reg_map");
+  reg         = cJSON_GetArrayItem(reg_map, reg_ndx);
+  app_config_get_modbus_reg_cfg(reg, mb_reg, chnl);
+}
+
+int
+app_config_get_modbus_master_num_request_schedules(int master_ndx)
+{
+  cJSON       *master_list,
+              *master,
+              *request_schedule;
+
+  master_list         = app_config_get_node(_jroot, "modbus_master_list");
+  master              = cJSON_GetArrayItem(master_list, master_ndx);
+  request_schedule    = app_config_get_node(master, "request_schedule");
+
+  return cJSON_GetArraySize(request_schedule);
+}
+
+void
+app_config_get_modbus_slave_request_schedule(int master_ndx, int req_ndx, app_modbus_master_request_config_t* cfg)
+{
+  cJSON       *master_list,
+              *master,
+              *request_schedule,
+              *request;
+  const char* str;
+
+  master_list         = app_config_get_node(_jroot, "modbus_master_list");
+  master              = cJSON_GetArrayItem(master_list, master_ndx);
+  request_schedule    = app_config_get_node(master, "request_schedule");
+  request             = cJSON_GetArrayItem(request_schedule, req_ndx);
+
+  cfg->slave_id   = app_config_get_int(request, "slave");
+
+  str = app_config_get_str(request, "op");
+  if(strcmp(str, "write") == 0)
+  {
+    cfg->op = modbus_reg_op_write;
+  }
+  else
+  {
+    cfg->op = modbus_reg_op_read;
+  }
+
+  cfg->reg        = app_config_get_modbus_reg_type(request, "reg");
+  cfg->start_addr = app_config_get_int(request, "reg_addr");
+  cfg->num_regs   = app_config_get_int(request, "num_regs");
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //

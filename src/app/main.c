@@ -8,6 +8,7 @@
 #include "app_config.h"
 #include "app_cli.h"
 #include "app_modbus_slave.h"
+#include "app_modbus_master.h"
 #include "app_core.h"
 
 static void main_thread_init(evloop_thread_t* thrd);
@@ -46,6 +47,7 @@ main_thread_init(evloop_thread_t* thrd)
   app_core_init();
   app_cli_init();
   app_modbus_slave_init();
+  app_modbus_master_init();
 }
 
 static void
