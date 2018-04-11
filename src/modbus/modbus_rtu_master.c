@@ -145,6 +145,11 @@ void
 modbus_rtu_master_start(ModbusRTUMaster* master)
 {
   stream_start(&master->stream);
+
+  if(master->ctx.event_cb != NULL)
+  {
+    master->ctx.event_cb(&master->ctx, modbus_master_event_connected);
+  }
 }
 
 void

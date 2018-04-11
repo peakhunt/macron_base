@@ -32,7 +32,7 @@ static uint32_t   _initial_trace_setup[] =
   TRACE_COMP(MB_RTU_SLAVE),
   TRACE_COMP(MB_RTU_MASTER),
   TRACE_COMP(MB_TCP_MASTER),
-  TRACE_COMP(MB_MASTER),
+  //TRACE_COMP(MB_MASTER),
 };
 
 static evloop_thread_t      _main_thread = 

@@ -5,6 +5,12 @@
 
 #define MODBUS_MASTER_MAX_BUFFER_SIZE           512
 
+typedef enum
+{
+  modbus_master_event_connected,
+  modbus_master_event_disconnected,
+} modbus_master_event_t;
+
 struct __modbus_master_ctx;
 typedef struct __modbus_master_ctx ModbusMasterCTX;
 
@@ -30,6 +36,7 @@ struct __modbus_master_ctx
       MBRegisterMode mode);
   void (*discrete_cb)(ModbusMasterCTX* ctx, uint8_t slave, uint16_t addr, uint16_t nreg, uint8_t* regs);
 
+  void (*event_cb)(ModbusMasterCTX* ctx, modbus_master_event_t event);
   void* priv;
 };
 

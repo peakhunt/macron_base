@@ -52,6 +52,11 @@ modbus_tcp_master_request(ModbusMasterCTX* ctx, uint8_t slave)
   {
     TRACE(MB_TCP_MASTER, "tx error\n");
     modbus_tcp_master_start_reconnect(master);
+
+    if(master->ctx.event_cb != NULL)
+    {
+      master->ctx.event_cb(&master->ctx, modbus_master_event_disconnected);
+    }
   }
 
   master->tid++;
@@ -93,12 +98,15 @@ static void
 modbus_tcp_master_got_frame(mbap_reader_t* mbap)
 {
   ModbusTCPMaster* master = container_of(mbap, ModbusTCPMaster, mbap_reader);
+  uint16_t    expected;
 
   TRACE_DUMP(MB_TCP_MASTER, "MB TCP Master RX", mbap->frame, mbap->ndx);
 
-  if((master->tid - 1) != mbap->tid)
+  expected = master->tid - 1;
+
+  if(expected != mbap->tid)
   {
-    TRACE(MB_TCP_MASTER, "TID Mismatch %d, %d\n", (master->tid - 1), mbap->tid);
+    TRACE(MB_TCP_MASTER, "TID Mismatch %d, %d\n", expected, mbap->tid);
     return;
   }
 
@@ -132,6 +140,11 @@ modbus_tcp_master_tcp_connector_callback(tcp_auto_connector_t* con, int sd)
     stream_start(&master->stream);
     
     mbap_reader_init(&master->mbap_reader, modbus_tcp_master_got_frame);
+
+    if(master->ctx.event_cb != NULL)
+    {
+      master->ctx.event_cb(&master->ctx, modbus_master_event_connected);
+    }
   }
   else
   {
@@ -149,6 +162,7 @@ modbus_tcp_master_init_with_ip_port(ModbusTCPMaster* master, const char* dest_ip
 {
   struct sockaddr_in    server_addr;
 
+  server_addr.sin_family       = AF_INET;
   server_addr.sin_addr.s_addr  = inet_addr(dest_ip);
   server_addr.sin_port         = htons(dest_port);
 
