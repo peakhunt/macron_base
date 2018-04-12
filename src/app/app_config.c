@@ -269,7 +269,8 @@ app_config_get_modbus_master_at(int ndx, app_modbus_master_config_t* cfg)
   master_list = app_config_get_node(_jroot, "modbus_master_list");
   node = cJSON_GetArrayItem(master_list, ndx);
 
-  cfg->interval = (uint32_t)app_config_get_int(node, "interval");
+  cfg->schedule_finish_delay  = app_config_get_int(node, "schedule_finish_delay");
+  cfg->inter_request_delay    = app_config_get_int(node, "inter_request_delay");
   cfg->timeout  = (uint32_t)app_config_get_int(node, "timeout");
 
   str = app_config_get_str(node, "protocol");

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <time.h>
 #include "common_def.h"
 #include "app_modbus_master.h"
 #include "app_config.h"
@@ -26,9 +27,18 @@ typedef struct
   app_modbus_master_type_t  mb_type;
   ModbusMasterCTX*          ctx;
   modbus_register_list_t    reg_map;
-  evloop_timer_t            transaction_timer;
   int                       current_request;
   int                       num_reqs;
+
+  uint32_t                  schedule_finish_delay;
+  uint32_t                  inter_request_delay;
+  uint32_t                  timeout;
+
+  struct timespec           req_start_time;
+
+  evloop_timer_t            wait_timer;
+  evloop_timer_t            transaction_timer;
+
   app_modbus_master_request_config_t*   request_schedule;
 } app_modbus_master_t;
 
@@ -59,6 +69,29 @@ __get_mapped_channel(app_modbus_master_t* master, uint32_t slave_id, modbus_reg_
     return -1;
   }
   return reg->chnl_num;
+}
+
+static inline void
+mark_req_start_time(app_modbus_master_t* master)
+{
+  clock_gettime(CLOCK_MONOTONIC, &master->req_start_time);
+}
+
+static inline long
+get_time_took_for_transaction_in_ms(app_modbus_master_t* master)
+{
+  long        delta,
+              second,
+              msecond;
+  struct timespec now;
+
+  clock_gettime(CLOCK_MONOTONIC, &now);
+
+  second  = now.tv_sec - master->req_start_time.tv_sec;
+  msecond = (now.tv_nsec - master->req_start_time.tv_nsec) / 1000000.0;
+
+  delta = (second * 1000 + msecond);
+  return delta;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -209,13 +242,56 @@ app_modbus_master_request(app_modbus_master_t* master)
     break;
   }
 
-  evloop_timer_start(&master->transaction_timer, 2.0, 0);
+  mark_req_start_time(master);
+  evloop_timer_start(&master->transaction_timer, master->timeout / 1000.0, 0);
 }
 
 static void
 app_modbus_master_next(app_modbus_master_t* master)
 {
-  master->current_request = (master->current_request + 1) % master->num_reqs;
+  double wait_time;
+  double target_delay;
+  long   time_took_for_prev_transacion = get_time_took_for_transaction_in_ms(master);
+
+  master->current_request++;
+
+  if(master->current_request >= master->num_reqs)
+  {
+    // schedule finish delay
+    master->current_request = 0;
+    if(master->schedule_finish_delay == 0)
+    {
+      // use inter request delay instead
+      target_delay = master->inter_request_delay;
+    }
+    else
+    {
+      target_delay = master->schedule_finish_delay;
+    }
+  }
+  else
+  {
+    // inter request delay
+    target_delay = master->inter_request_delay;
+  }
+
+  wait_time = target_delay - time_took_for_prev_transacion;
+
+  if(wait_time >= 1)
+  {
+    evloop_timer_start(&master->wait_timer, wait_time / 1000.0, 0);
+  }
+  else
+  {
+    app_modbus_master_request(master);
+  }
+}
+
+static void
+modbus_master_wait_timeout(evloop_timer_t* te, void* unused)
+{
+  app_modbus_master_t* master = container_of(te, app_modbus_master_t, wait_timer);
+
   app_modbus_master_request(master);
 }
 
@@ -436,11 +512,16 @@ alloc_init_modbus_master(app_modbus_master_config_t* cfg)
   ctx->discrete_cb        = __discrete_cb;
   ctx->event_cb           = __modbus_master_event_cb;
 
+  master->schedule_finish_delay = cfg->schedule_finish_delay;
+  master->inter_request_delay   = cfg->inter_request_delay;
+  master->timeout               = cfg->timeout;
+
   master->ctx = ctx;
   ctx->priv   = (void*)master;
 
   modbus_register_list_init(&master->reg_map);
 
+  evloop_timer_init(&master->wait_timer, modbus_master_wait_timeout, NULL);
   evloop_timer_init(&master->transaction_timer, modbus_master_transaction_timeout, NULL);
 
   list_add_tail(&master->le, &_modbus_masters);

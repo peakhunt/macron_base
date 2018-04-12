@@ -14,7 +14,8 @@ typedef enum
 typedef struct
 {
   app_modbus_master_type_t    protocol;
-  uint32_t                    interval;
+  uint32_t                    schedule_finish_delay;
+  uint32_t                    inter_request_delay;
   uint32_t                    timeout;
   char*                       dest_ip;
   int                         dest_port;
