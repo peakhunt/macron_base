@@ -93,11 +93,11 @@
 
   "modbus_master_list" : [
     {
-      "schedule_finish_delay": 50,
+      "schedule_finish_delay": 0,
       "inter_request_delay": 20,
       "timeout": 2000,
       "protocol": "tcp",
-      "dest_ip": "192.168.227.211",
+      "dest_ip": "192.168.227.246",
       "dest_port": 9000,
       "reg_map": [
         { "slave": 1,   "reg": "coil", "address": 1005, "channel": 200    },

@@ -277,6 +277,13 @@ app_modbus_master_next(app_modbus_master_t* master)
 
   wait_time = target_delay - time_took_for_prev_transacion;
 
+#if 0
+  TRACE(APP_START, "took %d, target: %f, wait %f\n",
+      time_took_for_prev_transacion,
+      target_delay,
+      wait_time);
+#endif
+
   if(wait_time >= 1)
   {
     evloop_timer_start(&master->wait_timer, wait_time / 1000.0, 0);
