@@ -455,6 +455,11 @@ __modbus_master_event_cb(ModbusMasterCTX* ctx, modbus_master_event_t event)
       evloop_timer_stop(&master->transaction_timer);
     }
 
+    if(evloop_timer_active(&master->wait_timer))
+    {
+      evloop_timer_stop(&master->wait_timer);
+    }
+
     master->current_request = 0;
 
     // FIXME sensor fault handling

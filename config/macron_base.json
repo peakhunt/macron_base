@@ -158,6 +158,73 @@
         { "slave": 1,   "op": "write",    "reg": "hold",      "reg_addr": 1020,     "num_regs": 10  },
         { "slave": 1,   "op": "read",     "reg": "disc",      "reg_addr": 1010,     "num_regs": 10  }
       ]
+    },
+    {
+      "schedule_finish_delay": 0,
+      "inter_request_delay": 20,
+      "timeout": 2000,
+      "protocol": "tcp",
+      "dest_ip": "192.168.227.211",
+      "dest_port": 9000,
+      "reg_map": [
+        { "slave": 1,   "reg": "coil", "address": 1005, "channel": 1200    },
+        { "slave": 1,   "reg": "coil", "address": 1006, "channel": 1201    },
+        { "slave": 1,   "reg": "coil", "address": 1007, "channel": 1202    },
+        { "slave": 1,   "reg": "coil", "address": 1008, "channel": 1203    },
+        { "slave": 1,   "reg": "coil", "address": 1009, "channel": 1204    },
+        { "slave": 1,   "reg": "coil", "address": 1010, "channel": 1205    },
+
+        { "slave": 1,   "reg": "inpt", "address": 1010, "channel": 1210    },
+        { "slave": 1,   "reg": "inpt", "address": 1011, "channel": 1211    },
+        { "slave": 1,   "reg": "inpt", "address": 1012, "channel": 1212    },
+        { "slave": 1,   "reg": "inpt", "address": 1013, "channel": 1213    },
+        { "slave": 1,   "reg": "inpt", "address": 1014, "channel": 1214    },
+        { "slave": 1,   "reg": "inpt", "address": 1015, "channel": 1215    },
+        { "slave": 1,   "reg": "inpt", "address": 1016, "channel": 1216    },
+        { "slave": 1,   "reg": "inpt", "address": 1017, "channel": 1217    },
+        { "slave": 1,   "reg": "inpt", "address": 1018, "channel": 1218    },
+        { "slave": 1,   "reg": "inpt", "address": 1019, "channel": 1219    },
+
+        { "slave": 1,   "reg": "hold", "address": 1010, "channel": 1220    },
+        { "slave": 1,   "reg": "hold", "address": 1011, "channel": 1221    },
+        { "slave": 1,   "reg": "hold", "address": 1012, "channel": 1222    },
+        { "slave": 1,   "reg": "hold", "address": 1013, "channel": 1223    },
+        { "slave": 1,   "reg": "hold", "address": 1014, "channel": 1224    },
+        { "slave": 1,   "reg": "hold", "address": 1015, "channel": 1225    },
+        { "slave": 1,   "reg": "hold", "address": 1016, "channel": 1226    },
+        { "slave": 1,   "reg": "hold", "address": 1017, "channel": 1227    },
+        { "slave": 1,   "reg": "hold", "address": 1018, "channel": 1228    },
+        { "slave": 1,   "reg": "hold", "address": 1019, "channel": 1229    },
+        { "slave": 1,   "reg": "hold", "address": 1020, "channel": 1230    },
+        { "slave": 1,   "reg": "hold", "address": 1021, "channel": 1231    },
+        { "slave": 1,   "reg": "hold", "address": 1022, "channel": 1232    },
+        { "slave": 1,   "reg": "hold", "address": 1023, "channel": 1233    },
+        { "slave": 1,   "reg": "hold", "address": 1024, "channel": 1234    },
+        { "slave": 1,   "reg": "hold", "address": 1025, "channel": 1235    },
+        { "slave": 1,   "reg": "hold", "address": 1026, "channel": 1236    },
+        { "slave": 1,   "reg": "hold", "address": 1027, "channel": 1237    },
+        { "slave": 1,   "reg": "hold", "address": 1028, "channel": 1238    },
+        { "slave": 1,   "reg": "hold", "address": 1029, "channel": 1239    },
+
+        { "slave": 1,   "reg": "disc", "address": 1010, "channel": 1240    },
+        { "slave": 1,   "reg": "disc", "address": 1011, "channel": 1241    },
+        { "slave": 1,   "reg": "disc", "address": 1012, "channel": 1242    },
+        { "slave": 1,   "reg": "disc", "address": 1013, "channel": 1243    },
+        { "slave": 1,   "reg": "disc", "address": 1014, "channel": 1244    },
+        { "slave": 1,   "reg": "disc", "address": 1015, "channel": 1245    },
+        { "slave": 1,   "reg": "disc", "address": 1016, "channel": 1246    },
+        { "slave": 1,   "reg": "disc", "address": 1017, "channel": 1247    },
+        { "slave": 1,   "reg": "disc", "address": 1018, "channel": 1248    },
+        { "slave": 1,   "reg": "disc", "address": 1019, "channel": 1249    }
+      ],
+      "request_schedule": [
+        { "slave": 1,   "op": "read",     "reg": "coil",      "reg_addr": 1005,     "num_regs": 5   },
+        { "slave": 1,   "op": "write",    "reg": "coil",      "reg_addr": 1010,     "num_regs": 1   },
+        { "slave": 1,   "op": "read",     "reg": "inpt",      "reg_addr": 1010,     "num_regs": 10  },
+        { "slave": 1,   "op": "read",     "reg": "hold",      "reg_addr": 1010,     "num_regs": 10  },
+        { "slave": 1,   "op": "write",    "reg": "hold",      "reg_addr": 1020,     "num_regs": 10  },
+        { "slave": 1,   "op": "read",     "reg": "disc",      "reg_addr": 1010,     "num_regs": 10  }
+      ]
     }
   ],
 
