@@ -235,7 +235,7 @@ modbus_master_transaction_timeout(evloop_timer_t* te, void* unused)
       req->start_addr,
       req->num_regs);
 
-  //app_modbus_master_next(master);
+  app_modbus_master_next(master);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -244,14 +244,66 @@ modbus_master_transaction_timeout(evloop_timer_t* te, void* unused)
 //
 ////////////////////////////////////////////////////////////////////////////////
 static void
+__handle_coil_discrete_read_response(app_modbus_master_t* master, modbus_reg_type_t reg_type,
+    uint8_t slave, uint16_t addr, uint16_t nreg, uint8_t* data_buf)
+{
+  uint16_t      i,
+                current;
+  int32_t       chnl_num;
+  uint8_t       v;
+
+  for(i = 0; i < nreg; i++)
+  {
+    current = addr + i;
+
+    chnl_num = __get_mapped_channel(master, slave, reg_type, current);
+    if(chnl_num == -1)
+    {
+      TRACE(APP_START, "can't find channel for %d, %d:%d\n", reg_type, slave, current);
+      continue;
+    }
+
+    v = xMBUtilGetBits(data_buf, i, 1);
+
+    channel_manager_set_raw_value(chnl_num, v == 0 ? 0 : 1);
+  }
+}
+
+static void
+__handle_holding_input_read_response(app_modbus_master_t* master, modbus_reg_type_t reg_type,
+    uint8_t slave, uint16_t addr, uint16_t nreg, uint8_t* data_buf)
+{
+  uint16_t      i,
+                current;
+  int32_t       chnl_num;
+  uint16_t      v;
+
+  for(i = 0; i < nreg; i++, data_buf += 2)
+  {
+    current = addr + i;
+
+    chnl_num = __get_mapped_channel(master, slave, reg_type, current);
+    if(chnl_num == -1)
+    {
+      TRACE(APP_START, "can't find channel for %d, %d:%d\n", reg_type, slave, current);
+      continue;
+    }
+
+    v = BUFFER_TO_U16(data_buf);
+
+    channel_manager_set_raw_value(chnl_num, v);
+  }
+}
+
+static void
 __input_regs_cb(ModbusMasterCTX* ctx, uint8_t slave, uint16_t addr, uint16_t nreg, uint8_t* regs)
 {
   app_modbus_master_t* master = (app_modbus_master_t*)ctx->priv;
 
-  TRACE(APP_START, "%s\n", __func__);
   evloop_timer_stop(&master->transaction_timer);
 
-  // FIXME
+  __handle_holding_input_read_response(master, modbus_reg_input, slave, addr, nreg, regs);
+
   app_modbus_master_next(master);
 }
 
@@ -260,10 +312,13 @@ __holding_regs_cb(ModbusMasterCTX* ctx, uint8_t slave, uint16_t addr, uint16_t n
 {
   app_modbus_master_t* master = (app_modbus_master_t*)ctx->priv;
 
-  TRACE(APP_START, "%s\n", __func__);
   evloop_timer_stop(&master->transaction_timer);
 
-  // FIXME
+  if(mode == MB_REG_READ)
+  {
+    __handle_holding_input_read_response(master, modbus_reg_holding, slave, addr, nreg, regs);
+  }
+
   app_modbus_master_next(master);
 }
 
@@ -272,10 +327,13 @@ __coil_cb(ModbusMasterCTX* ctx, uint8_t slave, uint16_t addr, uint16_t nreg, uin
 {
   app_modbus_master_t* master = (app_modbus_master_t*)ctx->priv;
 
-  TRACE(APP_START, "%s\n", __func__);
   evloop_timer_stop(&master->transaction_timer);
 
-  // FIXME
+  if(mode == MB_REG_READ)
+  {
+    __handle_coil_discrete_read_response(master,  modbus_reg_coil, slave, addr, nreg, regs);
+  }
+
   app_modbus_master_next(master);
 }
 
@@ -284,9 +342,9 @@ __discrete_cb(ModbusMasterCTX* ctx, uint8_t slave, uint16_t addr, uint16_t nreg,
 {
   app_modbus_master_t* master = (app_modbus_master_t*)ctx->priv;
 
-  TRACE(APP_START, "%s\n", __func__);
   evloop_timer_stop(&master->transaction_timer);
-  // FIXME
+
+  __handle_coil_discrete_read_response(master,  modbus_reg_discrete, slave, addr, nreg, regs);
 
   app_modbus_master_next(master);
 }
