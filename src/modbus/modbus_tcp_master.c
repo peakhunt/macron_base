@@ -51,12 +51,11 @@ modbus_tcp_master_request(ModbusMasterCTX* ctx, uint8_t slave)
   if(stream_write(&master->stream, ctx->tx_buf, ctx->tx_ndx) == FALSE)
   {
     TRACE(MB_TCP_MASTER, "tx error\n");
-    modbus_tcp_master_start_reconnect(master);
-
     if(master->ctx.event_cb != NULL)
     {
       master->ctx.event_cb(&master->ctx, modbus_master_event_disconnected);
     }
+    modbus_tcp_master_start_reconnect(master);
   }
 
   master->tid++;
@@ -80,6 +79,11 @@ modbus_tcp_master_stream_callback(stream_t* stream, stream_event_t evt)
 
   case stream_event_eof:
   case stream_event_err:
+    TRACE(MB_TCP_MASTER, "got eof/err event %d\n", evt);
+    if(master->ctx.event_cb != NULL)
+    {
+      master->ctx.event_cb(&master->ctx, modbus_master_event_disconnected);
+    }
     modbus_tcp_master_start_reconnect(master);
     break;
 
