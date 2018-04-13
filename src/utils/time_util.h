@@ -11,8 +11,16 @@ time_util_get_sys_clock_in_ms(void)
 
   clock_gettime(CLOCK_MONOTONIC, &now);
 
-  ret = now.tv_sec * 1000 +  now.tv_nsec / 1000000.0;
+  ret = now.tv_sec * 1000.0 +  now.tv_nsec / 1000000.0;
   return ret;
+}
+
+static inline long
+time_util_get_sys_clock_elapsed_in_ms(long start)
+{
+  long now = time_util_get_sys_clock_in_ms();
+
+  return now - start;
 }
 
 #endif /* !__TIME_UTIL_DEF_H__ */
