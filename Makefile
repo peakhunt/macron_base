@@ -54,6 +54,7 @@ src/modbus/modbus_crc.c
 
 LIB_CORE_SOURCES =                                  \
 src/core/channel.c                                  \
+src/core/alarm.c                                    \
 src/core/channel_manager.c
 
 APP_SOURCES =                                       \
