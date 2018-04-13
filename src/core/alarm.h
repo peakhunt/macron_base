@@ -1,6 +1,7 @@
 #ifndef __ALARM_DEF_H__
 #define __ALARM_DEF_H__
 
+#include <time.h>
 #include "common_def.h"
 #include "list.h"
 #include "bhash.h"
@@ -8,16 +9,17 @@
 typedef enum
 {
   alarm_state_inactive,
-  alarm_state_pending,
+  alarm_state_active_pending,
   alarm_state_inactive_pending,
   alarm_state_active
 } alarm_state_t;
 
 typedef enum
 {
-  alarm_delay_state_idle,
-  alarm_delay_state_measuring,
-  alarm_delay_state_clear_measuring,
+  alarm_delay_state_occurring,
+  alarm_delay_state_clearing,
+  alarm_delay_state_occurred,
+  alarm_delay_state_cleared,
 } alarm_delay_state_t;
 
 typedef enum
@@ -55,7 +57,9 @@ typedef struct
   alarm_setpoint_t      set_point;
 
   uint32_t              delay;
-  uint32_t              start_time;
+  long                  start_time;
+
+  time_t                occur_time;
 } alarm_t;
 
 extern alarm_t* alarm_alloc(uint32_t alarm_num, uint32_t chnl_num, alarm_severity_t severity,
