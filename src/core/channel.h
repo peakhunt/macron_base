@@ -41,9 +41,9 @@ typedef struct
   lookup_table_t*     lookup_table;
 } channel_t;
 
-extern channel_t* channel_alloc(uint16_t chnl_num, channel_type_t chnl_type, channel_direction_t chnl_dir);
-extern channel_t* channel_alloc_digital(uint16_t chnl_num, channel_direction_t chnl_dir);
-extern channel_t* channel_alloc_analog(uint16_t chnl_num, channel_direction_t chnl_dir, lookup_table_t* lookup_table);
+extern channel_t* channel_alloc(uint32_t chnl_num, channel_type_t chnl_type, channel_direction_t chnl_dir);
+extern channel_t* channel_alloc_digital(uint32_t chnl_num, channel_direction_t chnl_dir);
+extern channel_t* channel_alloc_analog(uint32_t chnl_num, channel_direction_t chnl_dir, lookup_table_t* lookup_table);
 
 extern void channel_set_lookup_table(channel_t* chnl, lookup_table_t* lookup_table);
 extern void channel_update_raw_value(channel_t* chnl);

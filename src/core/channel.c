@@ -2,7 +2,7 @@
 #include "channel.h"
 
 channel_t*
-channel_alloc(uint16_t chnl_num, channel_type_t chnl_type, channel_direction_t chnl_dir)
+channel_alloc(uint32_t chnl_num, channel_type_t chnl_type, channel_direction_t chnl_dir)
 {
   channel_t*    chnl;
 
@@ -23,13 +23,13 @@ channel_alloc(uint16_t chnl_num, channel_type_t chnl_type, channel_direction_t c
 }
 
 channel_t*
-channel_alloc_digital(uint16_t chnl_num, channel_direction_t chnl_dir)
+channel_alloc_digital(uint32_t chnl_num, channel_direction_t chnl_dir)
 {
   return channel_alloc(chnl_num, channel_type_digital, chnl_dir);
 }
 
 channel_t*
-channel_alloc_analog(uint16_t chnl_num, channel_direction_t chnl_dir, lookup_table_t* lookup_table)
+channel_alloc_analog(uint32_t chnl_num, channel_direction_t chnl_dir, lookup_table_t* lookup_table)
 {
   channel_t* chnl;
 
