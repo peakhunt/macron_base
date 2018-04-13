@@ -98,7 +98,6 @@ channel_update_eng_value(channel_t* chnl)
     }
     break;
   }
-  publisher_exec_notify(&chnl->chnl_update, chnl);
 }
 
 void

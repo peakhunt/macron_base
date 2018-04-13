@@ -53,12 +53,4 @@ extern void channel_update_raw_value(channel_t* chnl);
 extern void channel_update_eng_value(channel_t* chnl);
 extern void channel_add_observer(channel_t* chnl, observer_t* obs);
 
-static inline void
-__channel_set_eng_value(channel_t* chnl, channel_eng_value_t v)
-{
-  chnl->eng_value   = v;
-  publisher_exec_notify(&chnl->chnl_update, chnl);
-}
-
-
 #endif /* !__CHANNEL_DEF_H__ */

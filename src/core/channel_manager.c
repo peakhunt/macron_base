@@ -183,7 +183,11 @@ channel_manager_set_eng_value(uint32_t chnl_num, channel_eng_value_t v)
     return;
   }
 
-  __channel_set_eng_value(chnl, v);
+  chnl->eng_value = v;
+  if(chnl->chnl_dir == channel_direction_virtual)
+  {
+    publisher_exec_notify(&chnl->chnl_update, chnl);
+  }
 
   if(chnl->chnl_dir == channel_direction_out)
   {
@@ -209,6 +213,7 @@ channel_manager_update_input(void)
     chnl->raw_value = chnl->raw_value_queued;
 
     channel_update_eng_value(chnl);
+    publisher_exec_notify(&chnl->chnl_update, chnl);
 
     pthread_mutex_unlock(&_chnl_mgr_lock);
 
@@ -227,6 +232,7 @@ channel_manager_update_output(void)
     TRACE(CHANNELM, "updating output for channel %d\n", chnl->chnl_num);
 
     chnl->raw_value_queued = chnl->raw_value;
+    publisher_exec_notify(&chnl->chnl_update, chnl);
 
     pthread_mutex_unlock(&_chnl_mgr_lock);
   }
