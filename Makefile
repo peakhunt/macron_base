@@ -53,6 +53,9 @@ src/modbus/modbus_rtu_response_handler.c            \
 src/modbus/modbus_regs.c                            \
 src/modbus/modbus_crc.c
 
+MONGOOSE_SOURCES =                                  \
+src/mongoose/mongoose.c
+
 LIB_CORE_SOURCES =                                  \
 src/core/channel.c                                  \
 src/core/alarm.c                                    \
@@ -92,6 +95,7 @@ C_INCLUDES =                              \
 -Isrc/modbus                              \
 -Isrc/core                                \
 -Isrc/app                                 \
+-Isrc/mongoose                            \
 -I$(LIBEV_DIR)/include
 
 LIBS = -lev -lpthread -lm
@@ -135,7 +139,7 @@ all: $(BUILD_DIR)/$(TARGET) $(BUILD_DIR)/$(MIGRATION)
 #######################################
 # target source setup
 #######################################
-TARGET_SOURCES := $(LIB_UTILS_SOURCES) $(LIB_MODBUS_SOURCES) $(LIB_CORE_SOURCES) $(APP_SOURCES)
+TARGET_SOURCES := $(LIB_UTILS_SOURCES) $(LIB_MODBUS_SOURCES) $(LIB_CORE_SOURCES) $(MONGOOSE_SOURCES) $(APP_SOURCES)
 OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(TARGET_SOURCES:.c=.o)))
 vpath %.c $(sort $(dir $(TARGET_SOURCES)))
 
