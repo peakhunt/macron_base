@@ -68,7 +68,8 @@ src/app/app_config.c
 TEST_C_SOURCE =                                     \
 test/cmd_option_test.c                              \
 test/mb_reg_test.c                                  \
-test/lookup_table_test.c
+test/lookup_table_test.c                            \
+test/alarm_test.c
 
 TEST_MAIN_C_SOURCE =                                \
 test/test_main.c

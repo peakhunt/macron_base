@@ -201,15 +201,12 @@ alarm_alloc_analog(uint32_t alarm_num, uint32_t chnl_num, alarm_severity_t sever
 }
 
 void
-alarm_update(alarm_t* alarm)
+alarm_update(alarm_t* alarm, channel_eng_value_t v)
 {
-  bool          chnl_v_b = FALSE;     // FIXME
-  float         chnl_v_f = 0.0f;      // FIXME
-
   switch(alarm->trigger_type)
   {
   case alarm_trigger_digital:
-    if(chnl_v_b == alarm->set_point.b)
+    if(v.b == alarm->set_point.b)
     {
       handle_alarm_state_machine(alarm, alarm_event_occur);
     }
@@ -220,7 +217,7 @@ alarm_update(alarm_t* alarm)
     break;
 
   case alarm_trigger_low:
-    if(chnl_v_f < alarm->set_point.f)
+    if(v.f < alarm->set_point.f)
     {
       handle_alarm_state_machine(alarm, alarm_event_occur);
     }
@@ -231,7 +228,7 @@ alarm_update(alarm_t* alarm)
     break;
 
   case alarm_trigger_high:
-    if(chnl_v_f > alarm->set_point.f)
+    if(v.f > alarm->set_point.f)
     {
       handle_alarm_state_machine(alarm, alarm_event_occur);
     }

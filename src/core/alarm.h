@@ -5,6 +5,7 @@
 #include "common_def.h"
 #include "list.h"
 #include "bhash.h"
+#include "channel.h"
 
 typedef enum
 {
@@ -24,7 +25,7 @@ typedef enum
 
 typedef enum
 {
-  alarm_severity_minitor,
+  alarm_severity_minor,
   alarm_severity_major,
   alarm_severity_critical
 } alarm_severity_t;
@@ -69,7 +70,7 @@ extern alarm_t* alarm_alloc_digital(uint32_t alarm_num, uint32_t chnl_num, alarm
 extern alarm_t* alarm_alloc_analog(uint32_t alarm_num, uint32_t chnl_num, alarm_severity_t severity,
     bool high, float set_point, uint32_t delay);
 
-extern void alarm_update(alarm_t* alarm);
+extern void alarm_update(alarm_t* alarm, channel_eng_value_t v);
 extern void alarm_ack(alarm_t* alarm);
 
 #endif /* !__ALARM_DEF_H__ */

@@ -8,6 +8,7 @@
 extern void cmd_option_add_test(CU_pSuite pSuite);
 extern void lookup_table_add_test(CU_pSuite pSuite);
 extern void mb_reg_add_test(CU_pSuite pSuite);
+extern void alarm_add_test(CU_pSuite pSuite);
 
 int init_suite_success(void) { return 0; }
 int init_suite_failure(void) { return -1; }
@@ -33,6 +34,7 @@ main(void)
   cmd_option_add_test(pSuite);
   lookup_table_add_test(pSuite);
   mb_reg_add_test(pSuite);
+  alarm_add_test(pSuite);
 
   /* Run all tests using the basic interface */
   CU_basic_set_mode(CU_BRM_VERBOSE);
