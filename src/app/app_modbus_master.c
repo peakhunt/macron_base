@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <time.h>
 #include "common_def.h"
 #include "app_modbus_master.h"
 #include "app_config.h"
@@ -13,6 +12,7 @@
 #include "channel_manager.h"
 #include "evloop_timer.h"
 #include "trace.h"
+#include "time_util.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -34,7 +34,7 @@ typedef struct
   uint32_t                  inter_request_delay;
   uint32_t                  timeout;
 
-  struct timespec           req_start_time;
+  long                      req_start_time;
 
   evloop_timer_t            wait_timer;
   evloop_timer_t            transaction_timer;
@@ -74,24 +74,17 @@ __get_mapped_channel(app_modbus_master_t* master, uint32_t slave_id, modbus_reg_
 static inline void
 mark_req_start_time(app_modbus_master_t* master)
 {
-  clock_gettime(CLOCK_MONOTONIC, &master->req_start_time);
+  master->req_start_time = time_util_get_sys_clock_in_ms();
 }
 
 static inline long
 get_time_took_for_transaction_in_ms(app_modbus_master_t* master)
 {
-  long        delta,
-              second,
-              msecond;
-  struct timespec now;
+  long now;
 
-  clock_gettime(CLOCK_MONOTONIC, &now);
+  now = time_util_get_sys_clock_in_ms();
 
-  second  = now.tv_sec - master->req_start_time.tv_sec;
-  msecond = (now.tv_nsec - master->req_start_time.tv_nsec) / 1000000.0;
-
-  delta = (second * 1000 + msecond);
-  return delta;
+  return now - master->req_start_time;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -277,7 +270,7 @@ app_modbus_master_next(app_modbus_master_t* master)
 
   wait_time = target_delay - time_took_for_prev_transacion;
 
-#if 0
+#if 1
   TRACE(APP_START, "took %d, target: %f, wait %f\n",
       time_took_for_prev_transacion,
       target_delay,
