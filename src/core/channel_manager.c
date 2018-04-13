@@ -7,8 +7,6 @@
 
 #define CHANNEL_MANAGER_NUM_BUCKETS     1024
 
-#define MODULE_TRACE      CHANNELM
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 // module privates: this module is supposed to be a singleton
@@ -91,24 +89,24 @@ channel_manager_add_channel(channel_t* chnl)
 
   _num_channels++;
 
-  TRACE(MODULE_TRACE, "adding channel %d, %d\n", chnl->chnl_num, chnl->chnl_dir);
+  TRACE(CHANNELM, "adding channel %d, %d\n", chnl->chnl_num, chnl->chnl_dir);
 
   switch(chnl->chnl_dir)
   {
   case channel_direction_in:
-    TRACE(MODULE_TRACE, "adding in channel %d\n", chnl->chnl_num);
+    TRACE(CHANNELM, "adding in channel %d\n", chnl->chnl_num);
     list_add_tail(&chnl->le_by_dir, &_in_channels);
     _num_in_channels++;
     break;
 
   case channel_direction_out:
-    TRACE(MODULE_TRACE, "adding out channel %d\n", chnl->chnl_num);
+    TRACE(CHANNELM, "adding out channel %d\n", chnl->chnl_num);
     list_add_tail(&chnl->le_by_dir, &_out_channels);
     _num_out_channels++;
     break;
 
   case channel_direction_virtual:
-    TRACE(MODULE_TRACE, "adding virtual channel %d\n", chnl->chnl_num);
+    TRACE(CHANNELM, "adding virtual channel %d\n", chnl->chnl_num);
     list_add_tail(&chnl->le_by_dir, &_vir_channels);
     _num_vir_channels++;
     break;
@@ -126,7 +124,7 @@ channel_manager_get_raw_value(uint32_t chnl_num)
   chnl = channel_manager_chnl_get(chnl_num);
   if(chnl == NULL)
   {
-    TRACE(MODULE_TRACE, "%s can't find channel %d\n", __func__, chnl_num);
+    TRACE(CHANNELM, "%s can't find channel %d\n", __func__, chnl_num);
     return 0;
   }
 
@@ -144,7 +142,7 @@ channel_manager_set_raw_value(uint32_t chnl_num, uint32_t v)
   chnl = channel_manager_chnl_get(chnl_num);
   if(chnl == NULL)
   {
-    TRACE(MODULE_TRACE, "%s can't find channel %d\n", __func__, chnl_num);
+    TRACE(CHANNELM, "%s can't find channel %d\n", __func__, chnl_num);
     return;
   }
 
@@ -163,7 +161,7 @@ channel_manager_get_eng_value(uint32_t chnl_num)
   chnl = channel_manager_chnl_get(chnl_num);
   if(chnl == NULL)
   {
-    TRACE(MODULE_TRACE, "%s can't find channel %d\n", __func__, chnl_num);
+    TRACE(CHANNELM, "%s can't find channel %d\n", __func__, chnl_num);
     return v;
   }
 
@@ -181,13 +179,16 @@ channel_manager_set_eng_value(uint32_t chnl_num, channel_eng_value_t v)
   chnl = channel_manager_chnl_get(chnl_num);
   if(chnl == NULL)
   {
-    TRACE(MODULE_TRACE, "%s can't find channel %d\n", __func__, chnl_num);
+    TRACE(CHANNELM, "%s can't find channel %d\n", __func__, chnl_num);
     return;
   }
 
-  chnl->eng_value = v;
+  __channel_set_eng_value(chnl, v);
 
-  channel_update_raw_value(chnl);
+  if(chnl->chnl_dir == channel_direction_out)
+  {
+    channel_update_raw_value(chnl);
+  }
 
   channel_manager_chnl_put(chnl);
 }
@@ -197,13 +198,13 @@ channel_manager_update_input(void)
 {
   channel_t*    chnl;
 
-  TRACE(MODULE_TRACE, "updating input\n");
+  TRACE(CHANNELM, "updating input\n");
 
   list_for_each_entry(chnl, &_in_channels, le_by_dir)
   {
     pthread_mutex_lock(&_chnl_mgr_lock);
 
-    TRACE(MODULE_TRACE, "updating input for channel %d\n", chnl->chnl_num);
+    TRACE(CHANNELM, "updating input for channel %d\n", chnl->chnl_num);
 
     chnl->raw_value = chnl->raw_value_queued;
 
@@ -219,11 +220,11 @@ channel_manager_update_output(void)
 {
   channel_t*    chnl;
 
-  TRACE(MODULE_TRACE, "updating output\n");
+  TRACE(CHANNELM, "updating output\n");
   list_for_each_entry(chnl, &_out_channels, le_by_dir)
   {
     pthread_mutex_unlock(&_chnl_mgr_lock);
-    TRACE(MODULE_TRACE, "updating output for channel %d\n", chnl->chnl_num);
+    TRACE(CHANNELM, "updating output for channel %d\n", chnl->chnl_num);
 
     chnl->raw_value_queued = chnl->raw_value;
 
@@ -239,11 +240,28 @@ channel_manager_update_lookup_table(uint32_t chnl_num, lookup_table_t* lookup_ta
   chnl = channel_manager_chnl_get(chnl_num);
   if(chnl == NULL)
   {
-    TRACE(MODULE_TRACE, "%s can't find channel %d\n", __func__, chnl_num);
+    TRACE(CHANNELM, "%s can't find channel %d\n", __func__, chnl_num);
     return;
   }
 
   channel_set_lookup_table(chnl, lookup_table);
+
+  channel_manager_chnl_put(chnl);
+}
+
+void
+channel_manager_add_observer(uint32_t chnl_num, observer_t* obs)
+{
+  channel_t* chnl;
+
+  chnl = channel_manager_chnl_get(chnl_num);
+  if(chnl == NULL)
+  {
+    TRACE(CHANNELM, "%s can't find channel %d\n", __func__, chnl_num);
+    return;
+  }
+
+  channel_add_observer(chnl, obs);
 
   channel_manager_chnl_put(chnl);
 }

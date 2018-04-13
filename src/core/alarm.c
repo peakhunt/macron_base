@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "alarm.h"
 #include "time_util.h"
+#include "trace.h"
 
 typedef enum
 {
@@ -153,6 +154,15 @@ handle_alarm_state_machine(alarm_t* alarm, alarm_event_t event)
   }
 }
 
+static void
+__on_channel_update(observer_t* obs, void* arg)
+{
+  alarm_t*    alarm = container_of(obs, alarm_t, chnl_obs);
+  channel_t*  chnl = (channel_t*)arg;
+
+  alarm_update(alarm, chnl->eng_value);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // public interfaces
@@ -174,6 +184,8 @@ alarm_alloc(uint32_t alarm_num, uint32_t chnl_num, alarm_severity_t severity,
   alarm->trigger_type = trigger_type;
   alarm->set_point    = set_point;
   alarm->delay        = delay;
+
+  alarm->chnl_obs.notify = __on_channel_update;
 
   return alarm;
 }

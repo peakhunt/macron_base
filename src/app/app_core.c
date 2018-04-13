@@ -3,6 +3,7 @@
 #include "evloop_thread.h"
 #include "evloop_timer.h"
 #include "channel_manager.h"
+#include "alarm_manager.h"
 #include "trace.h"
 
 static void app_core_thread_init(evloop_thread_t* thrd);
@@ -67,6 +68,30 @@ __load_channels(void)
   TRACE(APP_CORE, "done loading %d channels\n", num_channels);
 }
 
+static void
+__load_alarms(void)
+{
+  int num_alarms;
+  app_alarm_config_t      alm_cfg;
+  alarm_t*                alarm;
+
+  TRACE(APP_CORE, "loading alarms\n");
+  num_alarms = app_config_get_num_alarms();
+
+  for(int i = 0; i < num_alarms; i++)
+  {
+    app_config_get_alarm_at(i, &alm_cfg);
+
+    alarm = alarm_alloc(alm_cfg.alarm_num, alm_cfg.chnl_num,
+        alm_cfg.severity, alm_cfg.trigger_type,
+        alm_cfg.set_point,
+        alm_cfg.delay);
+
+    alarm_manager_add_alarm(alarm);
+  }
+  TRACE(APP_CORE, "done loading %d alarms\n", num_alarms);
+}
+
 void
 app_core_init(void)
 {
@@ -75,8 +100,10 @@ app_core_init(void)
   evloop_thread_init(&_app_core_thread);
 
   channel_manager_init();
+  alarm_manager_init();
 
   __load_channels();
+  __load_alarms();
 
   evloop_thread_run(&_app_core_thread);
 }

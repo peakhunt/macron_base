@@ -19,6 +19,8 @@ channel_alloc(uint32_t chnl_num, channel_type_t chnl_type, channel_direction_t c
 
   chnl->lookup_table      = NULL;
 
+  publisher_init(&chnl->chnl_update);
+
   return chnl;
 }
 
@@ -96,4 +98,11 @@ channel_update_eng_value(channel_t* chnl)
     }
     break;
   }
+  publisher_exec_notify(&chnl->chnl_update, chnl);
+}
+
+void
+channel_add_observer(channel_t* chnl, observer_t* obs)
+{
+  publisher_add_observer(&chnl->chnl_update, obs);
 }

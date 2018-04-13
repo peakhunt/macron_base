@@ -5,6 +5,7 @@
 #include "list.h"
 #include "bhash.h"
 #include "lookup_table.h"
+#include "publish_observe.h"
 
 typedef enum
 {
@@ -39,6 +40,8 @@ typedef struct
   uint32_t            raw_value;
   uint32_t            raw_value_queued;     /* for input input buffer, for output output buffer */
   lookup_table_t*     lookup_table;
+
+  publisher_t         chnl_update;
 } channel_t;
 
 extern channel_t* channel_alloc(uint32_t chnl_num, channel_type_t chnl_type, channel_direction_t chnl_dir);
@@ -48,6 +51,14 @@ extern channel_t* channel_alloc_analog(uint32_t chnl_num, channel_direction_t ch
 extern void channel_set_lookup_table(channel_t* chnl, lookup_table_t* lookup_table);
 extern void channel_update_raw_value(channel_t* chnl);
 extern void channel_update_eng_value(channel_t* chnl);
+extern void channel_add_observer(channel_t* chnl, observer_t* obs);
+
+static inline void
+__channel_set_eng_value(channel_t* chnl, channel_eng_value_t v)
+{
+  chnl->eng_value   = v;
+  publisher_exec_notify(&chnl->chnl_update, chnl);
+}
 
 
 #endif /* !__CHANNEL_DEF_H__ */

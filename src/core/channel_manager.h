@@ -17,5 +17,6 @@ extern void channel_manager_update_input(void);
 extern void channel_manager_update_output(void);
 
 extern void channel_manager_update_lookup_table(uint32_t chnl_num, lookup_table_t* lookup_table);
+extern void channel_manager_add_observer(uint32_t chnl_num, observer_t* obs);
 
 #endif /* !__CHANNEL_MANAGER_DEF_H__ */

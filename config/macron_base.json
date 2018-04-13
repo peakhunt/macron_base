@@ -30231,6 +30231,36 @@
     }
   ],
 
+  "alarms": [
+    {
+      "name": "test alarm #1", 
+      "alarm_num": 1,
+      "chnl_num": 4,
+      "trigger_type": "digital",
+      "set_point": "on",
+      "severity": "critical",
+      "delay": 500
+    },
+    {
+      "name": "test alarm #2", 
+      "alarm_num": 2,
+      "chnl_num": 2,
+      "trigger_type": "low",
+      "set_point": 10,
+      "severity": "major",
+      "delay": 0
+    },
+    {
+      "name": "test alarm #3", 
+      "alarm_num": 3,
+      "chnl_num": 2,
+      "trigger_type": "high",
+      "set_point": 50,
+      "severity": "minor",
+      "delay": 500
+    }
+  ],
+
   "io_channels": {
     "modbus_reg_list" : [
       {

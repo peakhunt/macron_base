@@ -48,6 +48,12 @@ app_config_get_int(cJSON* node, const char* name)
   return app_config_get_node(node, name)->valueint;
 }
 
+static inline double
+app_config_get_double(cJSON* node, const char* name)
+{
+  return app_config_get_node(node, name)->valuedouble;
+}
+
 static inline char*
 app_config_get_str(cJSON* node, const char* name)
 {
@@ -417,3 +423,79 @@ app_config_get_channel_at(int ndx, app_channel_config_t* chnl_cfg)
   }
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// alarm loading
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int
+app_config_get_num_alarms(void)
+{
+  cJSON       *alarms;
+
+  alarms = app_config_get_node(_jroot, "alarms");
+
+  return cJSON_GetArraySize(alarms);
+}
+
+void
+app_config_get_alarm_at(int ndx, app_alarm_config_t* alm_cfg)
+{
+  cJSON       *alarms,
+              *node;
+
+  const char* str;
+
+  alarms = app_config_get_node(_jroot, "alarms");
+  node = cJSON_GetArrayItem(alarms, ndx);
+
+  alm_cfg->alarm_num  = app_config_get_int(node, "alarm_num");
+  alm_cfg->chnl_num   = app_config_get_int(node, "chnl_num");
+
+  str = app_config_get_str(node, "trigger_type");
+  if(strcmp(str, "digital") == 0)
+  {
+    alm_cfg->trigger_type = alarm_trigger_digital;
+  }
+  else if(strcmp(str, "low") == 0)
+  {
+    alm_cfg->trigger_type = alarm_trigger_low;
+  }
+  else
+  {
+    alm_cfg->trigger_type = alarm_trigger_high;
+  }
+
+  if(alm_cfg->trigger_type == alarm_trigger_digital)
+  {
+    str = app_config_get_str(node, "set_point");
+    if(strcmp(str, "on") == 0)
+    {
+      alm_cfg->set_point.b = TRUE;
+    }
+    else
+    {
+      alm_cfg->set_point.b = FALSE;
+    }
+  }
+  else
+  {
+    alm_cfg->set_point.f = (float)app_config_get_double(node, "set_point");
+  }
+
+  str = app_config_get_str(node, "severity");
+  if(strcmp(str, "minor") == 0)
+  {
+    alm_cfg->severity = alarm_severity_minor;
+  }
+  else if(strcmp(str, "major") == 0)
+  {
+    alm_cfg->severity = alarm_severity_major;
+  }
+  else
+  {
+    alm_cfg->severity = alarm_severity_critical;
+  }
+
+  alm_cfg->delay = app_config_get_int(node, "delay");
+}

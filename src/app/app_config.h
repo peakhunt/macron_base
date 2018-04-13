@@ -16,6 +16,10 @@ extern void app_config_get_cli_config(cli_config_t* cli_cfg);
 extern int app_config_get_num_channels(void);
 extern void app_config_get_channel_at(int ndx, app_channel_config_t* chnl_cfg);
 
+// for alarm core
+extern int app_config_get_num_alarms(void);
+extern void app_config_get_alarm_at(int ndx, app_alarm_config_t* alm_cfg);
+
 // for modbus slaves
 extern int app_config_get_num_modbus_slaves(void);
 extern void app_config_get_modbus_slave_at(int ndx, app_modbus_slave_config_t* cfg);

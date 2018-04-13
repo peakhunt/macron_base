@@ -6,6 +6,7 @@
 #include "list.h"
 #include "bhash.h"
 #include "channel.h"
+#include "publish_observe.h"
 
 typedef enum
 {
@@ -61,6 +62,8 @@ typedef struct
   long                  start_time;
 
   time_t                occur_time;
+
+  observer_t            chnl_obs;
 } alarm_t;
 
 extern alarm_t* alarm_alloc(uint32_t alarm_num, uint32_t chnl_num, alarm_severity_t severity,

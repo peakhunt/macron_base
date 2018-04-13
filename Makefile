@@ -33,6 +33,7 @@ src/utils/telnet_reader.c                           \
 src/utils/hex_dump.c                                \
 src/utils/trace.c                                   \
 src/utils/lookup_table.c                            \
+src/utils/publish_observe.c                         \
 src/utils/debug_log.c
 
 LIB_MODBUS_SOURCES =                                \
@@ -55,7 +56,8 @@ src/modbus/modbus_crc.c
 LIB_CORE_SOURCES =                                  \
 src/core/channel.c                                  \
 src/core/alarm.c                                    \
-src/core/channel_manager.c
+src/core/channel_manager.c                          \
+src/core/alarm_manager.c
 
 APP_SOURCES =                                       \
 src/app/main.c                                      \
