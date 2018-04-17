@@ -8,14 +8,25 @@ do
   echo "{"
   echo " \"name\": \"test channel #$CNT\","
   echo " \"chnl_num\": $CNT,"
-  echo '  "chnl_type": "digital",'
 
   MOD=$(expr $CNT % 2)
   if [ $MOD -eq 0 ]
   then
-    echo '  "chnl_dir": "input"'
+    echo '  "chnl_dir": "input",'
   else
-    echo '  "chnl_dir": "output"'
+    echo '  "chnl_dir": "output",'
+  fi
+
+  MOD=$(expr $CNT % 4)
+  if [ $MOD -eq 0 ]
+  then
+    echo '  "chnl_type": "analog",'
+    echo '  "lookup_table": ['
+    echo '    { "raw": 0,  "eng": 0     },'
+    echo '    { "raw": 20, "eng": 20    }'
+    echo '  ]'
+  else
+    echo '  "chnl_type": "digital"'
   fi
 
   if [ $CNT -lt $NUM_CHANNELS ]
