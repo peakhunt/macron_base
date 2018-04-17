@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "app_core.h"
 #include "app_config.h"
 #include "evloop_thread.h"
@@ -48,6 +49,34 @@ app_core_thread_fini(evloop_thread_t* thrd)
   TRACE(APP_CORE, "shutting down app_core thread\n");
 }
 
+static lookup_table_t*
+__load_lookup_table(int chnl_ndx)
+{
+  int                     num_entries;
+  float                   raw,
+                          eng;
+  lookup_table_t*         lut;
+  lookup_table_item_t*    items;
+
+  num_entries = app_config_get_num_lookup_table_of_channel_at(chnl_ndx);
+  items = malloc(sizeof(lookup_table_item_t) * num_entries);
+  lut   = malloc(sizeof(lookup_table_t));
+
+  for(int i = 0; i < num_entries; i++)
+  {
+    app_config_get_lookup_table_of_channel_at(chnl_ndx, i, &raw, &eng);
+
+    items[i].v1   = raw;
+    items[i].v2   = eng;
+  }
+
+  lookup_table_init(lut, items, num_entries);
+
+  free(items);
+
+  return lut;
+}
+
 static void
 __load_channels(void)
 {
@@ -61,8 +90,13 @@ __load_channels(void)
   for(int i = 0; i < num_channels; i++)
   {
     app_config_get_channel_at(i, &chnl_cfg);
-
     chnl = channel_alloc(chnl_cfg.chnl_num, chnl_cfg.chnl_type, chnl_cfg.chnl_dir);
+
+    if(chnl_cfg.chnl_type == channel_type_analog)
+    {
+      chnl->lookup_table = __load_lookup_table(i);
+    }
+
     channel_manager_add_channel(chnl);
   }
   TRACE(APP_CORE, "done loading %d channels\n", num_channels);

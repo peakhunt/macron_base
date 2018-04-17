@@ -16,6 +16,10 @@ extern void app_config_get_cli_config(cli_config_t* cli_cfg);
 extern int app_config_get_num_channels(void);
 extern void app_config_get_channel_at(int ndx, app_channel_config_t* chnl_cfg);
 
+// for analog lookup table
+extern int app_config_get_num_lookup_table_of_channel_at(int ndx);
+extern void app_config_get_lookup_table_of_channel_at(int chnl_ndx, int lt_ndx, float* raw, float* eng);
+
 // for alarm core
 extern int app_config_get_num_alarms(void);
 extern void app_config_get_alarm_at(int ndx, app_alarm_config_t* alm_cfg);

@@ -423,6 +423,37 @@ app_config_get_channel_at(int ndx, app_channel_config_t* chnl_cfg)
   }
 }
 
+int
+app_config_get_num_lookup_table_of_channel_at(int ndx)
+{
+  cJSON       *channels,
+              *channel,
+              *lookup_table;
+
+  channels      = app_config_get_node(_jroot, "channels");
+  channel       = cJSON_GetArrayItem(channels, ndx);
+  lookup_table  = app_config_get_node(channel, "lookup_table");
+
+  return cJSON_GetArraySize(lookup_table);
+}
+
+void
+app_config_get_lookup_table_of_channel_at(int chnl_ndx, int lt_ndx, float* raw, float* eng)
+{
+  cJSON       *channels,
+              *channel,
+              *lookup_table,
+              *entry;
+
+  channels      = app_config_get_node(_jroot, "channels");
+  channel       = cJSON_GetArrayItem(channels, chnl_ndx);
+  lookup_table  = app_config_get_node(channel, "lookup_table");
+  entry         =  cJSON_GetArrayItem(lookup_table, lt_ndx);
+
+  *raw          = (float)app_config_get_double(entry, "raw");
+  *eng          = (float)app_config_get_double(entry, "eng");
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // alarm loading
