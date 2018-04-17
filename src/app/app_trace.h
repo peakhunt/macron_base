@@ -5,11 +5,13 @@
 
 #define APP_TRACE_DEFS  \
   TRACE_DEF(APP_START), \
+  TRACE_DEF(APP_WEB),   \
   TRACE_DEF(APP_CORE), 
 
 
 #define APP_TRACE_STRS  \
   "APP_START"           \
+  "APP_WEB"             \
   "APP_CORE"
 
 

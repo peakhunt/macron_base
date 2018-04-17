@@ -68,6 +68,7 @@ src/app/app_core.c                                  \
 src/app/app_cli.c                                   \
 src/app/app_modbus_slave.c                          \
 src/app/app_modbus_master.c                         \
+src/app/app_webserver.c                             \
 src/app/app_config.c
 
 TEST_C_SOURCE =                                     \

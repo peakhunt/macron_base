@@ -10,6 +10,7 @@
 #include "app_modbus_slave.h"
 #include "app_modbus_master.h"
 #include "app_core.h"
+#include "app_webserver.h"
 
 static void main_thread_init(evloop_thread_t* thrd);
 
@@ -31,6 +32,7 @@ static uint32_t   _initial_trace_setup[] =
   //TRACE_COMP(MBAP),
   TRACE_COMP(MB_RTU_SLAVE),
   TRACE_COMP(MB_RTU_MASTER),
+  TRACE_COMP(APP_WEB),
   //TRACE_COMP(MB_TCP_MASTER),
   //TRACE_COMP(MB_MASTER),
 };
@@ -48,6 +50,7 @@ main_thread_init(evloop_thread_t* thrd)
   app_cli_init();
   app_modbus_slave_init();
   app_modbus_master_init();
+  app_webserver_init();
 }
 
 static void
