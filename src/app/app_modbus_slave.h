@@ -22,4 +22,12 @@ typedef struct
 
 extern void app_modbus_slave_init(void);
 
+////////////////////////////////////////////////////////////
+//
+// module APIs
+//
+////////////////////////////////////////////////////////////
+extern int app_api_modbus_slave_get_num_slaves(void);
+extern int app_api_modbus_slave_get_stat(int slave_ndx);
+
 #endif /* !__APP_MODBUS_SLAVE_DEF_H__ */

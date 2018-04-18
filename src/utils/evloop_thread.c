@@ -49,6 +49,27 @@ __quit_signal_handler (EV_P_ ev_async *w, int revents)
 
 ///////////////////////////////////////////////////////////////////////////////
 //
+// evloop thread lock release/acquire
+//
+///////////////////////////////////////////////////////////////////////////////
+static void
+l_release(EV_P)
+{
+  evloop_thread_t* thrd = ev_userdata(EV_A);
+
+  pthread_mutex_unlock(&thrd->thread_lock);
+}
+
+static void
+l_acquire(EV_P)
+{
+  evloop_thread_t* thrd = ev_userdata(EV_A);
+
+  pthread_mutex_lock(&thrd->thread_lock);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
 // module publics
 //
 ///////////////////////////////////////////////////////////////////////////////
@@ -56,6 +77,12 @@ void
 evloop_thread_init(evloop_thread_t* thrd)
 {
   thrd->ev_loop = ev_loop_new(0);
+
+  pthread_mutex_init(&thrd->thread_lock, NULL);
+
+  ev_set_loop_release_cb(thrd->ev_loop, l_release, l_acquire);
+  ev_set_userdata(thrd->ev_loop, thrd);
+
   ev_async_init(&thrd->quit_signal, __quit_signal_handler);
 }
 

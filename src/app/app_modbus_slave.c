@@ -35,6 +35,7 @@ static void app_mb_slave_thread_fini(evloop_thread_t* thrd);
 //
 ////////////////////////////////////////////////////////////////////////////////
 static LIST_HEAD(_modbus_slaves);
+static int _num_modbus_slaves = 0;
 
 static evloop_thread_t    _app_mb_slave_thread =
 {
@@ -238,6 +239,7 @@ alloc_init_modbus_slave(app_modbus_slave_config_t* cfg)
 
   modbus_register_list_init(&slave->reg_map);
   list_add_tail(&slave->le, &_modbus_slaves);
+  _num_modbus_slaves++;
   return slave;
 
 failed:
@@ -334,4 +336,29 @@ app_modbus_slave_init(void)
   evloop_thread_run(&_app_mb_slave_thread);
 
   app_init_complete_wait();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// external API implementation
+//
+////////////////////////////////////////////////////////////////////////////////
+int
+app_api_modbus_slave_get_num_slaves(void)
+{
+  return _num_modbus_slaves;
+}
+
+int
+app_api_modbus_slave_get_stat(int slave_ndx)
+{
+  if(slave_ndx >= _num_modbus_slaves)
+  {
+    return -1;
+  }
+
+  //
+  // FIXME
+  //
+  return 0;
 }

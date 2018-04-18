@@ -17,6 +17,8 @@ struct __evloop_thread_t
   bool              finish;
   void (*init)(evloop_thread_t* thrd);
   void (*fini)(evloop_thread_t* thrd);
+
+  pthread_mutex_t   thread_lock;
 };
 
 extern void evloop_thread_init(evloop_thread_t* thrd);
@@ -28,6 +30,18 @@ extern void evloop_default(evloop_thread_t* thrd);
 static inline evloop_thread_t* evloop_thread_self(void)
 {
   return (evloop_thread_t*)thread_getspecific();
+}
+
+static inline void
+evloop_thread_lock(evloop_thread_t* thrd)
+{
+  pthread_mutex_lock(&thrd->thread_lock);
+}
+
+static inline void
+evloop_thread_unlock(evloop_thread_t* thrd)
+{
+  pthread_mutex_unlock(&thrd->thread_lock);
 }
 
 #endif /* !__EVLOOP_THREAD_DEF_H__ */
