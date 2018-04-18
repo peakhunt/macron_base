@@ -13,6 +13,7 @@
 #include "evloop_timer.h"
 #include "trace.h"
 #include "time_util.h"
+#include "app_init_completion.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -42,12 +43,21 @@ typedef struct
   app_modbus_master_request_config_t*   request_schedule;
 } app_modbus_master_t;
 
+static void app_mb_master_thread_init(evloop_thread_t* thrd);
+static void app_mb_master_thread_fini(evloop_thread_t* thrd);
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // module privates
 //
 ////////////////////////////////////////////////////////////////////////////////
 static LIST_HEAD(_modbus_masters);
+
+static evloop_thread_t    _app_mb_master_thread =
+{
+  .init = app_mb_master_thread_init,
+  .fini = app_mb_master_thread_fini,
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -112,7 +122,7 @@ app_modbus_master_coil_write_req(app_modbus_master_t* master, app_modbus_master_
     chnl_num = __get_mapped_channel(master, slave_addr, modbus_reg_coil, reg_addr);
     if(chnl_num == -1)
     {
-      TRACE(APP_START, "can't find channel for %d, %d:%d\n", modbus_reg_coil, slave_addr, reg_addr);
+      TRACE(APP_MB_MASTER, "can't find channel for %d, %d:%d\n", modbus_reg_coil, slave_addr, reg_addr);
       return;
     }
 
@@ -127,7 +137,7 @@ app_modbus_master_coil_write_req(app_modbus_master_t* master, app_modbus_master_
     chnl_num = __get_mapped_channel(master, slave_addr, modbus_reg_coil, reg_addr + i);
     if(chnl_num == -1)
     {
-      TRACE(APP_START, "can't find channel for %d, %d:%d\n", modbus_reg_coil, slave_addr, reg_addr + i);
+      TRACE(APP_MB_MASTER, "can't find channel for %d, %d:%d\n", modbus_reg_coil, slave_addr, reg_addr + i);
       return;
     }
 
@@ -160,7 +170,7 @@ app_modbus_master_holding_write_req(app_modbus_master_t* master, app_modbus_mast
     chnl_num = __get_mapped_channel(master, slave_addr, modbus_reg_holding, reg_addr);
     if(chnl_num == -1)
     {
-      TRACE(APP_START, "can't find channel for %d, %d:%d\n", modbus_reg_holding, slave_addr, reg_addr);
+      TRACE(APP_MB_MASTER, "can't find channel for %d, %d:%d\n", modbus_reg_holding, slave_addr, reg_addr);
       return;
     }
 
@@ -174,7 +184,7 @@ app_modbus_master_holding_write_req(app_modbus_master_t* master, app_modbus_mast
     chnl_num = __get_mapped_channel(master, slave_addr, modbus_reg_holding, reg_addr + i);
     if(chnl_num == -1)
     {
-      TRACE(APP_START, "can't find channel for %d, %d:%d\n", modbus_reg_holding, slave_addr, reg_addr + i);
+      TRACE(APP_MB_MASTER, "can't find channel for %d, %d:%d\n", modbus_reg_holding, slave_addr, reg_addr + i);
       return;
     }
 
@@ -271,7 +281,7 @@ app_modbus_master_next(app_modbus_master_t* master)
   wait_time = target_delay - time_took_for_prev_transacion;
 
 #if 0
-  TRACE(APP_START, "took %d, target: %f, wait %f\n",
+  TRACE(APP_MB_MASTER, "took %d, target: %f, wait %f\n",
       time_took_for_prev_transacion,
       target_delay,
       wait_time);
@@ -303,7 +313,7 @@ modbus_master_transaction_timeout(evloop_timer_t* te, void* unused)
 
   req = &master->request_schedule[master->current_request];
 
-  TRACE(APP_START, "tr timeout, req ndx %d: %d, %d, %d, %d, %d\n",
+  TRACE(APP_MB_MASTER, "tr timeout, req ndx %d: %d, %d, %d, %d, %d\n",
       master->current_request,
       req->slave_id,
       req->op,
@@ -335,7 +345,7 @@ __handle_coil_discrete_read_response(app_modbus_master_t* master, modbus_reg_typ
     chnl_num = __get_mapped_channel(master, slave, reg_type, current);
     if(chnl_num == -1)
     {
-      TRACE(APP_START, "can't find channel for %d, %d:%d\n", reg_type, slave, current);
+      TRACE(APP_MB_MASTER, "can't find channel for %d, %d:%d\n", reg_type, slave, current);
       continue;
     }
 
@@ -361,7 +371,7 @@ __handle_holding_input_read_response(app_modbus_master_t* master, modbus_reg_typ
     chnl_num = __get_mapped_channel(master, slave, reg_type, current);
     if(chnl_num == -1)
     {
-      TRACE(APP_START, "can't find channel for %d, %d:%d\n", reg_type, slave, current);
+      TRACE(APP_MB_MASTER, "can't find channel for %d, %d:%d\n", reg_type, slave, current);
       continue;
     }
 
@@ -435,14 +445,14 @@ __modbus_master_event_cb(ModbusMasterCTX* ctx, modbus_master_event_t event)
   switch(event)
   {
   case modbus_master_event_connected:
-    TRACE(APP_START, "xxxxxx connected callback xxxxxx\n");
+    TRACE(APP_MB_MASTER, "xxxxxx connected callback xxxxxx\n");
     master->current_request = 0;
     app_modbus_master_request(master);
 
     break;
 
   case modbus_master_event_disconnected:
-    TRACE(APP_START, "xxxxxx disconnected callback xxxxxx\n");
+    TRACE(APP_MB_MASTER, "xxxxxx disconnected callback xxxxxx\n");
     if(evloop_timer_active(&master->transaction_timer))
     {
       evloop_timer_stop(&master->transaction_timer);
@@ -474,7 +484,7 @@ alloc_init_modbus_master(app_modbus_master_config_t* cfg)
   master = malloc(sizeof(app_modbus_master_t));
   if(master == NULL)
   {
-    TRACE(APP_START,"failed to alloc app_modbus_master_t\n");
+    TRACE(APP_MB_MASTER,"failed to alloc app_modbus_master_t\n");
     goto failed;
   }
 
@@ -489,7 +499,7 @@ alloc_init_modbus_master(app_modbus_master_config_t* cfg)
     tcp_master = malloc(sizeof(ModbusTCPMaster));
     if(tcp_master == NULL)
     {
-      TRACE(APP_START, "failed to alloc ModbusTCPMaster\n");
+      TRACE(APP_MB_MASTER, "failed to alloc ModbusTCPMaster\n");
       goto failed;
     }
 
@@ -503,7 +513,7 @@ alloc_init_modbus_master(app_modbus_master_config_t* cfg)
     rtu_master = malloc(sizeof(ModbusRTUMaster));
     if(rtu_master == NULL)
     {
-      TRACE(APP_START, "failed to alloc ModbusRTUMaster\n");
+      TRACE(APP_MB_MASTER, "failed to alloc ModbusRTUMaster\n");
       goto failed;
     }
 
@@ -556,11 +566,11 @@ app_modbus_load_masters(void)
 
     if(cfg.protocol == app_modbus_master_type_tcp)
     {
-      TRACE(APP_START,"initializing modbus tcp master for %s:%d\n", cfg.dest_ip, cfg.dest_port);
+      TRACE(APP_MB_MASTER,"initializing modbus tcp master for %s:%d\n", cfg.dest_ip, cfg.dest_port);
     }
     else
     {
-      TRACE(APP_START, "initializing modbus rtu master, port %s\n", cfg.serial_port);
+      TRACE(APP_MB_MASTER, "initializing modbus rtu master, port %s\n", cfg.serial_port);
     }
 
     master = alloc_init_modbus_master(&cfg);
@@ -583,7 +593,7 @@ app_modbus_load_masters(void)
     master->request_schedule  = malloc(sizeof(app_modbus_master_request_config_t) * num_reqs);
     if(master->request_schedule == NULL)
     {
-      TRACE(APP_START,"failed to malloc request_schedule\n");
+      TRACE(APP_MB_MASTER,"failed to malloc request_schedule\n");
       exit(-1);
     }
 
@@ -611,11 +621,38 @@ app_modbus_load_masters(void)
 
 ////////////////////////////////////////////////////////////////////////////////
 //
+// thread initializer
+//
+////////////////////////////////////////////////////////////////////////////////
+static void
+app_mb_master_thread_init(evloop_thread_t* thrd)
+{
+  TRACE(APP_MB_MASTER, "loading masters from config\n");
+
+  app_modbus_load_masters();
+
+  TRACE(APP_MB_MASTER, "done loading masters\n");
+
+  app_init_complete_signal();
+}
+
+static void
+app_mb_master_thread_fini(evloop_thread_t* thrd)
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//
 // public interfaces
 //
 ////////////////////////////////////////////////////////////////////////////////
 void
 app_modbus_master_init(void)
 {
-  app_modbus_load_masters();
+  TRACE(APP_MB_MASTER, "starting modbus master driver\n");
+
+  evloop_thread_init(&_app_mb_master_thread);
+  evloop_thread_run(&_app_mb_master_thread);
+
+  app_init_complete_wait();
 }

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 #include "common_def.h"
 #include "app_modbus_slave.h"
 #include "app_config.h"
@@ -10,6 +11,7 @@
 #include "modbus_tcp_slave.h"
 #include "modbus_util.h"
 #include "modbus_regs.h"
+#include "app_init_completion.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -24,12 +26,21 @@ typedef struct
   modbus_register_list_t  reg_map;
 } app_modbus_slave_t;
 
+static void app_mb_slave_thread_init(evloop_thread_t* thrd);
+static void app_mb_slave_thread_fini(evloop_thread_t* thrd);
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // module privates
 //
 ////////////////////////////////////////////////////////////////////////////////
 static LIST_HEAD(_modbus_slaves);
+
+static evloop_thread_t    _app_mb_slave_thread =
+{
+  .init = app_mb_slave_thread_init,
+  .fini = app_mb_slave_thread_fini,
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -180,7 +191,7 @@ alloc_init_modbus_slave(app_modbus_slave_config_t* cfg)
   slave = malloc(sizeof(app_modbus_slave_t));
   if(slave == NULL)
   {
-    TRACE(APP_START,"failed to alloc app_modbus_slave_t\n");
+    TRACE(APP_MB_SLAVE,"failed to alloc app_modbus_slave_t\n");
     goto failed;
   }
 
@@ -195,7 +206,7 @@ alloc_init_modbus_slave(app_modbus_slave_config_t* cfg)
     tcp_slave = malloc(sizeof(ModbusTCPSlave));
     if(tcp_slave == NULL)
     {
-      TRACE(APP_START,"failed to alloc ModbusTCPSlave\n");
+      TRACE(APP_MB_SLAVE,"failed to alloc ModbusTCPSlave\n");
       goto failed;
     }
 
@@ -209,7 +220,7 @@ alloc_init_modbus_slave(app_modbus_slave_config_t* cfg)
     rtu_slave = malloc(sizeof(ModbusRTUSlave));
     if(rtu_slave == NULL)
     {
-      TRACE(APP_START,"failed to alloc ModbusRTUSlave\n");
+      TRACE(APP_MB_SLAVE,"failed to alloc ModbusRTUSlave\n");
       goto failed;
     }
 
@@ -252,11 +263,11 @@ app_modbus_load_slaves(void)
 
     if(cfg.protocol == app_modbus_slave_type_tcp)
     {
-      TRACE(APP_START,"initializing modbus tcp slave, port %d\n", cfg.tcp_port);
+      TRACE(APP_MB_SLAVE,"initializing modbus tcp slave, port %d\n", cfg.tcp_port);
     }
     else
     {
-      TRACE(APP_START, "initializing modbus rtu slave, port %s\n", cfg.serial_port);
+      TRACE(APP_MB_SLAVE, "initializing modbus rtu slave, port %s\n", cfg.serial_port);
     }
 
     slave = alloc_init_modbus_slave(&cfg);
@@ -288,6 +299,26 @@ app_modbus_load_slaves(void)
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//
+// thread initializer
+//
+////////////////////////////////////////////////////////////////////////////////
+static void
+app_mb_slave_thread_init(evloop_thread_t* thrd)
+{
+  TRACE(APP_MB_SLAVE, "loading slaves from config\n");
+  app_modbus_load_slaves();
+
+  TRACE(APP_MB_SLAVE, "done loading slaves\n");
+
+  app_init_complete_signal();
+}
+
+static void
+app_mb_slave_thread_fini(evloop_thread_t* thrd)
+{
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -297,5 +328,10 @@ app_modbus_load_slaves(void)
 void
 app_modbus_slave_init(void)
 {
-  app_modbus_load_slaves();
+  TRACE(APP_MB_SLAVE, "starting modbus slave driver\n");
+
+  evloop_thread_init(&_app_mb_slave_thread);
+  evloop_thread_run(&_app_mb_slave_thread);
+
+  app_init_complete_wait();
 }

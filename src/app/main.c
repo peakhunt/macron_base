@@ -11,8 +11,10 @@
 #include "app_modbus_master.h"
 #include "app_core.h"
 #include "app_webserver.h"
+#include "completion.h"
 
 static void main_thread_init(evloop_thread_t* thrd);
+static completion_t     _comp;
 
 static uint32_t   _initial_trace_setup[] =
 {
@@ -33,6 +35,9 @@ static uint32_t   _initial_trace_setup[] =
   TRACE_COMP(MB_RTU_SLAVE),
   TRACE_COMP(MB_RTU_MASTER),
   TRACE_COMP(APP_WEB),
+  TRACE_COMP(APP_MB_SLAVE),
+  TRACE_COMP(APP_MB_MASTER),
+  TRACE_COMP(APP_CLI),
   //TRACE_COMP(MB_TCP_MASTER),
   //TRACE_COMP(MB_MASTER),
 };
@@ -43,14 +48,32 @@ static evloop_thread_t      _main_thread =
   .fini = NULL,
 };
 
+void
+app_init_complete_signal(void)
+{
+  completion_signal(&_comp);
+}
+
+void
+app_init_complete_wait(void)
+{
+  completion_wait(&_comp);
+}
+
 static void
 main_thread_init(evloop_thread_t* thrd)
 {
+  completion_init(&_comp);
+
   app_core_init();
-  app_cli_init();
   app_modbus_slave_init();
   app_modbus_master_init();
+
+  app_cli_init();
   app_webserver_init();
+
+  app_cli_go();
+  app_webserver_go();
 }
 
 static void

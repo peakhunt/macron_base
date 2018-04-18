@@ -5,6 +5,7 @@
 #include "evloop_timer.h"
 #include "channel_manager.h"
 #include "alarm_manager.h"
+#include "app_init_completion.h"
 #include "trace.h"
 
 static void app_core_thread_init(evloop_thread_t* thrd);
@@ -41,6 +42,10 @@ app_core_thread_init(evloop_thread_t* thrd)
 
   evloop_timer_init(&_update_timer, app_core_udpate, NULL);
   evloop_timer_start(&_update_timer, 0.05, 0);
+
+  TRACE(APP_CORE, "done initializing app_core\n");
+
+  app_init_complete_signal();
 }
 
 static void
@@ -140,4 +145,6 @@ app_core_init(void)
   __load_alarms();
 
   evloop_thread_run(&_app_core_thread);
+
+  app_init_complete_wait();
 }

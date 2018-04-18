@@ -2,6 +2,8 @@
 #include "app_webserver.h"
 #include "trace.h"
 #include "mongoose.h"
+#include "app_init_completion.h"
+#include "completion.h"
 
 #define WEB_SERVER_PORT         "8000"
 
@@ -14,6 +16,7 @@ static pthread_t    _mongoose_thread;
 static struct mg_serve_http_opts s_http_server_opts;
 
 static struct mg_str    _api_v1_root = MG_MK_STR("/api/v1/");
+static completion_t     _go_signal;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -107,6 +110,13 @@ __mongoose_thread(void* arg)
   s_http_server_opts.document_root = ".";
   s_http_server_opts.enable_directory_listing = "yes";
 
+  TRACE(APP_WEB, "done starting web server\n");
+  app_init_complete_signal();
+
+  TRACE(APP_WEB, "waiting for go signal from main\n");
+  completion_wait(&_go_signal);
+  TRACE(APP_WEB, "got go signal from main. entering main loop\n");
+
   for(;;) {
     mg_mgr_poll(&mgr, 1000);
   }
@@ -123,5 +133,16 @@ __mongoose_thread(void* arg)
 void
 app_webserver_init(void)
 {
+  TRACE(APP_CLI, "starting web server interface\n");
+
+  completion_init(&_go_signal);
+
   pthread_create(&_mongoose_thread, NULL, __mongoose_thread, NULL);
+  app_init_complete_wait();
+}
+
+void
+app_webserver_go(void)
+{
+  completion_signal(&_go_signal);
 }
