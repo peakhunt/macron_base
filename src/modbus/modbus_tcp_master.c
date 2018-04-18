@@ -240,7 +240,7 @@ modbus_tcp_master_get_stat(ModbusTCPMaster* master)
   cJSON_AddItemToObject(jmaster, "server_port", cJSON_CreateNumber(ntohs(master->server_addr.sin_port)));
 
   connected = master->tcp_state == ModbusTCPMasterState_Connected ? TRUE : FALSE;
-  cJSON_AddItemToObject(jmaster, "connected", cJSON_CreateBool(connected));
+  cJSON_AddBoolToObject(jmaster, "connected", connected);
 
   return jmaster;
 }

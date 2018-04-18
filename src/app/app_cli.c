@@ -138,7 +138,7 @@ cli_command_modbus(cli_intf_t* intf, int argc, const char** argv)
       {
         cli_printf(intf, "server ip:   %s"CLI_EOL, cJSON_GetObjectItem(master, "server_ip")->valuestring);
         cli_printf(intf, "server port: %d"CLI_EOL, cJSON_GetObjectItem(master, "server_port")->valueint);
-        cli_printf(intf, "connected:   %s"CLI_EOL, cJSON_GetObjectItem(master, "connected")->valueint ? "yes" : "no");
+        cli_printf(intf, "connected:   %s"CLI_EOL, cJSON_GetObjectItem(master, "connected")->type == cJSON_True ? "yes" : "no");
       }
       else
       {
