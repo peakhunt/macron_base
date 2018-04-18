@@ -9,6 +9,7 @@
 #include "list.h"
 #include "tcp_server.h"
 #include "tcp_server_ipv4.h"
+#include "cJSON.h"
 
 /*
  *
@@ -48,5 +49,8 @@ typedef struct
 extern void modbus_tcp_slave_init(ModbusTCPSlave* slave, uint8_t device_addr, int tcp_port);
 extern void modbus_tcp_slave_start(ModbusTCPSlave* slave);
 extern void modbus_tcp_slave_stop(ModbusTCPSlave* slave);
+
+extern cJSON* modbus_tcp_slave_get_stat(ModbusTCPSlave* tcp_slave);
+extern cJSON* modbus_tcp_slave_get_connctions(ModbusTCPSlave* tcp_slave);
 
 #endif /* !__MODBUS_TCP_SLAVE_DEF_H__ */

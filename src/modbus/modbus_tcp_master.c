@@ -219,3 +219,28 @@ modbus_tcp_master_stop(ModbusTCPMaster* master)
 
   master->tcp_state   = ModbusTCPMasterState_Not_Connected;
 }
+
+/**
+ {
+  "master_type":    "tcp",
+  "server_ip":      "xxx.xxx.xxx.xxx",
+  "server_port":    xxx,
+  "connected":      true or false,
+ }
+ */
+cJSON*
+modbus_tcp_master_get_stat(ModbusTCPMaster* master)
+{
+  cJSON*    jmaster;
+  bool      connected;
+
+  jmaster = cJSON_CreateObject();
+  cJSON_AddItemToObject(jmaster, "master_type",cJSON_CreateString("tcp"));
+  cJSON_AddItemToObject(jmaster, "server_ip", cJSON_CreateString(inet_ntoa(master->server_addr.sin_addr)));
+  cJSON_AddItemToObject(jmaster, "server_port", cJSON_CreateNumber(ntohs(master->server_addr.sin_port)));
+
+  connected = master->tcp_state == ModbusTCPMasterState_Connected ? TRUE : FALSE;
+  cJSON_AddItemToObject(jmaster, "connected", cJSON_CreateBool(connected));
+
+  return jmaster;
+}

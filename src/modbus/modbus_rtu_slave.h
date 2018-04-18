@@ -7,6 +7,7 @@
 #include "serial.h"
 #include "modbus_slave.h"
 #include "stream.h"
+#include "cJSON.h"
 
 /*
  * Constants which defines the format of a modbus frame. The example is
@@ -64,5 +65,7 @@ typedef struct
 extern void modbus_rtu_slave_init(ModbusRTUSlave* slave, uint8_t device_addr, const char* port, SerialConfig* cfg);
 extern void modbus_rtu_slave_start(ModbusRTUSlave* slave);
 extern void modbus_rtu_slave_stop(ModbusRTUSlave* slave);
+
+extern cJSON* modbus_rtu_slave_get_stat(ModbusRTUSlave* rtu_slave);
 
 #endif /* !__MODBUS_RTU_SLAVE_DEF_H__ */

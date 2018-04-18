@@ -234,3 +234,73 @@ modbus_tcp_slave_stop(ModbusTCPSlave* slave)
     modbus_tcp_slave_dealloc_conn(p);
   }
 }
+
+/**
+ {
+  "slave_type":     "tcp",
+  "slave_address":  "xxx,
+  "rx_frames":            xxx,
+  "tx_frames" :           xxx,
+  "my_frames" :           xxx,
+  "req_fails" :           xxx,
+  "rx_crc_error" :        xxx,
+  "rx_buffer_overflow":   xxx,
+  "bound_address":        "xxx:xxx",
+  "connections": [
+    {
+      "ip": "xxx.xxx.xxx.xxx",
+      "port": xxx
+    }
+    ...
+  ]
+ }
+ */
+cJSON*
+modbus_tcp_slave_get_stat(ModbusTCPSlave* tcp_slave)
+{
+  cJSON*    jslave;
+  char      name[MAX_ADDRESS_STRING_LEN];
+
+  jslave = cJSON_CreateObject();
+
+  cJSON_AddItemToObject(jslave, "slave_type",cJSON_CreateString("tcp"));
+  cJSON_AddItemToObject(jslave, "slave_address", cJSON_CreateNumber(tcp_slave->my_address));
+  mb_slave_ctx_get_stat(&tcp_slave->ctx, jslave);
+
+  tcp_server_get_port_name(&tcp_slave->server, name);
+  cJSON_AddItemToObject(jslave, "bound_address", cJSON_CreateString(name));
+  cJSON_AddItemToObject(jslave, "connections", modbus_tcp_slave_get_connctions(tcp_slave));
+
+  return jslave;
+}
+
+/**
+  [
+    {
+      "ip": "xxx.xxx.xxx.xxx",
+      "port": xxx,
+    },
+    ...
+  ]
+ */
+cJSON*
+modbus_tcp_slave_get_connctions(ModbusTCPSlave* tcp_slave)
+{
+  modbus_tcp_slave_connection_t* p;
+  cJSON*  ret;
+  cJSON*  item;
+
+  ret = cJSON_CreateArray();
+
+  list_for_each_entry(p, &tcp_slave->connections,  le)
+  {
+    item = cJSON_CreateObject();
+
+    cJSON_AddItemToObject(item, "ip", cJSON_CreateString(inet_ntoa(p->from.sin_addr)));
+    cJSON_AddItemToObject(item, "port", cJSON_CreateNumber(ntohs(p->from.sin_port)));
+
+    cJSON_AddItemToArray(ret, item);
+  }
+
+  return ret;
+}

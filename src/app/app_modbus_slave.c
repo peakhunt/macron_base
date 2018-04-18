@@ -343,22 +343,66 @@ app_modbus_slave_init(void)
 // external API implementation
 //
 ////////////////////////////////////////////////////////////////////////////////
-int
-app_api_modbus_slave_get_num_slaves(void)
-{
-  return _num_modbus_slaves;
-}
+/**
+ * return object
+ *
+ {
+  "slave_list" : [
+    {
+      "slave_type":           "tcp" or "rtu",
+      "slave_address:"        xxx,
+      "rx_frames":            xxx,
+      "tx_frames" :           xxx,
+      "my_frames" :           xxx,
+      "req_fails" :           xxx,
+      "rx_crc_error" :        xxx,
+      "rx_buffer_overflow":   xxx,
 
-int
-app_api_modbus_slave_get_stat(int slave_ndx)
+      in case of tcp
+      "bound_address":        xxx,
+      "connections": [
+        {
+          "ip":   "xxx.xxx.xxx.xxx",
+          "port": xxxx
+        }
+      ]
+    }
+  ]
+ }
+ */
+cJSON*
+app_api_modbus_slave_get_stat(void)
 {
-  if(slave_ndx >= _num_modbus_slaves)
+  cJSON*                ret;
+  cJSON*                jslave_list;
+  app_modbus_slave_t*   slave;
+
+  evloop_thread_lock(&_app_mb_slave_thread);
+
+  ret = cJSON_CreateObject();
+
+  jslave_list = cJSON_CreateArray();
+  list_for_each_entry(slave, &_modbus_slaves, le)
   {
-    return -1;
+    if(slave->mb_type == app_modbus_slave_type_tcp)
+    {
+      ModbusTCPSlave*   tcp_slave;
+
+      tcp_slave = container_of(slave->ctx, ModbusTCPSlave, ctx);
+      cJSON_AddItemToArray(jslave_list, modbus_tcp_slave_get_stat(tcp_slave));
+    }
+    else
+    {
+      ModbusRTUSlave*   rtu_slave;
+
+      rtu_slave = container_of(slave->ctx, ModbusRTUSlave, ctx);
+      cJSON_AddItemToArray(jslave_list, modbus_rtu_slave_get_stat(rtu_slave));
+    }
   }
 
-  //
-  // FIXME
-  //
-  return 0;
+  cJSON_AddItemToObject(ret, "slave_list", jslave_list);
+
+  evloop_thread_unlock(&_app_mb_slave_thread);
+
+  return ret;
 }

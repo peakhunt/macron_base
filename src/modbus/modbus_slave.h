@@ -1,7 +1,10 @@
 ﻿#ifndef MODBUS_SLAVE_H_
 #define MODBUS_SLAVE_H_
 
+#include <stdio.h>
 #include "modbus_common.h"
+#include "list.h"
+#include "cJSON.h"
 
 struct __modbus_slave_ctx;
 typedef struct __modbus_slave_ctx ModbusSlaveCTX;
@@ -35,6 +38,17 @@ mb_slave_ctx_init(ModbusSlaveCTX* ctx)
   ctx->req_fails                = 0;
   ctx->my_frames                = 0;
   ctx->tx_frames                = 0;
+}
+
+static inline void
+mb_slave_ctx_get_stat(ModbusSlaveCTX* ctx, cJSON* jslave)
+{
+  cJSON_AddItemToObject(jslave, "rx_frames", cJSON_CreateNumber(ctx->rx_frames));
+  cJSON_AddItemToObject(jslave, "tx_frames", cJSON_CreateNumber(ctx->tx_frames));
+  cJSON_AddItemToObject(jslave, "my_frames", cJSON_CreateNumber(ctx->my_frames));
+  cJSON_AddItemToObject(jslave, "req_fails", cJSON_CreateNumber(ctx->req_fails));
+  cJSON_AddItemToObject(jslave, "rx_crc_error", cJSON_CreateNumber(ctx->rx_crc_error));
+  cJSON_AddItemToObject(jslave, "rx_buffer_overflow", cJSON_CreateNumber(ctx->rx_buffer_overflow));
 }
 
 #endif /* MODBUS_SLAVE_H_ */

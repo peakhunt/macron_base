@@ -6,6 +6,7 @@
 #include "stream.h"
 #include "mbap_reader.h"
 #include "modbus_master.h"
+#include "cJSON.h"
 
 typedef enum
 {
@@ -35,5 +36,7 @@ extern void modbus_tcp_master_init(ModbusTCPMaster* master, struct sockaddr_in* 
 extern void modbus_tcp_master_init_with_ip_port(ModbusTCPMaster* master, const char* dest_ip, int dest_port);
 extern void modbus_tcp_master_start(ModbusTCPMaster* master);
 extern void modbus_tcp_master_stop(ModbusTCPMaster* master);
+
+extern cJSON* modbus_tcp_master_get_stat(ModbusTCPMaster* master);
 
 #endif /* !__MODBUS_TCP_MASTER_DEF_H__ */

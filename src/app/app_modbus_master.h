@@ -4,6 +4,7 @@
 #include "common_def.h"
 #include "serial.h"
 #include "modbus_regs.h"
+#include "cJSON.h"
 
 typedef enum
 {
@@ -33,5 +34,12 @@ typedef struct
 } app_modbus_master_request_config_t;
 
 extern void app_modbus_master_init(void);
+
+////////////////////////////////////////////////////////////
+//
+// module APIs
+//
+////////////////////////////////////////////////////////////
+extern cJSON* app_api_modbus_master_get_stat(void);
 
 #endif /* !__APP_MODBUS_MASTER_DEF_H__ */

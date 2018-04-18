@@ -7,6 +7,7 @@
 #include "serial.h"
 #include "stream.h"
 #include "modbus_master.h"
+#include "cJSON.h"
 
 typedef struct
 {
@@ -22,5 +23,7 @@ typedef struct
 extern void modbus_rtu_master_init(ModbusRTUMaster* master, const char* port, SerialConfig* cfg);
 extern void modbus_rtu_master_start(ModbusRTUMaster* master);
 extern void modbus_rtu_master_stop(ModbusRTUMaster* master);
+
+extern cJSON* modbus_rtu_master_get_stat(ModbusRTUMaster* master);
 
 #endif /* !__MODBUS_RTU_MASTER_DEF_H__ */

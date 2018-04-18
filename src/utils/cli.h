@@ -9,6 +9,8 @@
 #define CLI_RX_BUFFER_LENGTH          252
 #define CLI_MAX_COMMAND_LEN           252
 
+#define CLI_EOL                           "\r\n"
+
 typedef struct 
 {
   char*           prompt;
@@ -27,6 +29,7 @@ struct __cli_intf
   char          cmd_buffer[CLI_MAX_COMMAND_LEN];
 
   void          (*put_tx_data)(cli_intf_t* intf, char* data, int len);
+  void          (*print_status)(cli_intf_t* intf);
 
   struct list_head      le;
 };

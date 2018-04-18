@@ -123,3 +123,18 @@ tcp_server_ipv4_init_with_addr(tcp_server_t* server, struct sockaddr_in* addr, i
 {
   return __init_tcp_server_ipv4(server, addr, backlog);
 }
+
+int
+tcp_server_ipv4_get_local_port(tcp_server_t* server)
+{
+  struct sockaddr_in    sin;
+  socklen_t             len = sizeof(sin);
+
+  if(server->sd < 0)
+  {
+    return -1;
+  }
+
+  getsockname(server->sd, (struct sockaddr*)&sin, &len);
+  return ntohs(sin.sin_port);
+}

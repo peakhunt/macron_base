@@ -329,3 +329,28 @@ modbus_rtu_slave_stop(ModbusRTUSlave* slave)
 {
   stream_stop(&slave->stream);
 }
+
+/**
+ {
+  "slave_type":     "rtu",
+  "slave_address":  "xxx,
+  "rx_frames":            xxx,
+  "tx_frames" :           xxx,
+  "my_frames" :           xxx,
+  "req_fails" :           xxx,
+  "rx_crc_error" :        xxx,
+  "rx_buffer_overflow":   xxx,
+ }
+ */
+cJSON*
+modbus_rtu_slave_get_stat(ModbusRTUSlave* rtu_slave)
+{
+  cJSON*    jslave;
+
+  jslave = cJSON_CreateObject();
+  cJSON_AddItemToObject(jslave, "slave_type",cJSON_CreateString("rtu"));
+  cJSON_AddItemToObject(jslave, "slave_address", cJSON_CreateNumber(rtu_slave->my_address));
+  mb_slave_ctx_get_stat(&rtu_slave->ctx, jslave);
+
+  return jslave;
+}

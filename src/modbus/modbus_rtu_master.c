@@ -157,3 +157,19 @@ modbus_rtu_master_stop(ModbusRTUMaster* master)
 {
   stream_stop(&master->stream);
 }
+
+/**
+ {
+  "master_type":    "rtu",
+ }
+ */
+cJSON*
+modbus_rtu_master_get_stat(ModbusRTUMaster* master)
+{
+  cJSON*    jmaster;
+
+  jmaster = cJSON_CreateObject();
+  cJSON_AddItemToObject(jmaster, "master_type",cJSON_CreateString("rtu"));
+
+  return jmaster;
+}

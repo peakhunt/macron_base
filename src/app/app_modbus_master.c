@@ -656,3 +656,64 @@ app_modbus_master_init(void)
 
   app_init_complete_wait();
 }
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// external API implementation
+//
+////////////////////////////////////////////////////////////////////////////////
+/**
+ * return object
+ *
+ {
+  "master_list": [
+    "master_type":      "tcp" or "rtu",
+
+    "in case of tcp":
+    "server_ip":    "xxx.xxx.xxx.xxx",
+    "server_port":  xxx,
+    "connected":    true or false,
+
+    "in case of rtu":
+    ...
+
+    FIXME
+    master stats
+  ]
+ }
+ */
+cJSON*
+app_api_modbus_master_get_stat(void)
+{
+  cJSON*                ret;
+  cJSON*                jmaster_list;
+  app_modbus_master_t*  master;
+
+  evloop_thread_lock(&_app_mb_master_thread);
+
+  ret = cJSON_CreateObject();
+  jmaster_list = cJSON_CreateArray();
+  list_for_each_entry(master, &_modbus_masters, le)
+  {
+    if(master->mb_type == app_modbus_master_type_tcp)
+    {
+      ModbusTCPMaster*    tcp_master;
+
+      tcp_master = container_of(master->ctx, ModbusTCPMaster, ctx);
+      cJSON_AddItemToArray(jmaster_list, modbus_tcp_master_get_stat(tcp_master));
+    }
+    else
+    {
+      ModbusRTUMaster*    rtu_master;
+
+      rtu_master = container_of(master->ctx, ModbusRTUMaster, ctx);
+      cJSON_AddItemToArray(jmaster_list, modbus_rtu_master_get_stat(rtu_master));
+    }
+  }
+
+  cJSON_AddItemToObject(ret, "master_list", jmaster_list);
+
+  evloop_thread_unlock(&_app_mb_master_thread);
+
+  return ret;
+}

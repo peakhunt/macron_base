@@ -5,6 +5,7 @@
 #include "config_reader.h"
 #include "debug_log.h"
 #include "cJSON.h"
+#include <pthread.h>
 
 
 #define APP_CONFIG_DEFAULT_FILE           "config/macron_base.json"
@@ -15,13 +16,33 @@
 // module privates
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-static cJSON*     _jroot = NULL;
+static cJSON*             _jroot = NULL;
+static pthread_rwlock_t   _jroot_lock;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // utilities
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static inline void
+app_config_read_lock(void)
+{
+  pthread_rwlock_rdlock(&_jroot_lock);
+}
+
+static inline void
+app_config_write_lock(void)
+{
+  pthread_rwlock_wrlock(&_jroot_lock);
+}
+
+static inline void
+app_config_unlock(void)
+{
+  pthread_rwlock_unlock(&_jroot_lock);
+}
+
+
 static inline cJSON*
 app_config_get_node(cJSON* node, const char* name)
 {
@@ -134,6 +155,8 @@ app_config_init(const char* cfg_file)
 
   file = cfg_file == NULL ? APP_CONFIG_DEFAULT_FILE : cfg_file;
 
+  pthread_rwlock_init(&_jroot_lock, NULL);
+
   _jroot = config_reader_init(file);
   if(_jroot == NULL)
   {
@@ -153,6 +176,8 @@ app_config_get_cli_config(cli_config_t* cli_cfg)
   cJSON   *cli,
           *node;
 
+  app_config_read_lock();
+
   cli = app_config_get_node(_jroot, "cli");
 
   cli_cfg->prompt = app_config_get_node(cli, "prompt")->valuestring;
@@ -166,6 +191,8 @@ app_config_get_cli_config(cli_config_t* cli_cfg)
   cli_cfg->serial_port = app_config_get_str(node, "serial_port");
 
   app_config_get_serial_cfg(node, &cli_cfg->serial_cfg);
+
+  app_config_unlock();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -177,10 +204,17 @@ int
 app_config_get_num_modbus_slaves(void)
 {
   cJSON   *slave_list;
+  int     n;
+
+  app_config_read_lock();
 
   slave_list = app_config_get_node(_jroot, "modbus_slave_list");
 
-  return cJSON_GetArraySize(slave_list);
+  n  = cJSON_GetArraySize(slave_list);
+
+  app_config_unlock();
+
+  return n;
 }
 
 void
@@ -190,6 +224,8 @@ app_config_get_modbus_slave_at(int ndx, app_modbus_slave_config_t* cfg)
               *node,
               *param;
   const char  *str;
+
+  app_config_read_lock();
 
   slave_list = app_config_get_node(_jroot, "modbus_slave_list");
   node = cJSON_GetArrayItem(slave_list, ndx);
@@ -217,6 +253,8 @@ app_config_get_modbus_slave_at(int ndx, app_modbus_slave_config_t* cfg)
     cfg->serial_port = app_config_get_str(param, "serial_port");
     app_config_get_serial_cfg(param, &cfg->serial_cfg);
   }
+
+  app_config_unlock();
 }
 
 int
@@ -225,12 +263,19 @@ app_config_get_modbus_slave_num_regs(int slave_ndx)
   cJSON       *slave_list,
               *slave,
               *reg_map;
+  int         n;
+
+  app_config_read_lock();
 
   slave_list  = app_config_get_node(_jroot, "modbus_slave_list");
   slave       = cJSON_GetArrayItem(slave_list, slave_ndx);
   reg_map     = app_config_get_node(slave, "reg_map");
 
-  return cJSON_GetArraySize(reg_map);
+  n =  cJSON_GetArraySize(reg_map);
+
+  app_config_unlock();
+
+  return n;
 }
 
 void
@@ -241,12 +286,16 @@ app_config_get_modbus_slave_reg(int slave_ndx, int reg_ndx, modbus_address_t* mb
               *reg_map,
               *reg;
 
+  app_config_read_lock();
+
   slave_list  = app_config_get_node(_jroot, "modbus_slave_list");
   slave       = cJSON_GetArrayItem(slave_list, slave_ndx);
   reg_map     = app_config_get_node(slave, "reg_map");
   reg         = cJSON_GetArrayItem(reg_map, reg_ndx);
 
   app_config_get_modbus_reg_cfg(reg, mb_reg, chnl);
+
+  app_config_unlock();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -258,10 +307,17 @@ int
 app_config_get_num_modbus_masters(void)
 {
   cJSON   *master_list;
+  int     n;
+
+  app_config_read_lock();
 
   master_list = app_config_get_node(_jroot, "modbus_master_list");
 
-  return cJSON_GetArraySize(master_list);
+  n  = cJSON_GetArraySize(master_list);
+
+  app_config_unlock();
+
+  return n;
 }
 
 void
@@ -271,6 +327,8 @@ app_config_get_modbus_master_at(int ndx, app_modbus_master_config_t* cfg)
               *node,
               *param;
   const char  *str;
+
+  app_config_read_lock();
 
   master_list = app_config_get_node(_jroot, "modbus_master_list");
   node = cJSON_GetArrayItem(master_list, ndx);
@@ -293,6 +351,8 @@ app_config_get_modbus_master_at(int ndx, app_modbus_master_config_t* cfg)
     cfg->serial_port = app_config_get_str(param, "serial_port");
     app_config_get_serial_cfg(param, &cfg->serial_cfg);
   }
+
+  app_config_unlock();
 }
 
 int
@@ -301,12 +361,18 @@ app_config_get_modbus_master_num_regs(int master_ndx)
   cJSON       *master_list,
               *master,
               *reg_map;
+  int         n;
+
+  app_config_read_lock();
 
   master_list = app_config_get_node(_jroot, "modbus_master_list");
   master      = cJSON_GetArrayItem(master_list, master_ndx);
   reg_map     = app_config_get_node(master, "reg_map");
 
-  return cJSON_GetArraySize(reg_map);
+  n =  cJSON_GetArraySize(reg_map);
+
+  app_config_unlock();
+  return n;
 }
 
 void
@@ -317,11 +383,15 @@ app_config_get_modbus_master_reg(int master_ndx, int reg_ndx, modbus_address_t* 
             *reg_map,
             *reg;
 
+  app_config_read_lock();
+
   master_list = app_config_get_node(_jroot, "modbus_master_list");
   master      = cJSON_GetArrayItem(master_list, master_ndx);
   reg_map     = app_config_get_node(master, "reg_map");
   reg         = cJSON_GetArrayItem(reg_map, reg_ndx);
   app_config_get_modbus_reg_cfg(reg, mb_reg, chnl);
+
+  app_config_unlock();
 }
 
 int
@@ -330,12 +400,18 @@ app_config_get_modbus_master_num_request_schedules(int master_ndx)
   cJSON       *master_list,
               *master,
               *request_schedule;
+  int         n;
+
+  app_config_read_lock();
 
   master_list         = app_config_get_node(_jroot, "modbus_master_list");
   master              = cJSON_GetArrayItem(master_list, master_ndx);
   request_schedule    = app_config_get_node(master, "request_schedule");
 
-  return cJSON_GetArraySize(request_schedule);
+  n =  cJSON_GetArraySize(request_schedule);
+
+  app_config_unlock();
+  return n;
 }
 
 void
@@ -346,6 +422,8 @@ app_config_get_modbus_slave_request_schedule(int master_ndx, int req_ndx, app_mo
               *request_schedule,
               *request;
   const char* str;
+
+  app_config_read_lock();
 
   master_list         = app_config_get_node(_jroot, "modbus_master_list");
   master              = cJSON_GetArrayItem(master_list, master_ndx);
@@ -367,6 +445,8 @@ app_config_get_modbus_slave_request_schedule(int master_ndx, int req_ndx, app_mo
   cfg->reg        = app_config_get_modbus_reg_type(request, "reg");
   cfg->start_addr = app_config_get_int(request, "reg_addr");
   cfg->num_regs   = app_config_get_int(request, "num_regs");
+
+  app_config_unlock();
 }
 
 
@@ -379,10 +459,17 @@ int
 app_config_get_num_channels(void)
 {
   cJSON       *channels;
+  int         n;
+
+  app_config_read_lock();
 
   channels = app_config_get_node(_jroot, "channels");
 
-  return cJSON_GetArraySize(channels);
+  n =  cJSON_GetArraySize(channels);
+
+  app_config_unlock();
+
+  return n;
 }
 
 void
@@ -390,8 +477,9 @@ app_config_get_channel_at(int ndx, app_channel_config_t* chnl_cfg)
 {
   cJSON       *channels,
               *node;
-
   const char* str;
+
+  app_config_read_lock();
 
   channels = app_config_get_node(_jroot, "channels");
   node = cJSON_GetArrayItem(channels, ndx);
@@ -421,6 +509,8 @@ app_config_get_channel_at(int ndx, app_channel_config_t* chnl_cfg)
   {
     chnl_cfg->chnl_dir = channel_direction_virtual;
   }
+
+  app_config_unlock();
 }
 
 int
@@ -429,12 +519,18 @@ app_config_get_num_lookup_table_of_channel_at(int ndx)
   cJSON       *channels,
               *channel,
               *lookup_table;
+  int         n;
+
+  app_config_read_lock();
 
   channels      = app_config_get_node(_jroot, "channels");
   channel       = cJSON_GetArrayItem(channels, ndx);
   lookup_table  = app_config_get_node(channel, "lookup_table");
 
-  return cJSON_GetArraySize(lookup_table);
+  n =  cJSON_GetArraySize(lookup_table);
+  app_config_unlock();
+
+  return n;
 }
 
 void
@@ -445,6 +541,8 @@ app_config_get_lookup_table_of_channel_at(int chnl_ndx, int lt_ndx, float* raw, 
               *lookup_table,
               *entry;
 
+  app_config_read_lock();
+
   channels      = app_config_get_node(_jroot, "channels");
   channel       = cJSON_GetArrayItem(channels, chnl_ndx);
   lookup_table  = app_config_get_node(channel, "lookup_table");
@@ -452,6 +550,8 @@ app_config_get_lookup_table_of_channel_at(int chnl_ndx, int lt_ndx, float* raw, 
 
   *raw          = (float)app_config_get_double(entry, "raw");
   *eng          = (float)app_config_get_double(entry, "eng");
+
+  app_config_unlock();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -463,10 +563,17 @@ int
 app_config_get_num_alarms(void)
 {
   cJSON       *alarms;
+  int         n;
+
+  app_config_read_lock();
 
   alarms = app_config_get_node(_jroot, "alarms");
 
-  return cJSON_GetArraySize(alarms);
+  n =  cJSON_GetArraySize(alarms);
+
+  app_config_unlock();
+
+  return n;
 }
 
 void
@@ -476,6 +583,8 @@ app_config_get_alarm_at(int ndx, app_alarm_config_t* alm_cfg)
               *node;
 
   const char* str;
+
+  app_config_read_lock();
 
   alarms = app_config_get_node(_jroot, "alarms");
   node = cJSON_GetArrayItem(alarms, ndx);
@@ -529,4 +638,6 @@ app_config_get_alarm_at(int ndx, app_alarm_config_t* alm_cfg)
   }
 
   alm_cfg->delay = app_config_get_int(node, "delay");
+
+  app_config_unlock();
 }

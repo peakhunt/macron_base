@@ -18,7 +18,6 @@ extern void cli_serial_intf_init(const char* port, SerialConfig* scfg);
 #define CLI_MAX_COLUMNS_PER_LINE          512
 #define VERSION                           "Macron Base CLI V1.0"
 
-#define CLI_EOL                           "\r\n"
 #define CLI_EOL_CHAR                      '\r'
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -30,6 +29,7 @@ static void cli_command_help(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_version(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_trace_status(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_trace_set(cli_intf_t* intf, int argc, const char** argv);
+static void cli_command_cli(cli_intf_t* intf, int argc, const char** argv);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -60,6 +60,11 @@ static cli_command_t    _core_commands[] =
     "enable/disable trace on a component",
     cli_command_trace_set,
   },
+  {
+    "cli",
+    "show CLI status",
+    cli_command_cli,
+  },
 };
 
 static cli_command_t*   _user_commands;
@@ -88,7 +93,7 @@ cli_command_help(cli_intf_t* intf, int argc, const char** argv)
 
   for(i = 0; i < _num_user_commands; i++)
   {
-    cli_printf(intf, "%-10s: ", _user_commands[i].command);
+    cli_printf(intf, "%-20s: ", _user_commands[i].command);
     cli_printf(intf, "%s"CLI_EOL, _user_commands[i].help_str);
   }
 }
@@ -145,6 +150,39 @@ cli_command_trace_set(cli_intf_t* intf, int argc, const char** argv)
     cli_printf(intf, "disabled trace for %s"CLI_EOL, argv[2]);
     trace_off(trace_ndx);
   }
+}
+
+static void
+cli_command_cli(cli_intf_t* intf, int argc, const char** argv)
+{
+  if(argc != 2)
+  {
+    goto invalid_command;
+  }
+
+  if(strcmp(argv[1], "status") == 0)
+  {
+    cli_intf_t* i;
+
+    list_for_each_entry(i, &_cli_intf_list, le)
+    {
+      if(i->print_status)
+      {
+        i->print_status(intf);
+      }
+    }
+  }
+  else
+  {
+    goto invalid_command;
+  }
+
+  return;
+
+invalid_command:
+  cli_printf(intf, "invalid argument!!!"CLI_EOL CLI_EOL);
+  cli_printf(intf, "%s status"CLI_EOL, argv[0]);
+  return;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
