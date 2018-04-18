@@ -34,6 +34,7 @@ src/utils/hex_dump.c                                \
 src/utils/trace.c                                   \
 src/utils/lookup_table.c                            \
 src/utils/publish_observe.c                         \
+src/utils/atomic_file_update.c                      \
 src/utils/debug_log.c
 
 LIB_MODBUS_SOURCES =                                \
