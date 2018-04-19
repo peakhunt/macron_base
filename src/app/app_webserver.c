@@ -4,6 +4,8 @@
 #include "mongoose.h"
 #include "app_init_completion.h"
 #include "completion.h"
+#include "app_web_common.h"
+#include "app_webapi.h"
 
 #define WEB_SERVER_PORT         "8000"
 
@@ -15,37 +17,7 @@
 static pthread_t    _mongoose_thread;
 static struct mg_serve_http_opts s_http_server_opts;
 
-static struct mg_str    _api_v1_root = MG_MK_STR("/api/v1/");
 static completion_t     _go_signal;
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// utilities
-//
-///////////////////////////////////////////////////////////////////////////////
-static inline const char*
-c_str_from_mg_str(struct mg_str ms)
-{
-  static char str[1024 + 1];
-  int   len;
-
-  len = ms.len <= 1024 ? ms.len : 1024;
-  strncpy(str, ms.p, len);
-  str[len] = '\0';
-
-  return str;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// JSON REST API Handler
-//
-///////////////////////////////////////////////////////////////////////////////
-static void
-__handle_api_v1_request(struct mg_connection* nc, struct http_message* hm)
-{
-  // FIXME
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -60,10 +32,9 @@ ev_handler(struct mg_connection* nc, int ev, void* ev_data)
   switch(ev)
   {
   case MG_EV_HTTP_REQUEST:
-    if(mg_strncmp(hm->uri, _api_v1_root, _api_v1_root.len) == 0)
+    if(app_webapi_handler(nc, hm))
     {
-      TRACE(APP_WEB, "api request: %s\n", c_str_from_mg_str(hm->uri));
-      __handle_api_v1_request(nc, hm);
+      return;
     }
     else if(mg_vcmp(&hm->uri, "/printcontent") == 0) 
     { // just for a test
@@ -133,7 +104,7 @@ __mongoose_thread(void* arg)
 void
 app_webserver_init(void)
 {
-  TRACE(APP_CLI, "starting web server interface\n");
+  TRACE(APP_WEB, "starting web server interface\n");
 
   completion_init(&_go_signal);
 

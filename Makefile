@@ -70,6 +70,8 @@ src/app/app_cli.c                                   \
 src/app/app_modbus_slave.c                          \
 src/app/app_modbus_master.c                         \
 src/app/app_webserver.c                             \
+src/app/app_webapi.c                                \
+src/app/app_web_common.c                            \
 src/app/app_config.c
 
 TEST_C_SOURCE =                                     \
