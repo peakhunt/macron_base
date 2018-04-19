@@ -1,6 +1,8 @@
 #include "common_def.h"
 #include "channel_manager.h"
 #include "alarm_manager.h"
+#include "app_config.h"
+#include "time_util.h"
 #include "trace.h"
 #include "app_webapi.h"
 #include "app_web_common.h"
@@ -11,6 +13,7 @@ typedef struct __api_cmd_handler_t api_cmd_handler_t;
 struct __api_cmd_handler_t
 {
   struct mg_str       prefix;
+  bool                exact;
   api_cmd_handler_t*  sub;
   int                 n_sub;
   void (*handler)(struct mg_connection* nc, struct http_message* hm, struct mg_str* prev);
@@ -18,6 +21,9 @@ struct __api_cmd_handler_t
 
 /*
    API List
+
+   GET /api/v1/config/base
+       base system configuration in JSON format
 
    GET /api/v1/channel/status/<channel_num>
        {
@@ -65,10 +71,20 @@ execute_api_handler(api_cmd_handler_t* table, int num_entries,
     struct mg_connection* nc, struct http_message* hm, struct mg_str* current)
 {
   struct mg_str         next;
+  bool                  match;
 
   for(int i = 0; i < num_entries; i++)
   {
-    if(app_web_has_prefix(current, &table[i].prefix) == true)
+    if(table[i].exact)
+    {
+      match = app_web_is_equal(current, &table[i].prefix);
+    }
+    else
+    {
+      match = app_web_has_prefix(current, &table[i].prefix);
+    }
+
+    if(match)
     {
       next.p    = current->p    + table[i].prefix.len;
       next.len  = current->len  - table[i].prefix.len;
@@ -95,7 +111,7 @@ execute_api_handler(api_cmd_handler_t* table, int num_entries,
 //
 ///////////////////////////////////////////////////////////////////////////////
 static void
-app_webapi_channel_status(struct mg_connection* nc, struct http_message* hm, struct mg_str* subcmd)
+app_webapi_get_channel_status(struct mg_connection* nc, struct http_message* hm, struct mg_str* subcmd)
 {
   uint32_t            chnl_num;
   channel_status_t    status;
@@ -132,7 +148,7 @@ app_webapi_channel_status(struct mg_connection* nc, struct http_message* hm, str
 }
 
 static void
-app_webapi_alarm_status(struct mg_connection* nc, struct http_message* hm, struct mg_str* subcmd)
+app_webapi_get_alarm_status(struct mg_connection* nc, struct http_message* hm, struct mg_str* subcmd)
 {
   uint32_t          alarm_num;
   alarm_status_t    status;
@@ -157,6 +173,32 @@ app_webapi_alarm_status(struct mg_connection* nc, struct http_message* hm, struc
       (int)strlen(data), data);
 }
 
+static void
+app_webapi_get_config_base(struct mg_connection* nc, struct http_message* hm, struct mg_str* subcmd)
+{
+  const char*   json;
+  int     len;
+
+  app_config_read_lock();
+
+  json = app_config_get_json_string_use_lock_before_call(&len);
+
+  if(json == NULL)
+  {
+    app_webapi_server_error(nc, hm);
+  }
+  else
+  {
+    mg_printf(nc,
+        "HTTP/1.1 200 OK\r\n"
+        "Content-Type: text/json\r\n"
+        "Content-Length: %d\r\n\r\n%s",
+        len, json);
+  }
+  app_config_unlock();
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // API command declarations
@@ -172,7 +214,7 @@ static api_cmd_handler_t    _channel_cmd_handlers[] =
 {
   {
     .prefix   = MG_MK_STR("status/"),
-    .handler  = app_webapi_channel_status,
+    .handler  = app_webapi_get_channel_status,
   },
 };
 
@@ -180,7 +222,16 @@ static api_cmd_handler_t  _alarm_cmd_handlers[] =
 {
   {
     .prefix   = MG_MK_STR("status/"),
-    .handler  = app_webapi_alarm_status,
+    .handler  = app_webapi_get_alarm_status,
+  },
+};
+
+static api_cmd_handler_t  _config_handlers[] =
+{
+  {
+    .prefix   = MG_MK_STR("base"),
+    .exact    = true,
+    .handler  = app_webapi_get_config_base,
   },
 };
 
@@ -196,6 +247,11 @@ static api_cmd_handler_t    _top_level_get_handlers[] =
     .sub      = _alarm_cmd_handlers,
     .n_sub    = NARRAY(_alarm_cmd_handlers),
   },
+  {
+    .prefix   = MG_MK_STR("config/"),
+    .sub      = _config_handlers,
+    .n_sub    = NARRAY(_config_handlers),
+  },
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -207,6 +263,9 @@ bool
 app_webapi_handler(struct mg_connection* nc, struct http_message* hm)
 {
   struct mg_str     cmd;
+  long              start;
+
+  start = time_util_get_sys_clock_in_ms();
 
   if(app_web_has_prefix(&hm->uri, &_api_v1_root) == false)
   {
@@ -232,5 +291,9 @@ app_webapi_handler(struct mg_connection* nc, struct http_message* hm)
   {
     app_webapi_not_found(nc, hm);
   }
+
+  TRACE(APP_WEB, "done handling api request. took %ld ms\n",
+      time_util_get_sys_clock_elapsed_in_ms(start));
+
   return true;
 }

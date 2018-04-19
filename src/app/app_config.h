@@ -38,4 +38,11 @@ extern void app_config_get_modbus_master_reg(int master_ndx, int reg_ndx, modbus
 extern int app_config_get_modbus_master_num_request_schedules(int master_ndx);
 extern void app_config_get_modbus_slave_request_schedule(int master_ndx, int req_ndx, app_modbus_master_request_config_t* cfg);
 
+extern const char* app_config_get_json_string_use_lock_before_call(int* len);
+
+extern void app_config_read_lock(void);
+extern void app_config_write_lock(void);
+extern void app_config_unlock(void);
+
+
 #endif /* !__APP_CONFIG_DEF_H__ */

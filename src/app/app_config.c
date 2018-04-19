@@ -18,25 +18,27 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static cJSON*             _jroot = NULL;
 static pthread_rwlock_t   _jroot_lock;
+static const char*        _json_str;
+static int                _json_str_len;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // utilities
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-static inline void
+void
 app_config_read_lock(void)
 {
   pthread_rwlock_rdlock(&_jroot_lock);
 }
 
-static inline void
+void
 app_config_write_lock(void)
 {
   pthread_rwlock_wrlock(&_jroot_lock);
 }
 
-static inline void
+void
 app_config_unlock(void)
 {
   pthread_rwlock_unlock(&_jroot_lock);
@@ -163,6 +165,9 @@ app_config_init(const char* cfg_file)
     debug_log("failed to load config file: %s\n", file);
     exit(-2);
   }
+
+  _json_str = cJSON_PrintUnformatted(_jroot);
+  _json_str_len = strlen(_json_str);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -640,4 +645,14 @@ app_config_get_alarm_at(int ndx, app_alarm_config_t* alm_cfg)
   alm_cfg->delay = app_config_get_int(node, "delay");
 
   app_config_unlock();
+}
+
+//
+// XXX should be called with read lock on config
+//
+const char*
+app_config_get_json_string_use_lock_before_call(int* len)
+{
+  *len = _json_str_len;
+  return _json_str;
 }
