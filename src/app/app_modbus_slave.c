@@ -34,7 +34,7 @@ static void app_mb_slave_thread_fini(evloop_thread_t* thrd);
 // module privates
 //
 ////////////////////////////////////////////////////////////////////////////////
-static LIST_HEAD(_modbus_slaves);
+static LIST_HEAD_DECL(_modbus_slaves);
 static int _num_modbus_slaves = 0;
 
 static evloop_thread_t    _app_mb_slave_thread =

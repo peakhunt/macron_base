@@ -94,7 +94,7 @@ static void
 debug_log_queue_noti_callback(EV_P_ ev_async *w, int revents)
 {
   log_buffer_t*             lb;
-  LIST_HEAD(tmp_list);
+  LIST_HEAD_DECL(tmp_list);
 
   thread_queue_lock(&_debug_log_queue);
   list_cut_position(&tmp_list, &_debug_log_queue.q, _debug_log_queue.q.prev);

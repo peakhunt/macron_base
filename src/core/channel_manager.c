@@ -12,10 +12,10 @@
 // module privates: this module is supposed to be a singleton
 //
 ////////////////////////////////////////////////////////////////////////////////
-static LIST_HEAD(_channels);
-static LIST_HEAD(_in_channels);
-static LIST_HEAD(_out_channels);
-static LIST_HEAD(_vir_channels);
+static LIST_HEAD_DECL(_channels);
+static LIST_HEAD_DECL(_in_channels);
+static LIST_HEAD_DECL(_out_channels);
+static LIST_HEAD_DECL(_vir_channels);
 
 static BHashContext   _channel_hash_by_chnl_num;
 

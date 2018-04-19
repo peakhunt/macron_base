@@ -13,7 +13,7 @@
 // module privates: this module is supposed to be a singleton
 //
 ////////////////////////////////////////////////////////////////////////////////
-static LIST_HEAD(_alarms);
+static LIST_HEAD_DECL(_alarms);
 
 static BHashContext   _alarm_hash_by_alarm_num;
 
