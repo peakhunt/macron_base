@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "app_cli.h"
 #include "app_config.h"
 #include "cli.h"
@@ -8,6 +9,8 @@
 #include "completion.h"
 #include "app_modbus_slave.h"
 #include "app_modbus_master.h"
+#include "channel_manager.h"
+#include "alarm_manager.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -18,6 +21,8 @@ static void app_cli_thread_init(evloop_thread_t* thrd);
 static void app_cli_thread_fini(evloop_thread_t* thrd);
 
 static void cli_command_modbus(cli_intf_t* intf, int argc, const char** argv);
+static void cli_command_channel(cli_intf_t* intf, int argc, const char** argv);
+static void cli_command_alarm(cli_intf_t* intf, int argc, const char** argv);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -36,9 +41,19 @@ static cli_command_t    _app_commands[] =
 {
   {
     "modbus",
-    "modbus related command",
+    "modbus related commands",
     cli_command_modbus,
-  }
+  },
+  {
+    "channel",
+    "channel related commands",
+    cli_command_channel,
+  },
+  {
+    "alarm",
+    "alarm related commands",
+    cli_command_alarm,
+  },
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -156,6 +171,111 @@ cli_command_modbus(cli_intf_t* intf, int argc, const char** argv)
 command_error:
   cli_printf(intf, "invalid argument!!!"CLI_EOL CLI_EOL);
   cli_printf(intf, "%s slave|master"CLI_EOL, argv[0]);
+}
+
+static void
+cli_command_channel(cli_intf_t* intf, int argc, const char** argv)
+{
+  if(argc < 2)
+  {
+    goto command_error;
+  }
+
+  if(strcmp(argv[1], "status") == 0)
+  {
+    channel_status_t    status;
+    uint32_t            chnl_num;
+
+    if(argc != 3)
+    {
+      goto command_error;
+    }
+
+    chnl_num = atoi(argv[2]);
+
+    if(channel_manager_get_channel_stat(chnl_num, &status) == -1)
+    {
+      cli_printf(intf, "can't find channel number %d"CLI_EOL, chnl_num);
+      return;
+    }
+
+    cli_printf(intf, "channel status for channel #%d"CLI_EOL, chnl_num);
+    cli_printf(intf, "raw value: %d"CLI_EOL, status.raw_val);
+
+    if(status.chnl_type == channel_type_digital)
+    {
+      cli_printf(intf, "eng value: %s"CLI_EOL, status.eng_val.b ? "on" : "off");
+    }
+    else
+    {
+      cli_printf(intf, "eng value: %.2f"CLI_EOL, status.eng_val.f);
+    }
+  }
+  else
+  {
+    goto command_error;
+  }
+
+  return;
+
+command_error:
+  cli_printf(intf, "invalid argument!!!"CLI_EOL CLI_EOL);
+  cli_printf(intf, "%s status chnl-num"CLI_EOL, argv[0]);
+}
+
+static void
+cli_command_alarm(cli_intf_t* intf, int argc, const char** argv)
+{
+  if(argc < 2)
+  {
+    goto command_error;
+  }
+
+  if(strcmp(argv[1], "status") == 0)
+  {
+    alarm_status_t    status;
+    uint32_t          alarm_num;
+
+    if(argc != 3)
+    {
+      goto command_error;
+    }
+
+    alarm_num = atoi(argv[2]);
+
+    if(alarm_manager_get_alarm_status(alarm_num, &status) == -1)
+    {
+      cli_printf(intf, "can't find alarm number %d"CLI_EOL, alarm_num);
+      return;
+    }
+
+    cli_printf(intf, "alarm status for alarm #%d"CLI_EOL, alarm_num);
+    cli_printf(intf, "alarm state: %s"CLI_EOL, alarm_get_string_state(status.state));
+  }
+  else if(strcmp(argv[1], "ack") == 0)
+  {
+    uint32_t          alarm_num;
+
+    if(argc != 3)
+    {
+      goto command_error;
+    }
+
+    alarm_num = atoi(argv[2]);
+    cli_printf(intf, "acking alarm #%d"CLI_EOL, alarm_num);
+    alarm_manager_ack_alarm(alarm_num);
+  }
+  else
+  {
+    goto command_error;
+  }
+
+  return;
+
+command_error:
+  cli_printf(intf, "invalid argument!!!"CLI_EOL CLI_EOL);
+  cli_printf(intf, "%s status alarm-num"CLI_EOL, argv[0]);
+  cli_printf(intf, "%s ack alarm-num"CLI_EOL, argv[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

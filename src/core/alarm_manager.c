@@ -26,6 +26,45 @@ static pthread_mutex_t    _alarm_mgr_lock;
 // utilities
 //
 ////////////////////////////////////////////////////////////////////////////////
+static inline alarm_t*
+alarm_manager_alarm_get(uint32_t alarm_num)
+{
+  alarm_t* alarm;
+
+  pthread_mutex_lock(&_alarm_mgr_lock);
+
+  alarm = bhash_lookup(&_alarm_hash_by_alarm_num, (void*)&alarm_num);
+  if(alarm == NULL)
+  {
+    pthread_mutex_unlock(&_alarm_mgr_lock);
+  }
+
+  return alarm;
+}
+
+static inline void
+alarm_manager_alarm_put(alarm_t* alarm)
+{
+  pthread_mutex_unlock(&_alarm_mgr_lock);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// channel listener
+//
+////////////////////////////////////////////////////////////////////////////////
+static void
+__on_channel_update(observer_t* obs, void* arg)
+{
+  alarm_t*    alarm = container_of(obs, alarm_t, chnl_obs);
+  channel_eng_value_t*    ev = (channel_eng_value_t*)arg;
+
+  pthread_mutex_lock(&_alarm_mgr_lock);
+
+  alarm_update(alarm, *ev);
+
+  pthread_mutex_unlock(&_alarm_mgr_lock);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -59,11 +98,49 @@ alarm_manager_add_alarm(alarm_t* alarm)
 
   _num_alarms++;
 
+  alarm->chnl_obs.notify = __on_channel_update;
   channel_manager_add_observer(alarm->chnl_num, &alarm->chnl_obs);
+
   pthread_mutex_unlock(&_alarm_mgr_lock);
 }
 
 void
 alarm_manager_update(void)
 {
+}
+
+void
+alarm_manager_ack_alarm(uint32_t alarm_num)
+{
+  alarm_t*    alarm;
+
+  alarm = alarm_manager_alarm_get(alarm_num);
+  if(alarm == NULL)
+  {
+    alarm_manager_alarm_put(alarm);
+    return;
+  }
+
+  alarm_ack(alarm);
+
+  alarm_manager_alarm_put(alarm);
+}
+
+int
+alarm_manager_get_alarm_status(uint32_t alarm_num, alarm_status_t* status)
+{
+  alarm_t*    alarm;
+
+  alarm = alarm_manager_alarm_get(alarm_num);
+  if(alarm == NULL)
+  {
+    alarm_manager_alarm_put(alarm);
+    return -1;
+  }
+
+  status->state = alarm->state;
+
+  alarm_manager_alarm_put(alarm);
+
+  return 0;
 }

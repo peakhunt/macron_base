@@ -175,6 +175,7 @@ void
 channel_manager_set_eng_value(uint32_t chnl_num, channel_eng_value_t v)
 {
   channel_t* chnl;
+  channel_eng_value_t   eng_v;
 
   chnl = channel_manager_chnl_get(chnl_num);
   if(chnl == NULL)
@@ -184,10 +185,7 @@ channel_manager_set_eng_value(uint32_t chnl_num, channel_eng_value_t v)
   }
 
   chnl->eng_value = v;
-  if(chnl->chnl_dir == channel_direction_virtual)
-  {
-    publisher_exec_notify(&chnl->chnl_update, chnl);
-  }
+  eng_v = chnl->eng_value;
 
   if(chnl->chnl_dir == channel_direction_out)
   {
@@ -195,12 +193,15 @@ channel_manager_set_eng_value(uint32_t chnl_num, channel_eng_value_t v)
   }
 
   channel_manager_chnl_put(chnl);
+
+  publisher_exec_notify(&chnl->chnl_update, (void*)&eng_v);
 }
 
 void
 channel_manager_update_input(void)
 {
   channel_t*    chnl;
+  channel_eng_value_t   eng_v;
 
   TRACE(CHANNELM, "updating input\n");
 
@@ -213,10 +214,12 @@ channel_manager_update_input(void)
     chnl->raw_value = chnl->raw_value_queued;
 
     channel_update_eng_value(chnl);
-    publisher_exec_notify(&chnl->chnl_update, chnl);
+
+    eng_v = chnl->eng_value;
 
     pthread_mutex_unlock(&_chnl_mgr_lock);
 
+    publisher_exec_notify(&chnl->chnl_update, (void*)&eng_v);
   }
 }
 
@@ -232,7 +235,9 @@ channel_manager_update_output(void)
     TRACE(CHANNELM, "updating output for channel %d\n", chnl->chnl_num);
 
     chnl->raw_value_queued = chnl->raw_value;
-    publisher_exec_notify(&chnl->chnl_update, chnl);
+
+    // XXX review later
+    //publisher_exec_notify(&chnl->chnl_update, chnl);
 
     pthread_mutex_unlock(&_chnl_mgr_lock);
   }
@@ -270,4 +275,24 @@ channel_manager_add_observer(uint32_t chnl_num, observer_t* obs)
   channel_add_observer(chnl, obs);
 
   channel_manager_chnl_put(chnl);
+}
+
+int
+channel_manager_get_channel_stat(uint32_t chnl_num, channel_status_t* status)
+{
+  channel_t* chnl;
+
+  chnl = channel_manager_chnl_get(chnl_num);
+  if(chnl == NULL)
+  {
+    return -1;
+  }
+
+  status->chnl_type = chnl->chnl_type;
+  status->eng_val   = chnl->eng_value;
+  status->raw_val   = chnl->raw_value;
+
+  channel_manager_chnl_put(chnl);
+
+  return 0;
 }

@@ -75,5 +75,6 @@ extern alarm_t* alarm_alloc_analog(uint32_t alarm_num, uint32_t chnl_num, alarm_
 
 extern void alarm_update(alarm_t* alarm, channel_eng_value_t v);
 extern void alarm_ack(alarm_t* alarm);
+extern const char* alarm_get_string_state(alarm_state_t state);
 
 #endif /* !__ALARM_DEF_H__ */

@@ -4,6 +4,13 @@
 #include "channel.h"
 #include "lookup_table.h"
 
+typedef struct
+{
+  channel_type_t          chnl_type;
+  channel_eng_value_t     eng_val;
+  uint32_t                raw_val;
+} channel_status_t;
+
 extern void channel_manager_init(void);
 extern void channel_manager_add_channel(channel_t* chnl);
 
@@ -18,5 +25,7 @@ extern void channel_manager_update_output(void);
 
 extern void channel_manager_update_lookup_table(uint32_t chnl_num, lookup_table_t* lookup_table);
 extern void channel_manager_add_observer(uint32_t chnl_num, observer_t* obs);
+
+extern int channel_manager_get_channel_stat(uint32_t chnl_num, channel_status_t* status);
 
 #endif /* !__CHANNEL_MANAGER_DEF_H__ */
