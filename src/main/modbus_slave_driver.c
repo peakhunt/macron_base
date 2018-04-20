@@ -26,8 +26,8 @@ typedef struct
   modbus_register_list_t      reg_map;
 } modbus_slave_driver_t;
 
-static void app_mb_slave_thread_init(evloop_thread_t* thrd);
-static void app_mb_slave_thread_fini(evloop_thread_t* thrd);
+static void mb_slave_driver_thread_init(evloop_thread_t* thrd);
+static void mb_slave_driver_thread_fini(evloop_thread_t* thrd);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -37,10 +37,10 @@ static void app_mb_slave_thread_fini(evloop_thread_t* thrd);
 static LIST_HEAD_DECL(_modbus_slaves);
 static int _num_modbus_slaves = 0;
 
-static evloop_thread_t    _app_mb_slave_thread =
+static evloop_thread_t    _mb_slave_driver_thread =
 {
-  .init = app_mb_slave_thread_init,
-  .fini = app_mb_slave_thread_fini,
+  .init = mb_slave_driver_thread_init,
+  .fini = mb_slave_driver_thread_fini,
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -111,14 +111,14 @@ __handle_modbus_u16(ModbusSlaveCTX* ctx, modbus_reg_type_t reg_type, uint8_t* bu
 }
 
 static MBErrorCode
-app_input_regs_cb(ModbusSlaveCTX* ctx, uint8_t addr, uint8_t * pucRegBuffer,
+modbus_slave_driver_input_regs_cb(ModbusSlaveCTX* ctx, uint8_t addr, uint8_t * pucRegBuffer,
                   uint16_t usAddress, uint16_t usNRegs)
 {
   return __handle_modbus_u16(ctx, modbus_reg_input, pucRegBuffer, usAddress, usNRegs, MB_REG_READ);
 }
 
 static MBErrorCode
-app_holding_regs_cb(ModbusSlaveCTX* ctx, uint8_t addr, uint8_t * pucRegBuffer,
+modbus_slave_driver_holding_regs_cb(ModbusSlaveCTX* ctx, uint8_t addr, uint8_t * pucRegBuffer,
                     uint16_t usAddress, uint16_t usNRegs, MBRegisterMode eMode)
 {
   return __handle_modbus_u16(ctx, modbus_reg_holding, pucRegBuffer, usAddress, usNRegs, eMode);
@@ -164,14 +164,14 @@ __handle_modbus_u1(ModbusSlaveCTX* ctx, modbus_reg_type_t reg_type, uint8_t* buf
 }
 
 static MBErrorCode
-app_coil_cb(ModbusSlaveCTX* ctx, uint8_t addr, uint8_t * pucRegBuffer, uint16_t usAddress,
+modbus_slave_driver_coil_cb(ModbusSlaveCTX* ctx, uint8_t addr, uint8_t * pucRegBuffer, uint16_t usAddress,
             uint16_t usNRegs, MBRegisterMode eMode)
 {
   return __handle_modbus_u1(ctx, modbus_reg_coil, pucRegBuffer, usAddress, usNRegs, eMode);
 }
 
 static MBErrorCode
-app_discrete_cb(ModbusSlaveCTX* ctx, uint8_t addr, uint8_t * pucRegBuffer,
+modbus_slave_driver_discrete_cb(ModbusSlaveCTX* ctx, uint8_t addr, uint8_t * pucRegBuffer,
                 uint16_t usAddress, uint16_t usNRegs)
 {
   return __handle_modbus_u1(ctx, modbus_reg_discrete, pucRegBuffer, usAddress, usNRegs, MB_REG_READ);
@@ -229,10 +229,10 @@ alloc_init_modbus_slave(modbus_slave_driver_config_t* cfg)
     modbus_rtu_slave_init(rtu_slave, (uint8_t)cfg->address, cfg->serial_port, &cfg->serial_cfg);
   }
 
-  ctx->input_regs_cb      = app_input_regs_cb;
-  ctx->holding_regs_cb    = app_holding_regs_cb;
-  ctx->coil_cb            = app_coil_cb;
-  ctx->discrete_cb        = app_discrete_cb;
+  ctx->input_regs_cb      = modbus_slave_driver_input_regs_cb;
+  ctx->holding_regs_cb    = modbus_slave_driver_holding_regs_cb;
+  ctx->coil_cb            = modbus_slave_driver_coil_cb;
+  ctx->discrete_cb        = modbus_slave_driver_discrete_cb;
 
   slave->ctx = ctx;
   ctx->priv = (void*)slave;
@@ -248,7 +248,7 @@ failed:
 }
 
 static void
-app_modbus_load_slaves(void)
+modbus_slave_driver_load_slaves(void)
 {
   modbus_slave_driver_config_t    cfg;
   int                             num_slaves,
@@ -307,10 +307,10 @@ app_modbus_load_slaves(void)
 //
 ////////////////////////////////////////////////////////////////////////////////
 static void
-app_mb_slave_thread_init(evloop_thread_t* thrd)
+mb_slave_driver_thread_init(evloop_thread_t* thrd)
 {
   TRACE(APP_MB_SLAVE, "loading slaves from config\n");
-  app_modbus_load_slaves();
+  modbus_slave_driver_load_slaves();
 
   TRACE(APP_MB_SLAVE, "done loading slaves\n");
 
@@ -318,7 +318,7 @@ app_mb_slave_thread_init(evloop_thread_t* thrd)
 }
 
 static void
-app_mb_slave_thread_fini(evloop_thread_t* thrd)
+mb_slave_driver_thread_fini(evloop_thread_t* thrd)
 {
 }
 
@@ -332,8 +332,8 @@ modbus_slave_driver_init(void)
 {
   TRACE(APP_MB_SLAVE, "starting modbus slave driver\n");
 
-  evloop_thread_init(&_app_mb_slave_thread);
-  evloop_thread_run(&_app_mb_slave_thread);
+  evloop_thread_init(&_mb_slave_driver_thread);
+  evloop_thread_run(&_mb_slave_driver_thread);
 
   app_init_complete_wait();
 }
@@ -377,7 +377,7 @@ modbus_slave_driver_get_stat(void)
   cJSON*                    jslave_list;
   modbus_slave_driver_t*    slave;
 
-  evloop_thread_lock(&_app_mb_slave_thread);
+  evloop_thread_lock(&_mb_slave_driver_thread);
 
   ret = cJSON_CreateObject();
 
@@ -402,7 +402,7 @@ modbus_slave_driver_get_stat(void)
 
   cJSON_AddItemToObject(ret, "slave_list", jslave_list);
 
-  evloop_thread_unlock(&_app_mb_slave_thread);
+  evloop_thread_unlock(&_mb_slave_driver_thread);
 
   return ret;
 }

@@ -43,8 +43,8 @@ typedef struct
   modbus_master_driver_request_config_t*   request_schedule;
 } modbus_master_driver_t;
 
-static void app_mb_master_thread_init(evloop_thread_t* thrd);
-static void app_mb_master_thread_fini(evloop_thread_t* thrd);
+static void mb_master_driver_thread_init(evloop_thread_t* thrd);
+static void mb_master_driver_thread_fini(evloop_thread_t* thrd);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -53,10 +53,10 @@ static void app_mb_master_thread_fini(evloop_thread_t* thrd);
 ////////////////////////////////////////////////////////////////////////////////
 static LIST_HEAD_DECL(_modbus_masters);
 
-static evloop_thread_t    _app_mb_master_thread =
+static evloop_thread_t    _mb_master_driver_thread =
 {
-  .init = app_mb_master_thread_init,
-  .fini = app_mb_master_thread_fini,
+  .init = mb_master_driver_thread_init,
+  .fini = mb_master_driver_thread_fini,
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -103,7 +103,7 @@ get_time_took_for_transaction_in_ms(modbus_master_driver_t* master)
 //
 ////////////////////////////////////////////////////////////////////////////////
 static void
-app_modbus_master_coil_write_req(modbus_master_driver_t* master, modbus_master_driver_request_config_t* req)
+modbus_master_driver_coil_write_req(modbus_master_driver_t* master, modbus_master_driver_request_config_t* req)
 {
   ModbusMasterCTX* ctx = master->ctx;
   uint8_t           slave_addr;
@@ -150,7 +150,7 @@ app_modbus_master_coil_write_req(modbus_master_driver_t* master, modbus_master_d
 }
 
 static void
-app_modbus_master_holding_write_req(modbus_master_driver_t* master, modbus_master_driver_request_config_t* req)
+modbus_master_driver_holding_write_req(modbus_master_driver_t* master, modbus_master_driver_request_config_t* req)
 {
   ModbusMasterCTX* ctx = master->ctx;
   uint8_t           slave_addr;
@@ -198,7 +198,7 @@ app_modbus_master_holding_write_req(modbus_master_driver_t* master, modbus_maste
 }
 
 static void
-app_modbus_master_request(modbus_master_driver_t* master)
+modbus_master_driver_request(modbus_master_driver_t* master)
 {
   modbus_master_driver_request_config_t*   req;
   ModbusMasterCTX* ctx = master->ctx;
@@ -221,7 +221,7 @@ app_modbus_master_request(modbus_master_driver_t* master)
     }
     else
     {
-      app_modbus_master_coil_write_req(master, req);
+      modbus_master_driver_coil_write_req(master, req);
     }
     break;
 
@@ -236,7 +236,7 @@ app_modbus_master_request(modbus_master_driver_t* master)
     }
     else
     {
-      app_modbus_master_holding_write_req(master, req);
+      modbus_master_driver_holding_write_req(master, req);
     }
     break;
 
@@ -250,7 +250,7 @@ app_modbus_master_request(modbus_master_driver_t* master)
 }
 
 static void
-app_modbus_master_next(modbus_master_driver_t* master)
+modbus_driver_master_next(modbus_master_driver_t* master)
 {
   double wait_time;
   double target_delay;
@@ -293,7 +293,7 @@ app_modbus_master_next(modbus_master_driver_t* master)
   }
   else
   {
-    app_modbus_master_request(master);
+    modbus_master_driver_request(master);
   }
 }
 
@@ -302,7 +302,7 @@ modbus_master_wait_timeout(evloop_timer_t* te, void* unused)
 {
   modbus_master_driver_t* master = container_of(te, modbus_master_driver_t, wait_timer);
 
-  app_modbus_master_request(master);
+  modbus_master_driver_request(master);
 }
 
 static void
@@ -321,7 +321,7 @@ modbus_master_transaction_timeout(evloop_timer_t* te, void* unused)
       req->start_addr,
       req->num_regs);
 
-  app_modbus_master_next(master);
+  modbus_driver_master_next(master);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -390,7 +390,7 @@ __input_regs_cb(ModbusMasterCTX* ctx, uint8_t slave, uint16_t addr, uint16_t nre
 
   __handle_holding_input_read_response(master, modbus_reg_input, slave, addr, nreg, regs);
 
-  app_modbus_master_next(master);
+  modbus_driver_master_next(master);
 }
 
 static void
@@ -405,7 +405,7 @@ __holding_regs_cb(ModbusMasterCTX* ctx, uint8_t slave, uint16_t addr, uint16_t n
     __handle_holding_input_read_response(master, modbus_reg_holding, slave, addr, nreg, regs);
   }
 
-  app_modbus_master_next(master);
+  modbus_driver_master_next(master);
 }
 
 static void
@@ -420,7 +420,7 @@ __coil_cb(ModbusMasterCTX* ctx, uint8_t slave, uint16_t addr, uint16_t nreg, uin
     __handle_coil_discrete_read_response(master,  modbus_reg_coil, slave, addr, nreg, regs);
   }
 
-  app_modbus_master_next(master);
+  modbus_driver_master_next(master);
 }
 
 static void
@@ -432,7 +432,7 @@ __discrete_cb(ModbusMasterCTX* ctx, uint8_t slave, uint16_t addr, uint16_t nreg,
 
   __handle_coil_discrete_read_response(master,  modbus_reg_discrete, slave, addr, nreg, regs);
 
-  app_modbus_master_next(master);
+  modbus_driver_master_next(master);
 }
 
 static void
@@ -447,7 +447,7 @@ __modbus_master_event_cb(ModbusMasterCTX* ctx, modbus_master_event_t event)
   case modbus_master_event_connected:
     TRACE(APP_MB_MASTER, "xxxxxx connected callback xxxxxx\n");
     master->current_request = 0;
-    app_modbus_master_request(master);
+    modbus_master_driver_request(master);
 
     break;
 
@@ -549,7 +549,7 @@ failed:
 }
 
 static void
-app_modbus_load_masters(void)
+modbus_driver_load_masters(void)
 {
   modbus_master_driver_config_t   cfg;
   int                             num_masters,
@@ -625,11 +625,11 @@ app_modbus_load_masters(void)
 //
 ////////////////////////////////////////////////////////////////////////////////
 static void
-app_mb_master_thread_init(evloop_thread_t* thrd)
+mb_master_driver_thread_init(evloop_thread_t* thrd)
 {
   TRACE(APP_MB_MASTER, "loading masters from config\n");
 
-  app_modbus_load_masters();
+  modbus_driver_load_masters();
 
   TRACE(APP_MB_MASTER, "done loading masters\n");
 
@@ -637,7 +637,7 @@ app_mb_master_thread_init(evloop_thread_t* thrd)
 }
 
 static void
-app_mb_master_thread_fini(evloop_thread_t* thrd)
+mb_master_driver_thread_fini(evloop_thread_t* thrd)
 {
 }
 
@@ -651,8 +651,8 @@ modbus_master_driver_init(void)
 {
   TRACE(APP_MB_MASTER, "starting modbus master driver\n");
 
-  evloop_thread_init(&_app_mb_master_thread);
-  evloop_thread_run(&_app_mb_master_thread);
+  evloop_thread_init(&_mb_master_driver_thread);
+  evloop_thread_run(&_mb_master_driver_thread);
 
   app_init_complete_wait();
 }
@@ -689,7 +689,7 @@ modbus_master_driver_get_stat(void)
   cJSON*                    jmaster_list;
   modbus_master_driver_t*   master;
 
-  evloop_thread_lock(&_app_mb_master_thread);
+  evloop_thread_lock(&_mb_master_driver_thread);
 
   ret = cJSON_CreateObject();
   jmaster_list = cJSON_CreateArray();
@@ -713,7 +713,7 @@ modbus_master_driver_get_stat(void)
 
   cJSON_AddItemToObject(ret, "master_list", jmaster_list);
 
-  evloop_thread_unlock(&_app_mb_master_thread);
+  evloop_thread_unlock(&_mb_master_driver_thread);
 
   return ret;
 }
