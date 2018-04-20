@@ -26,6 +26,8 @@ extern void channel_manager_update_output(void);
 extern void channel_manager_update_lookup_table(uint32_t chnl_num, lookup_table_t* lookup_table);
 extern void channel_manager_add_observer(uint32_t chnl_num, observer_t* obs);
 
+extern void channel_manager_set_sensor_fault_status(uint32_t chnl_num, bool status);
+
 extern int channel_manager_get_channel_stat(uint32_t chnl_num, channel_status_t* status);
 
 #endif /* !__CHANNEL_MANAGER_DEF_H__ */

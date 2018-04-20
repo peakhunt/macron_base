@@ -21,6 +21,9 @@ channel_alloc(uint32_t chnl_num, channel_type_t chnl_type, channel_direction_t c
   chnl->failsafe_value.f  = 0.0f;
   chnl->failsafe_value.b  = FALSE;
 
+  chnl->min_val           = 0.0f;
+  chnl->max_val           = 0.0f;
+
   chnl->sensor_fault      = FALSE;
 
   chnl->raw_value         = 0;

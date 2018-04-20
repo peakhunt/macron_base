@@ -261,6 +261,26 @@ channel_manager_update_lookup_table(uint32_t chnl_num, lookup_table_t* lookup_ta
 }
 
 void
+channel_manager_set_sensor_fault_status(uint32_t chnl_num, bool status)
+{
+  channel_t* chnl;
+
+  chnl = channel_manager_chnl_get(chnl_num);
+  if(chnl == NULL)
+  {
+    TRACE(CHANNELM, "%s can't find channel %d\n", __func__, chnl_num);
+    return;
+  }
+
+  //
+  // FIXME add sensor fault handling logic here
+  //
+  chnl->sensor_fault  = status;
+
+  channel_manager_chnl_put(chnl);
+}
+
+void
 channel_manager_add_observer(uint32_t chnl_num, observer_t* obs)
 {
   channel_t* chnl;

@@ -97,15 +97,17 @@ __load_channels(void)
     cfg_mgr_get_channel_at(i, &chnl_cfg);
     chnl = channel_alloc(chnl_cfg.chnl_num, chnl_cfg.chnl_type, chnl_cfg.chnl_dir);
 
-    if(chnl_cfg.chnl_type == channel_type_analog)
-    {
-      chnl->lookup_table = __load_lookup_table(i);
-    }
-
     chnl->failsafe_value    = chnl_cfg.failsafe_val;
     chnl->init_value        = chnl_cfg.init_val;
     chnl->eng_value         = chnl_cfg.init_val;
 
+    if(chnl_cfg.chnl_type == channel_type_analog)
+    {
+      chnl->min_val       = chnl_cfg.min_val;
+      chnl->max_val       = chnl_cfg.max_val;
+
+      chnl->lookup_table  = __load_lookup_table(i);
+    }
     channel_manager_add_channel(chnl);
   }
   TRACE(CORE_DRIVER, "done loading %d channels\n", num_channels);

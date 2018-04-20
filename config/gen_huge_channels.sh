@@ -23,6 +23,9 @@ do
     echo '  "chnl_type": "analog",'
     echo '  "init_val": 0.0,'
     echo '  "failsafe_val": 0.0,'
+    echo '  "min_val": 0.0,'
+    echo '  "max_val": 100000.0,'
+
     echo '  "lookup_table": ['
     echo '    { "raw": 0,  "eng": 0     },'
     echo '    { "raw": 20, "eng": 20    }'

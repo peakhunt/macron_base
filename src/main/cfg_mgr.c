@@ -503,6 +503,8 @@ cfg_mgr_get_channel_at(int ndx, core_driver_channel_config_t* chnl_cfg)
     chnl_cfg->chnl_type       = channel_type_analog;
     chnl_cfg->init_val.f      = (float)cfg_mgr_get_double(node, "init_val");
     chnl_cfg->failsafe_val.f  = (float)cfg_mgr_get_double(node, "failsafe_val");
+    chnl_cfg->min_val         = (float)cfg_mgr_get_double(node, "min_val");
+    chnl_cfg->max_val         = (float)cfg_mgr_get_double(node, "max_val");
   }
 
   str = cfg_mgr_get_str(node, "chnl_dir");

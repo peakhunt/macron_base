@@ -40,6 +40,9 @@ typedef struct
   channel_eng_value_t init_value;
   channel_eng_value_t failsafe_value;
 
+  float               min_val;
+  float               max_val;
+
   bool                sensor_fault;
 
   uint32_t            raw_value;
