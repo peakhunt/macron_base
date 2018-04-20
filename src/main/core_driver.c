@@ -102,6 +102,10 @@ __load_channels(void)
       chnl->lookup_table = __load_lookup_table(i);
     }
 
+    chnl->failsafe_value    = chnl_cfg.failsafe_val;
+    chnl->init_value        = chnl_cfg.init_val;
+    chnl->eng_value         = chnl_cfg.init_val;
+
     channel_manager_add_channel(chnl);
   }
   TRACE(CORE_DRIVER, "done loading %d channels\n", num_channels);

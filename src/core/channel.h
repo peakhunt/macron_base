@@ -37,6 +37,11 @@ typedef struct
   channel_direction_t chnl_dir;
 
   channel_eng_value_t eng_value;
+  channel_eng_value_t init_value;
+  channel_eng_value_t failsafe_value;
+
+  bool                sensor_fault;
+
   uint32_t            raw_value;
   uint32_t            raw_value_queued;     /* for input input buffer, for output output buffer */
   lookup_table_t*     lookup_table;

@@ -9,6 +9,8 @@ typedef struct
 {
   uint32_t            chnl_num;
   channel_type_t      chnl_type;
+  channel_eng_value_t init_val;
+  channel_eng_value_t failsafe_val;
   channel_direction_t chnl_dir;
 } core_driver_channel_config_t;
 

@@ -21,12 +21,16 @@ do
   if [ $MOD -eq 0 ]
   then
     echo '  "chnl_type": "analog",'
+    echo '  "init_val": 0.0,'
+    echo '  "failsafe_val": 0.0,'
     echo '  "lookup_table": ['
     echo '    { "raw": 0,  "eng": 0     },'
     echo '    { "raw": 20, "eng": 20    }'
     echo '  ]'
   else
-    echo '  "chnl_type": "digital"'
+    echo '  "chnl_type": "digital",'
+    echo '  "init_val": false,'
+    echo '  "failsafe_val": false'
   fi
 
   if [ $CNT -lt $NUM_CHANNELS ]

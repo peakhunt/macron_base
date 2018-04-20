@@ -14,6 +14,15 @@ channel_alloc(uint32_t chnl_num, channel_type_t chnl_type, channel_direction_t c
 
   chnl->eng_value.f       = 0.0f;
   chnl->eng_value.b       = FALSE;
+
+  chnl->init_value.f      = 0.0f;
+  chnl->init_value.b      = FALSE;
+
+  chnl->failsafe_value.f  = 0.0f;
+  chnl->failsafe_value.b  = FALSE;
+
+  chnl->sensor_fault      = FALSE;
+
   chnl->raw_value         = 0;
   chnl->raw_value_queued  = 0;
 
