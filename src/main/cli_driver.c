@@ -17,8 +17,8 @@
 // private definitions
 //
 ////////////////////////////////////////////////////////////////////////////////
-static void app_cli_thread_init(evloop_thread_t* thrd);
-static void app_cli_thread_fini(evloop_thread_t* thrd);
+static void cli_driver_thread_init(evloop_thread_t* thrd);
+static void cli_driver_thread_fini(evloop_thread_t* thrd);
 
 static void cli_command_modbus(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_channel(cli_intf_t* intf, int argc, const char** argv);
@@ -31,8 +31,8 @@ static void cli_command_alarm(cli_intf_t* intf, int argc, const char** argv);
 ////////////////////////////////////////////////////////////////////////////////
 static evloop_thread_t    _app_cli_thread =
 {
-  .init = app_cli_thread_init,
-  .fini = app_cli_thread_fini,
+  .init = cli_driver_thread_init,
+  .fini = cli_driver_thread_fini,
 };
 
 static completion_t     _go_signal;
@@ -284,7 +284,7 @@ command_error:
 //
 ////////////////////////////////////////////////////////////////////////////////
 static void
-app_cli_thread_init(evloop_thread_t* thrd)
+cli_driver_thread_init(evloop_thread_t* thrd)
 {
   cli_config_t    cfg;
 
@@ -303,7 +303,7 @@ app_cli_thread_init(evloop_thread_t* thrd)
 }
 
 static void
-app_cli_thread_fini(evloop_thread_t* thrd)
+cli_driver_thread_fini(evloop_thread_t* thrd)
 {
 }
 
