@@ -5,7 +5,7 @@
 #include "utils.h"
 #include "evloop_thread.h"
 #include "trace.h"
-#include "app_config.h"
+#include "cfg_mgr.h"
 #include "cli_driver.h"
 #include "modbus_slave_driver.h"
 #include "modbus_master_driver.h"
@@ -102,7 +102,7 @@ main(int argc, char** argv)
   }
 
   debug_log_init(option->foreground ? NULL : "./debug.out");
-  app_config_init(NULL);
+  cfg_mgr_init(NULL);
 
   debug_log("starting system\n");
 

@@ -1,7 +1,7 @@
 #include "common_def.h"
 #include "channel_manager.h"
 #include "alarm_manager.h"
-#include "app_config.h"
+#include "cfg_mgr.h"
 #include "time_util.h"
 #include "trace.h"
 #include "webserver_api.h"
@@ -179,9 +179,9 @@ webapi_get_config_base(struct mg_connection* nc, struct http_message* hm, struct
   const char*   json;
   int     len;
 
-  app_config_read_lock();
+  cfg_mgr_read_lock();
 
-  json = app_config_get_json_string_use_lock_before_call(&len);
+  json = cfg_mgr_get_json_string_use_lock_before_call(&len);
 
   if(json == NULL)
   {
@@ -195,7 +195,7 @@ webapi_get_config_base(struct mg_connection* nc, struct http_message* hm, struct
         "Content-Length: %d\r\n\r\n%s",
         len, json);
   }
-  app_config_unlock();
+  cfg_mgr_unlock();
 }
 
 

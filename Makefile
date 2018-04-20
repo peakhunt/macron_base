@@ -72,7 +72,7 @@ src/main/modbus_slave_driver.c                      \
 src/main/modbus_master_driver.c                     \
 src/main/webserver_driver.c                         \
 src/main/webserver_api.c                            \
-src/main/app_config.c
+src/main/cfg_mgr.c
 
 TEST_C_SOURCE =                                     \
 test/cmd_option_test.c                              \

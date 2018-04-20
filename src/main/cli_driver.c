@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "cli_driver.h"
-#include "app_config.h"
+#include "cfg_mgr.h"
 #include "cli.h"
 #include "trace.h"
 #include "app_init_completion.h"
@@ -290,7 +290,7 @@ cli_driver_thread_init(evloop_thread_t* thrd)
 
   TRACE(APP_CLI, "initializing CLI\n");
 
-  app_config_get_cli_config(&cfg);
+  cfg_mgr_get_cli_config(&cfg);
   cli_init(&cfg, _app_commands, NARRAY(_app_commands));
 
   TRACE(APP_CLI, "done initializing CLI\n");

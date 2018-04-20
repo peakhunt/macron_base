@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include "common_def.h"
 #include "modbus_master_driver.h"
-#include "app_config.h"
+#include "cfg_mgr.h"
 #include "list.h"
 #include "modbus_master.h"
 #include "modbus_tcp_master.h"
@@ -558,11 +558,11 @@ modbus_driver_load_masters(void)
                                   i;
   modbus_master_driver_t*         master;
 
-  num_masters = app_config_get_num_modbus_masters();
+  num_masters = cfg_mgr_get_num_modbus_masters();
 
   for(i = 0; i < num_masters; i++)
   {
-    app_config_get_modbus_master_at(i, &cfg);
+    cfg_mgr_get_modbus_master_at(i, &cfg);
 
     if(cfg.protocol == modbus_master_driver_type_tcp)
     {
@@ -576,19 +576,19 @@ modbus_driver_load_masters(void)
     master = alloc_init_modbus_master(&cfg);
 
     // load registers 
-    num_regs = app_config_get_modbus_master_num_regs(i);
+    num_regs = cfg_mgr_get_modbus_master_num_regs(i);
     for(int reg_ndx = 0; reg_ndx < num_regs; reg_ndx++)
     {
       uint32_t          chnl;
       modbus_address_t  reg;
 
-      app_config_get_modbus_master_reg(i, reg_ndx, &reg, &chnl);
+      cfg_mgr_get_modbus_master_reg(i, reg_ndx, &reg, &chnl);
       modbus_register_list_add(&master->reg_map,
           reg.slave_id, reg.reg_type, reg.mb_address, chnl);
     }
 
     // load request schedule
-    num_reqs = app_config_get_modbus_master_num_request_schedules(i);
+    num_reqs = cfg_mgr_get_modbus_master_num_request_schedules(i);
     master->num_reqs = num_reqs;
     master->request_schedule  = malloc(sizeof(modbus_master_driver_request_config_t) * num_reqs);
     if(master->request_schedule == NULL)
@@ -601,7 +601,7 @@ modbus_driver_load_masters(void)
 
     for(int req_ndx = 0; req_ndx < num_reqs; req_ndx++)
     {
-      app_config_get_modbus_slave_request_schedule(i, req_ndx, &master->request_schedule[req_ndx]);
+      cfg_mgr_get_modbus_slave_request_schedule(i, req_ndx, &master->request_schedule[req_ndx]);
     }
   }
 

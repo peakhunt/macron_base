@@ -3,7 +3,7 @@
 #include <pthread.h>
 #include "common_def.h"
 #include "modbus_slave_driver.h"
-#include "app_config.h"
+#include "cfg_mgr.h"
 #include "list.h"
 #include "trace.h"
 #include "channel_manager.h"
@@ -256,12 +256,12 @@ modbus_slave_driver_load_slaves(void)
                                   i;
   modbus_slave_driver_t*          slave;
 
-  num_slaves = app_config_get_num_modbus_slaves();
+  num_slaves = cfg_mgr_get_num_modbus_slaves();
 
   // init phase
   for( i = 0; i < num_slaves; i++)
   {
-    app_config_get_modbus_slave_at(i, &cfg);
+    cfg_mgr_get_modbus_slave_at(i, &cfg);
 
     if(cfg.protocol == modbus_slave_driver_type_tcp)
     {
@@ -275,13 +275,13 @@ modbus_slave_driver_load_slaves(void)
     slave = alloc_init_modbus_slave(&cfg);
 
     // load registers
-    num_regs = app_config_get_modbus_slave_num_regs(i);
+    num_regs = cfg_mgr_get_modbus_slave_num_regs(i);
     for(int reg_ndx = 0; reg_ndx < num_regs; reg_ndx++)
     {
       uint32_t            chnl;
       modbus_address_t    reg;
 
-      app_config_get_modbus_slave_reg(i, reg_ndx, &reg, &chnl);
+      cfg_mgr_get_modbus_slave_reg(i, reg_ndx, &reg, &chnl);
       modbus_register_list_add(&slave->reg_map,
           reg.slave_id, reg.reg_type, reg.mb_address, chnl);
     }

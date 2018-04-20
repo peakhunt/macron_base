@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include "core_driver.h"
-#include "app_config.h"
+#include "cfg_mgr.h"
 #include "evloop_thread.h"
 #include "evloop_timer.h"
 #include "channel_manager.h"
@@ -63,13 +63,13 @@ __load_lookup_table(int chnl_ndx)
   lookup_table_t*         lut;
   lookup_table_item_t*    items;
 
-  num_entries = app_config_get_num_lookup_table_of_channel_at(chnl_ndx);
+  num_entries = cfg_mgr_get_num_lookup_table_of_channel_at(chnl_ndx);
   items = malloc(sizeof(lookup_table_item_t) * num_entries);
   lut   = malloc(sizeof(lookup_table_t));
 
   for(int i = 0; i < num_entries; i++)
   {
-    app_config_get_lookup_table_of_channel_at(chnl_ndx, i, &raw, &eng);
+    cfg_mgr_get_lookup_table_of_channel_at(chnl_ndx, i, &raw, &eng);
 
     items[i].v1   = raw;
     items[i].v2   = eng;
@@ -90,11 +90,11 @@ __load_channels(void)
   channel_t*                      chnl;
 
   TRACE(APP_CORE, "loading channels\n");
-  num_channels = app_config_get_num_channels();
+  num_channels = cfg_mgr_get_num_channels();
 
   for(int i = 0; i < num_channels; i++)
   {
-    app_config_get_channel_at(i, &chnl_cfg);
+    cfg_mgr_get_channel_at(i, &chnl_cfg);
     chnl = channel_alloc(chnl_cfg.chnl_num, chnl_cfg.chnl_type, chnl_cfg.chnl_dir);
 
     if(chnl_cfg.chnl_type == channel_type_analog)
@@ -115,11 +115,11 @@ __load_alarms(void)
   alarm_t*                    alarm;
 
   TRACE(APP_CORE, "loading alarms\n");
-  num_alarms = app_config_get_num_alarms();
+  num_alarms = cfg_mgr_get_num_alarms();
 
   for(int i = 0; i < num_alarms; i++)
   {
-    app_config_get_alarm_at(i, &alm_cfg);
+    cfg_mgr_get_alarm_at(i, &alm_cfg);
 
     alarm = alarm_alloc(alm_cfg.alarm_num, alm_cfg.chnl_num,
         alm_cfg.severity, alm_cfg.trigger_type,
