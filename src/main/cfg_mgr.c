@@ -662,3 +662,18 @@ cfg_mgr_get_json_string_use_lock_before_call(int* len)
   *len = _json_str_len;
   return _json_str;
 }
+
+void
+cfg_mgr_get_webserver_config(webserver_config_t* cfg)
+{
+  cJSON*      web;
+
+  cfg_mgr_read_lock();
+
+  web = cfg_mgr_get_node(_jroot, "web");
+
+  cfg->http_address = cfg_mgr_get_str(web, "http_address");
+  cfg->doc_root     = cfg_mgr_get_str(web, "doc_root");
+
+  cfg_mgr_unlock();
+}

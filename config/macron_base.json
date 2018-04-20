@@ -20,6 +20,11 @@
     }
   },
 
+  "web": {
+    "http_address": "8000",
+    "doc_root" : "./"
+  },
+
   "modbus_slave_list" : [
     {
       "protocol": "tcp",

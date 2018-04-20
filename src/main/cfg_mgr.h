@@ -5,6 +5,7 @@
 #include "cli.h"
 #include "modbus_slave_driver.h"
 #include "modbus_master_driver.h"
+#include "webserver_driver.h"
 #include "core_driver.h"
 
 extern void cfg_mgr_init(const char* cfg_file);
@@ -39,6 +40,8 @@ extern int cfg_mgr_get_modbus_master_num_request_schedules(int master_ndx);
 extern void cfg_mgr_get_modbus_slave_request_schedule(int master_ndx, int req_ndx, modbus_master_driver_request_config_t* cfg);
 
 extern const char* cfg_mgr_get_json_string_use_lock_before_call(int* len);
+
+extern void cfg_mgr_get_webserver_config(webserver_config_t* cfg);
 
 extern void cfg_mgr_read_lock(void);
 extern void cfg_mgr_write_lock(void);

@@ -1,13 +1,12 @@
 #include <pthread.h>
 #include "webserver_driver.h"
+#include "cfg_mgr.h"
 #include "trace.h"
 #include "mongoose.h"
 #include "app_init_completion.h"
 #include "completion.h"
 #include "mongoose_util.h"
 #include "webserver_api.h"
-
-#define WEB_SERVER_PORT         "8000"
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -18,6 +17,9 @@ static pthread_t    _mongoose_thread;
 static struct mg_serve_http_opts s_http_server_opts;
 
 static completion_t     _go_signal;
+
+static char*            _http_address;
+static char*            _doc_root;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -66,10 +68,10 @@ __mongoose_thread(void* arg)
   struct mg_mgr           mgr;
   struct mg_connection*   nc;
 
-  TRACE(WEBS_DRIVER, "starting web server for port %s\n", WEB_SERVER_PORT);
+  TRACE(WEBS_DRIVER, "starting web server bound to %s, doc root %s\n", _http_address, _doc_root);
   mg_mgr_init(&mgr, NULL);
 
-  nc = mg_bind(&mgr, WEB_SERVER_PORT, ev_handler);
+  nc = mg_bind(&mgr, _http_address, ev_handler);
   if(nc == NULL)
   {
     TRACE(WEBS_DRIVER, "failed to create listener\n");
@@ -78,7 +80,7 @@ __mongoose_thread(void* arg)
 
   mg_set_protocol_http_websocket(nc);
 
-  s_http_server_opts.document_root = ".";
+  s_http_server_opts.document_root = _doc_root;
   s_http_server_opts.enable_directory_listing = "yes";
 
   TRACE(WEBS_DRIVER, "done starting web server\n");
@@ -104,7 +106,14 @@ __mongoose_thread(void* arg)
 void
 webserver_driver_init(void)
 {
+  webserver_config_t    cfg;
+
   TRACE(WEBS_DRIVER, "starting web server interface\n");
+
+  cfg_mgr_get_webserver_config(&cfg);
+
+  _http_address = strdup(cfg.http_address);
+  _doc_root     = strdup(cfg.doc_root);
 
   completion_init(&_go_signal);
 
