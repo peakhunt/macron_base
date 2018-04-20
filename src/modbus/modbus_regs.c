@@ -23,8 +23,9 @@ modbus_register_list_init(modbus_register_list_t* mb_list)
 }
 
 void
-modbus_register_list_add(modbus_register_list_t* mb_list,
-    uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t mb_addr, uint32_t chnl_num)
+modbus_register_list_add(modbus_register_list_t* mb_list, uint32_t slave_id,
+    modbus_reg_type_t reg_type, uint32_t mb_addr, uint32_t chnl_num,
+    modbus_reg_filter_t* filter)
 {
   modbus_register_t*    reg;
 
@@ -36,6 +37,19 @@ modbus_register_list_add(modbus_register_list_t* mb_list,
   reg->mb_addr.mb_address   = mb_addr;
   reg->mb_addr.reg_type     = reg_type;
   reg->chnl_num             = chnl_num;
+
+  if(filter)
+  {
+    reg->filter               = *filter;
+  }
+  else
+  {
+    reg->filter.d_mask  = 0xffff;
+    reg->filter.s_mask  = 0x0;
+    reg->filter.d_shift = 0;
+    reg->filter.s_shift = 0;
+    reg->filter.fault   = 0;
+  }
 
   bhash_add(&mb_list->hash_by_mb_addr, (void*)reg);
 

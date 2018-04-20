@@ -308,9 +308,10 @@ channel_manager_get_channel_stat(uint32_t chnl_num, channel_status_t* status)
     return -1;
   }
 
-  status->chnl_type = chnl->chnl_type;
-  status->eng_val   = chnl->eng_value;
-  status->raw_val   = chnl->raw_value;
+  status->chnl_type     = chnl->chnl_type;
+  status->eng_val       = chnl->eng_value;
+  status->raw_val       = chnl->raw_value;
+  status->sensor_fault  = chnl->sensor_fault;
 
   channel_manager_chnl_put(chnl);
 

@@ -28,13 +28,22 @@ typedef struct
   modbus_reg_type_t     reg_type;
 } modbus_address_t;
 
+typedef struct
+{
+  uint16_t              d_mask;           // data mask
+  uint16_t              s_mask;           // sensor status mask
+  uint8_t               d_shift;          // data shift left
+  uint8_t               s_shift;          // sensor status shift left
+  uint16_t              fault;
+} modbus_reg_filter_t;
 
 typedef struct
 {
-  struct list_head      le;
-  BHashElement          bh_by_mb_addr;
-  modbus_address_t      mb_addr;
-  uint32_t              chnl_num;
+  struct list_head          le;
+  BHashElement              bh_by_mb_addr;
+  modbus_address_t          mb_addr;
+  uint32_t                  chnl_num;
+  modbus_reg_filter_t       filter;
 } modbus_register_t;
 
 typedef struct
@@ -46,9 +55,8 @@ typedef struct
 
 extern void modbus_register_list_init(modbus_register_list_t* mb_list);
 extern void modbus_register_list_add(modbus_register_list_t* mb_list,
-    uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t mb_addr, uint32_t chnl_num);
+    uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t mb_addr, uint32_t chnl_num, modbus_reg_filter_t* filter);
 extern modbus_register_t* modbus_register_list_lookup_by_mb_type_addr(modbus_register_list_t* mb_list,
     uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t mb_addr);
-
 
 #endif /* !__MODBUS_REGS_DEF_H__ */

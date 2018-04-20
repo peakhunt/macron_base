@@ -283,7 +283,7 @@ modbus_slave_driver_load_slaves(void)
 
       cfg_mgr_get_modbus_slave_reg(i, reg_ndx, &reg, &chnl);
       modbus_register_list_add(&slave->reg_map,
-          reg.slave_id, reg.reg_type, reg.mb_address, chnl);
+          reg.slave_id, reg.reg_type, reg.mb_address, chnl, NULL);
     }
   }
 

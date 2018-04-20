@@ -5,6 +5,7 @@
 #include "config_reader.h"
 #include "debug_log.h"
 #include "cJSON.h"
+#include "bit_util.h"
 #include <pthread.h>
 
 
@@ -143,6 +144,42 @@ cfg_mgr_get_modbus_reg_cfg(cJSON* node, modbus_address_t* mb_reg, uint32_t* chnl
   mb_reg->reg_type = cfg_mgr_get_modbus_reg_type(node, "reg");
   mb_reg->mb_address  = (uint32_t)cfg_mgr_get_int(node, "address");
   *chnl               = cfg_mgr_get_int(node, "channel");
+}
+
+static inline void
+cfg_mgr_get_modbus_reg_filter(cJSON* node, modbus_reg_filter_t* filter)
+{
+  cJSON* jfilter;
+  char*   str;
+
+  jfilter = cJSON_GetObjectItem(node, "filter");
+
+  if(jfilter == NULL)
+  {
+    filter->d_mask    = 0xffff;
+    filter->s_mask    = 0x0000;
+    filter->d_shift   = 0;
+    filter->s_shift   = 0;
+  }
+  else
+  {
+    int         d_start, d_end, s_start, s_end;
+    uint32_t    tmp;
+
+    str = cfg_mgr_get_str(node, "filter");
+    sscanf(str, "%d:%d,%d:%d,fault=%x", &d_start, &d_end, &s_start, &s_end, &tmp);
+
+    u16_mask(d_start, d_end, &filter->d_mask, &filter->d_shift);
+    u16_mask(s_start, s_end, &filter->s_mask, &filter->s_shift);
+
+    filter->fault = (uint16_t)tmp;
+
+    debug_log("d_mask : %x, d_shift: %d, s_mask: %x, s_shift: %d\n",
+        filter->d_mask, 
+        filter->d_shift,
+        filter->s_mask,
+        filter->s_shift);
+  }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -381,7 +418,8 @@ cfg_mgr_get_modbus_master_num_regs(int master_ndx)
 }
 
 void
-cfg_mgr_get_modbus_master_reg(int master_ndx, int reg_ndx, modbus_address_t* mb_reg, uint32_t* chnl)
+cfg_mgr_get_modbus_master_reg(int master_ndx, int reg_ndx, modbus_address_t* mb_reg, uint32_t* chnl,
+    modbus_reg_filter_t* filter)
 {
   cJSON     *master_list,
             *master,
@@ -393,8 +431,11 @@ cfg_mgr_get_modbus_master_reg(int master_ndx, int reg_ndx, modbus_address_t* mb_
   master_list = cfg_mgr_get_node(_jroot, "modbus_master_list");
   master      = cJSON_GetArrayItem(master_list, master_ndx);
   reg_map     = cfg_mgr_get_node(master, "reg_map");
+
   reg         = cJSON_GetArrayItem(reg_map, reg_ndx);
+
   cfg_mgr_get_modbus_reg_cfg(reg, mb_reg, chnl);
+  cfg_mgr_get_modbus_reg_filter(reg, filter);
 
   cfg_mgr_unlock();
 }

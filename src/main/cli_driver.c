@@ -200,16 +200,17 @@ cli_command_channel(cli_intf_t* intf, int argc, const char** argv)
     }
 
     cli_printf(intf, "channel status for channel #%d"CLI_EOL, chnl_num);
-    cli_printf(intf, "raw value: %d"CLI_EOL, status.raw_val);
+    cli_printf(intf, "raw value:    %d"CLI_EOL, status.raw_val);
 
     if(status.chnl_type == channel_type_digital)
     {
-      cli_printf(intf, "eng value: %s"CLI_EOL, status.eng_val.b ? "on" : "off");
+      cli_printf(intf, "eng value:    %s"CLI_EOL, status.eng_val.b ? "on" : "off");
     }
     else
     {
-      cli_printf(intf, "eng value: %.2f"CLI_EOL, status.eng_val.f);
+      cli_printf(intf, "eng value:    %.2f"CLI_EOL, status.eng_val.f);
     }
+    cli_printf(intf, "sensor fault: %s"CLI_EOL, status.sensor_fault ? "fault" : "normal");
   }
   else
   {

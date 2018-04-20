@@ -35,7 +35,8 @@ extern void cfg_mgr_get_modbus_slave_reg(int slave_ndx, int reg_ndx, modbus_addr
 extern int cfg_mgr_get_num_modbus_masters(void);
 extern void cfg_mgr_get_modbus_master_at(int ndx, modbus_master_driver_config_t* cfg);
 extern int cfg_mgr_get_modbus_master_num_regs(int master_ndx);
-extern void cfg_mgr_get_modbus_master_reg(int master_ndx, int reg_ndx, modbus_address_t* mb_reg, uint32_t* chnl);
+extern void cfg_mgr_get_modbus_master_reg(int master_ndx, int reg_ndx, modbus_address_t* mb_reg, uint32_t* chnl,
+    modbus_reg_filter_t* filter);
 extern int cfg_mgr_get_modbus_master_num_request_schedules(int master_ndx);
 extern void cfg_mgr_get_modbus_slave_request_schedule(int master_ndx, int req_ndx, modbus_master_driver_request_config_t* cfg);
 

@@ -9,6 +9,7 @@ typedef struct
   channel_type_t          chnl_type;
   channel_eng_value_t     eng_val;
   uint32_t                raw_val;
+  bool                    sensor_fault;
 } channel_status_t;
 
 extern void channel_manager_init(void);

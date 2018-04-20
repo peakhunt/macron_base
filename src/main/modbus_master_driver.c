@@ -14,6 +14,7 @@
 #include "trace.h"
 #include "time_util.h"
 #include "app_init_completion.h"
+#include "bit_util.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -79,6 +80,15 @@ __get_mapped_channel(modbus_master_driver_t* master, uint32_t slave_id, modbus_r
     return -1;
   }
   return reg->chnl_num;
+}
+
+static modbus_register_t*
+__get_modbus_register(modbus_master_driver_t* master, uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t addr)
+{
+  return modbus_register_list_lookup_by_mb_type_addr(&master->reg_map,
+                                                     slave_id,
+                                                     reg_type,
+                                                     addr);
 }
 
 static inline void
@@ -335,15 +345,16 @@ __handle_coil_discrete_read_response(modbus_master_driver_t* master, modbus_reg_
 {
   uint16_t      i,
                 current;
-  int32_t       chnl_num;
-  uint8_t       v;
+  uint8_t       v,
+                final_v;
+  modbus_register_t*    mreg;
 
   for(i = 0; i < nreg; i++)
   {
     current = addr + i;
 
-    chnl_num = __get_mapped_channel(master, slave, reg_type, current);
-    if(chnl_num == -1)
+    mreg = __get_modbus_register(master, slave, reg_type, current);
+    if(mreg == NULL)
     {
       TRACE(MBM_DRIVER, "can't find channel for %d, %d:%d\n", reg_type, slave, current);
       continue;
@@ -351,7 +362,19 @@ __handle_coil_discrete_read_response(modbus_master_driver_t* master, modbus_reg_
 
     v = xMBUtilGetBits(data_buf, i, 1);
 
-    channel_manager_set_raw_value(chnl_num, v == 0 ? 0 : 1);
+    if(mreg->filter.d_mask != 0)
+    {
+      // data response
+      final_v = u16_filter(mreg->filter.d_mask, mreg->filter.d_shift, v);
+      channel_manager_set_raw_value(mreg->chnl_num, final_v == 0 ? 0 : 1);
+    }
+
+    if(mreg->filter.s_mask != 0)
+    {
+      // sensor status response
+      final_v = u16_filter(mreg->filter.s_mask, mreg->filter.s_shift, v);
+      channel_manager_set_sensor_fault_status(mreg->chnl_num, final_v == mreg->filter.fault ? TRUE : FALSE);
+    }
   }
 }
 
@@ -361,15 +384,16 @@ __handle_holding_input_read_response(modbus_master_driver_t* master, modbus_reg_
 {
   uint16_t      i,
                 current;
-  int32_t       chnl_num;
-  uint16_t      v;
+  uint16_t      v,
+                final_v;
+  modbus_register_t*    mreg;
 
   for(i = 0; i < nreg; i++, data_buf += 2)
   {
     current = addr + i;
 
-    chnl_num = __get_mapped_channel(master, slave, reg_type, current);
-    if(chnl_num == -1)
+    mreg = __get_modbus_register(master, slave, reg_type, current);
+    if(mreg == NULL)
     {
       TRACE(MBM_DRIVER, "can't find channel for %d, %d:%d\n", reg_type, slave, current);
       continue;
@@ -377,7 +401,19 @@ __handle_holding_input_read_response(modbus_master_driver_t* master, modbus_reg_
 
     v = BUFFER_TO_U16(data_buf);
 
-    channel_manager_set_raw_value(chnl_num, v);
+    if(mreg->filter.d_mask != 0)
+    {
+      // data response
+      final_v = u16_filter(mreg->filter.d_mask, mreg->filter.d_shift, v);
+      channel_manager_set_raw_value(mreg->chnl_num, final_v);
+    }
+
+    if(mreg->filter.s_mask != 0)
+    {
+      // sensor status response
+      final_v = u16_filter(mreg->filter.s_mask, mreg->filter.s_shift, v);
+      channel_manager_set_sensor_fault_status(mreg->chnl_num, final_v == mreg->filter.fault ? TRUE : FALSE);
+    }
   }
 }
 
@@ -579,12 +615,13 @@ modbus_driver_load_masters(void)
     num_regs = cfg_mgr_get_modbus_master_num_regs(i);
     for(int reg_ndx = 0; reg_ndx < num_regs; reg_ndx++)
     {
-      uint32_t          chnl;
-      modbus_address_t  reg;
+      uint32_t                    chnl;
+      modbus_address_t            reg;
+      modbus_reg_filter_t         filter;
 
-      cfg_mgr_get_modbus_master_reg(i, reg_ndx, &reg, &chnl);
+      cfg_mgr_get_modbus_master_reg(i, reg_ndx, &reg, &chnl, &filter);
       modbus_register_list_add(&master->reg_map,
-          reg.slave_id, reg.reg_type, reg.mb_address, chnl);
+          reg.slave_id, reg.reg_type, reg.mb_address, chnl, &filter);
     }
 
     // load request schedule
