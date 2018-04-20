@@ -41,8 +41,8 @@ ev_handler(struct mg_connection* nc, int ev, void* ev_data)
       char buf[100] = {0};
 
       memcpy(buf, hm->body.p, sizeof(buf) - 1 < hm->body.len ? sizeof(buf) - 1 : hm->body.len);
-      TRACE(APP_WEB, "printing contents\n");
-      TRACE(APP_WEB, "%s\n", buf);
+      TRACE(WEBS_DRIVER, "printing contents\n");
+      TRACE(WEBS_DRIVER, "%s\n", buf);
     }
     else
     {
@@ -66,13 +66,13 @@ __mongoose_thread(void* arg)
   struct mg_mgr           mgr;
   struct mg_connection*   nc;
 
-  TRACE(APP_WEB, "starting web server for port %s\n", WEB_SERVER_PORT);
+  TRACE(WEBS_DRIVER, "starting web server for port %s\n", WEB_SERVER_PORT);
   mg_mgr_init(&mgr, NULL);
 
   nc = mg_bind(&mgr, WEB_SERVER_PORT, ev_handler);
   if(nc == NULL)
   {
-    TRACE(APP_WEB, "failed to create listener\n");
+    TRACE(WEBS_DRIVER, "failed to create listener\n");
     return NULL;
   }
 
@@ -81,12 +81,12 @@ __mongoose_thread(void* arg)
   s_http_server_opts.document_root = ".";
   s_http_server_opts.enable_directory_listing = "yes";
 
-  TRACE(APP_WEB, "done starting web server\n");
+  TRACE(WEBS_DRIVER, "done starting web server\n");
   app_init_complete_signal();
 
-  TRACE(APP_WEB, "waiting for go signal from main\n");
+  TRACE(WEBS_DRIVER, "waiting for go signal from main\n");
   completion_wait(&_go_signal);
-  TRACE(APP_WEB, "got go signal from main. entering main loop\n");
+  TRACE(WEBS_DRIVER, "got go signal from main. entering main loop\n");
 
   for(;;) {
     mg_mgr_poll(&mgr, 1000);
@@ -104,7 +104,7 @@ __mongoose_thread(void* arg)
 void
 webserver_driver_init(void)
 {
-  TRACE(APP_WEB, "starting web server interface\n");
+  TRACE(WEBS_DRIVER, "starting web server interface\n");
 
   completion_init(&_go_signal);
 

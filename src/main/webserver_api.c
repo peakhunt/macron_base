@@ -101,7 +101,7 @@ execute_api_handler(api_cmd_handler_t* table, int num_entries,
     }
   }
 
-  TRACE(APP_WEB, "can't find target handler: %s\n", mg_util_to_c_str(current));
+  TRACE(WEBS_DRIVER, "can't find target handler: %s\n", mg_util_to_c_str(current));
   webapi_not_found(nc, hm);
 }
 
@@ -119,7 +119,7 @@ webapi_get_channel_status(struct mg_connection* nc, struct http_message* hm, str
 
   chnl_num = (uint32_t)mg_util_get_int(subcmd);
 
-  TRACE(APP_WEB, "channel status request for %d\n", chnl_num);
+  TRACE(WEBS_DRIVER, "channel status request for %d\n", chnl_num);
 
   if(channel_manager_get_channel_stat(chnl_num, &status) == -1)
   {
@@ -156,7 +156,7 @@ webapi_get_alarm_status(struct mg_connection* nc, struct http_message* hm, struc
 
   alarm_num = (uint32_t)mg_util_get_int(subcmd);
 
-  TRACE(APP_WEB, "alarm status request for %d\n", alarm_num);
+  TRACE(WEBS_DRIVER, "alarm status request for %d\n", alarm_num);
 
   if(alarm_manager_get_alarm_status(alarm_num, &status) == -1)
   {
@@ -292,7 +292,7 @@ webserver_api_handler(struct mg_connection* nc, struct http_message* hm)
     webapi_not_found(nc, hm);
   }
 
-  TRACE(APP_WEB, "done handling api request. took %ld ms\n",
+  TRACE(WEBS_DRIVER, "done handling api request. took %ld ms\n",
       time_util_get_sys_clock_elapsed_in_ms(start));
 
   return true;

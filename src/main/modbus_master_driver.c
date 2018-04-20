@@ -122,7 +122,7 @@ modbus_master_driver_coil_write_req(modbus_master_driver_t* master, modbus_maste
     chnl_num = __get_mapped_channel(master, slave_addr, modbus_reg_coil, reg_addr);
     if(chnl_num == -1)
     {
-      TRACE(APP_MB_MASTER, "can't find channel for %d, %d:%d\n", modbus_reg_coil, slave_addr, reg_addr);
+      TRACE(MBM_DRIVER, "can't find channel for %d, %d:%d\n", modbus_reg_coil, slave_addr, reg_addr);
       return;
     }
 
@@ -137,7 +137,7 @@ modbus_master_driver_coil_write_req(modbus_master_driver_t* master, modbus_maste
     chnl_num = __get_mapped_channel(master, slave_addr, modbus_reg_coil, reg_addr + i);
     if(chnl_num == -1)
     {
-      TRACE(APP_MB_MASTER, "can't find channel for %d, %d:%d\n", modbus_reg_coil, slave_addr, reg_addr + i);
+      TRACE(MBM_DRIVER, "can't find channel for %d, %d:%d\n", modbus_reg_coil, slave_addr, reg_addr + i);
       return;
     }
 
@@ -170,7 +170,7 @@ modbus_master_driver_holding_write_req(modbus_master_driver_t* master, modbus_ma
     chnl_num = __get_mapped_channel(master, slave_addr, modbus_reg_holding, reg_addr);
     if(chnl_num == -1)
     {
-      TRACE(APP_MB_MASTER, "can't find channel for %d, %d:%d\n", modbus_reg_holding, slave_addr, reg_addr);
+      TRACE(MBM_DRIVER, "can't find channel for %d, %d:%d\n", modbus_reg_holding, slave_addr, reg_addr);
       return;
     }
 
@@ -184,7 +184,7 @@ modbus_master_driver_holding_write_req(modbus_master_driver_t* master, modbus_ma
     chnl_num = __get_mapped_channel(master, slave_addr, modbus_reg_holding, reg_addr + i);
     if(chnl_num == -1)
     {
-      TRACE(APP_MB_MASTER, "can't find channel for %d, %d:%d\n", modbus_reg_holding, slave_addr, reg_addr + i);
+      TRACE(MBM_DRIVER, "can't find channel for %d, %d:%d\n", modbus_reg_holding, slave_addr, reg_addr + i);
       return;
     }
 
@@ -281,7 +281,7 @@ modbus_driver_master_next(modbus_master_driver_t* master)
   wait_time = target_delay - time_took_for_prev_transacion;
 
 #if 0
-  TRACE(APP_MB_MASTER, "took %d, target: %f, wait %f\n",
+  TRACE(MBM_DRIVER, "took %d, target: %f, wait %f\n",
       time_took_for_prev_transacion,
       target_delay,
       wait_time);
@@ -313,7 +313,7 @@ modbus_master_transaction_timeout(evloop_timer_t* te, void* unused)
 
   req = &master->request_schedule[master->current_request];
 
-  TRACE(APP_MB_MASTER, "tr timeout, req ndx %d: %d, %d, %d, %d, %d\n",
+  TRACE(MBM_DRIVER, "tr timeout, req ndx %d: %d, %d, %d, %d, %d\n",
       master->current_request,
       req->slave_id,
       req->op,
@@ -345,7 +345,7 @@ __handle_coil_discrete_read_response(modbus_master_driver_t* master, modbus_reg_
     chnl_num = __get_mapped_channel(master, slave, reg_type, current);
     if(chnl_num == -1)
     {
-      TRACE(APP_MB_MASTER, "can't find channel for %d, %d:%d\n", reg_type, slave, current);
+      TRACE(MBM_DRIVER, "can't find channel for %d, %d:%d\n", reg_type, slave, current);
       continue;
     }
 
@@ -371,7 +371,7 @@ __handle_holding_input_read_response(modbus_master_driver_t* master, modbus_reg_
     chnl_num = __get_mapped_channel(master, slave, reg_type, current);
     if(chnl_num == -1)
     {
-      TRACE(APP_MB_MASTER, "can't find channel for %d, %d:%d\n", reg_type, slave, current);
+      TRACE(MBM_DRIVER, "can't find channel for %d, %d:%d\n", reg_type, slave, current);
       continue;
     }
 
@@ -445,14 +445,14 @@ __modbus_master_event_cb(ModbusMasterCTX* ctx, modbus_master_event_t event)
   switch(event)
   {
   case modbus_master_event_connected:
-    TRACE(APP_MB_MASTER, "xxxxxx connected callback xxxxxx\n");
+    TRACE(MBM_DRIVER, "xxxxxx connected callback xxxxxx\n");
     master->current_request = 0;
     modbus_master_driver_request(master);
 
     break;
 
   case modbus_master_event_disconnected:
-    TRACE(APP_MB_MASTER, "xxxxxx disconnected callback xxxxxx\n");
+    TRACE(MBM_DRIVER, "xxxxxx disconnected callback xxxxxx\n");
     if(evloop_timer_active(&master->transaction_timer))
     {
       evloop_timer_stop(&master->transaction_timer);
@@ -484,7 +484,7 @@ alloc_init_modbus_master(modbus_master_driver_config_t* cfg)
   master = malloc(sizeof(modbus_master_driver_t));
   if(master == NULL)
   {
-    TRACE(APP_MB_MASTER,"failed to alloc modbus_master_driver_t\n");
+    TRACE(MBM_DRIVER,"failed to alloc modbus_master_driver_t\n");
     goto failed;
   }
 
@@ -499,7 +499,7 @@ alloc_init_modbus_master(modbus_master_driver_config_t* cfg)
     tcp_master = malloc(sizeof(ModbusTCPMaster));
     if(tcp_master == NULL)
     {
-      TRACE(APP_MB_MASTER, "failed to alloc ModbusTCPMaster\n");
+      TRACE(MBM_DRIVER, "failed to alloc ModbusTCPMaster\n");
       goto failed;
     }
 
@@ -513,7 +513,7 @@ alloc_init_modbus_master(modbus_master_driver_config_t* cfg)
     rtu_master = malloc(sizeof(ModbusRTUMaster));
     if(rtu_master == NULL)
     {
-      TRACE(APP_MB_MASTER, "failed to alloc ModbusRTUMaster\n");
+      TRACE(MBM_DRIVER, "failed to alloc ModbusRTUMaster\n");
       goto failed;
     }
 
@@ -566,11 +566,11 @@ modbus_driver_load_masters(void)
 
     if(cfg.protocol == modbus_master_driver_type_tcp)
     {
-      TRACE(APP_MB_MASTER,"initializing modbus tcp master for %s:%d\n", cfg.dest_ip, cfg.dest_port);
+      TRACE(MBM_DRIVER,"initializing modbus tcp master for %s:%d\n", cfg.dest_ip, cfg.dest_port);
     }
     else
     {
-      TRACE(APP_MB_MASTER, "initializing modbus rtu master, port %s\n", cfg.serial_port);
+      TRACE(MBM_DRIVER, "initializing modbus rtu master, port %s\n", cfg.serial_port);
     }
 
     master = alloc_init_modbus_master(&cfg);
@@ -593,7 +593,7 @@ modbus_driver_load_masters(void)
     master->request_schedule  = malloc(sizeof(modbus_master_driver_request_config_t) * num_reqs);
     if(master->request_schedule == NULL)
     {
-      TRACE(APP_MB_MASTER,"failed to malloc request_schedule\n");
+      TRACE(MBM_DRIVER,"failed to malloc request_schedule\n");
       exit(-1);
     }
 
@@ -627,11 +627,11 @@ modbus_driver_load_masters(void)
 static void
 mb_master_driver_thread_init(evloop_thread_t* thrd)
 {
-  TRACE(APP_MB_MASTER, "loading masters from config\n");
+  TRACE(MBM_DRIVER, "loading masters from config\n");
 
   modbus_driver_load_masters();
 
-  TRACE(APP_MB_MASTER, "done loading masters\n");
+  TRACE(MBM_DRIVER, "done loading masters\n");
 
   app_init_complete_signal();
 }
@@ -649,7 +649,7 @@ mb_master_driver_thread_fini(evloop_thread_t* thrd)
 void
 modbus_master_driver_init(void)
 {
-  TRACE(APP_MB_MASTER, "starting modbus master driver\n");
+  TRACE(MBM_DRIVER, "starting modbus master driver\n");
 
   evloop_thread_init(&_mb_master_driver_thread);
   evloop_thread_run(&_mb_master_driver_thread);

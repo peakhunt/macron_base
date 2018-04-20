@@ -24,7 +24,7 @@ app_core_udpate(evloop_timer_t* t, void* arg)
 {
   //static uint32_t   cnt = 0;
 
-  //TRACE(APP_CORE, "updating... %d\n", cnt++);
+  //TRACE(CORE_DRIVER, "updating... %d\n", cnt++);
 
   channel_manager_update_input();
   //
@@ -38,12 +38,12 @@ app_core_udpate(evloop_timer_t* t, void* arg)
 static void
 app_core_thread_init(evloop_thread_t* thrd)
 {
-  TRACE(APP_CORE, "initializing app_core before thread loop\n");
+  TRACE(CORE_DRIVER, "initializing app_core before thread loop\n");
 
   evloop_timer_init(&_update_timer, app_core_udpate, NULL);
   evloop_timer_start(&_update_timer, 0.05, 0);
 
-  TRACE(APP_CORE, "done initializing app_core\n");
+  TRACE(CORE_DRIVER, "done initializing app_core\n");
 
   app_init_complete_signal();
 }
@@ -51,7 +51,7 @@ app_core_thread_init(evloop_thread_t* thrd)
 static void
 app_core_thread_fini(evloop_thread_t* thrd)
 {
-  TRACE(APP_CORE, "shutting down app_core thread\n");
+  TRACE(CORE_DRIVER, "shutting down app_core thread\n");
 }
 
 static lookup_table_t*
@@ -89,7 +89,7 @@ __load_channels(void)
   core_driver_channel_config_t    chnl_cfg;
   channel_t*                      chnl;
 
-  TRACE(APP_CORE, "loading channels\n");
+  TRACE(CORE_DRIVER, "loading channels\n");
   num_channels = cfg_mgr_get_num_channels();
 
   for(int i = 0; i < num_channels; i++)
@@ -104,7 +104,7 @@ __load_channels(void)
 
     channel_manager_add_channel(chnl);
   }
-  TRACE(APP_CORE, "done loading %d channels\n", num_channels);
+  TRACE(CORE_DRIVER, "done loading %d channels\n", num_channels);
 }
 
 static void
@@ -114,7 +114,7 @@ __load_alarms(void)
   core_driver_alarm_config_t  alm_cfg;
   alarm_t*                    alarm;
 
-  TRACE(APP_CORE, "loading alarms\n");
+  TRACE(CORE_DRIVER, "loading alarms\n");
   num_alarms = cfg_mgr_get_num_alarms();
 
   for(int i = 0; i < num_alarms; i++)
@@ -128,13 +128,13 @@ __load_alarms(void)
 
     alarm_manager_add_alarm(alarm);
   }
-  TRACE(APP_CORE, "done loading %d alarms\n", num_alarms);
+  TRACE(CORE_DRIVER, "done loading %d alarms\n", num_alarms);
 }
 
 void
 core_driver_init(void)
 {
-  TRACE(APP_CORE, "starting up core driver\n");
+  TRACE(CORE_DRIVER, "starting up core driver\n");
 
   evloop_thread_init(&_app_core_thread);
 

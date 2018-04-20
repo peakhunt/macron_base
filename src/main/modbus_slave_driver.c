@@ -192,7 +192,7 @@ alloc_init_modbus_slave(modbus_slave_driver_config_t* cfg)
   slave = malloc(sizeof(modbus_slave_driver_t));
   if(slave == NULL)
   {
-    TRACE(APP_MB_SLAVE,"failed to alloc modbus_slave_driver_t\n");
+    TRACE(MBS_DRIVER,"failed to alloc modbus_slave_driver_t\n");
     goto failed;
   }
 
@@ -207,7 +207,7 @@ alloc_init_modbus_slave(modbus_slave_driver_config_t* cfg)
     tcp_slave = malloc(sizeof(ModbusTCPSlave));
     if(tcp_slave == NULL)
     {
-      TRACE(APP_MB_SLAVE,"failed to alloc ModbusTCPSlave\n");
+      TRACE(MBS_DRIVER,"failed to alloc ModbusTCPSlave\n");
       goto failed;
     }
 
@@ -221,7 +221,7 @@ alloc_init_modbus_slave(modbus_slave_driver_config_t* cfg)
     rtu_slave = malloc(sizeof(ModbusRTUSlave));
     if(rtu_slave == NULL)
     {
-      TRACE(APP_MB_SLAVE,"failed to alloc ModbusRTUSlave\n");
+      TRACE(MBS_DRIVER,"failed to alloc ModbusRTUSlave\n");
       goto failed;
     }
 
@@ -265,11 +265,11 @@ modbus_slave_driver_load_slaves(void)
 
     if(cfg.protocol == modbus_slave_driver_type_tcp)
     {
-      TRACE(APP_MB_SLAVE,"initializing modbus tcp slave, port %d\n", cfg.tcp_port);
+      TRACE(MBS_DRIVER,"initializing modbus tcp slave, port %d\n", cfg.tcp_port);
     }
     else
     {
-      TRACE(APP_MB_SLAVE, "initializing modbus rtu slave, port %s\n", cfg.serial_port);
+      TRACE(MBS_DRIVER, "initializing modbus rtu slave, port %s\n", cfg.serial_port);
     }
 
     slave = alloc_init_modbus_slave(&cfg);
@@ -309,10 +309,10 @@ modbus_slave_driver_load_slaves(void)
 static void
 mb_slave_driver_thread_init(evloop_thread_t* thrd)
 {
-  TRACE(APP_MB_SLAVE, "loading slaves from config\n");
+  TRACE(MBS_DRIVER, "loading slaves from config\n");
   modbus_slave_driver_load_slaves();
 
-  TRACE(APP_MB_SLAVE, "done loading slaves\n");
+  TRACE(MBS_DRIVER, "done loading slaves\n");
 
   app_init_complete_signal();
 }
@@ -330,7 +330,7 @@ mb_slave_driver_thread_fini(evloop_thread_t* thrd)
 void
 modbus_slave_driver_init(void)
 {
-  TRACE(APP_MB_SLAVE, "starting modbus slave driver\n");
+  TRACE(MBS_DRIVER, "starting modbus slave driver\n");
 
   evloop_thread_init(&_mb_slave_driver_thread);
   evloop_thread_run(&_mb_slave_driver_thread);

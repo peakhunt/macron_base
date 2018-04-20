@@ -5,20 +5,20 @@
 
 #define APP_TRACE_DEFS      \
   TRACE_DEF(APP_START),     \
-  TRACE_DEF(APP_CLI),       \
-  TRACE_DEF(APP_WEB),       \
-  TRACE_DEF(APP_MB_SLAVE),  \
-  TRACE_DEF(APP_MB_MASTER), \
-  TRACE_DEF(APP_CORE), 
+  TRACE_DEF(CLI_DRIVER),    \
+  TRACE_DEF(WEBS_DRIVER),   \
+  TRACE_DEF(MBS_DRIVER),    \
+  TRACE_DEF(MBM_DRIVER),    \
+  TRACE_DEF(CORE_DRIVER), 
 
 
 #define APP_TRACE_STRS  \
   "APP_START"           \
-  "APP_CLI"             \
-  "APP_WEB"             \
-  "APP_MB_SLAVE"        \
-  "APP_MB_MASTER"       \
-  "APP_CORE"
+  "CLI_DRIVER"          \
+  "WEBS_DRIVER"         \
+  "MBS_DRIVER"          \
+  "MBM_DRIVER"          \
+  "CORE_DRIVER"
 
 
 #endif /*!__APP_TRACE_DEF_H__ */

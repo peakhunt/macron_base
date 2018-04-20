@@ -288,18 +288,18 @@ cli_driver_thread_init(evloop_thread_t* thrd)
 {
   cli_config_t    cfg;
 
-  TRACE(APP_CLI, "initializing CLI\n");
+  TRACE(CLI_DRIVER, "initializing CLI\n");
 
   cfg_mgr_get_cli_config(&cfg);
   cli_init(&cfg, _app_commands, NARRAY(_app_commands));
 
-  TRACE(APP_CLI, "done initializing CLI\n");
+  TRACE(CLI_DRIVER, "done initializing CLI\n");
 
   app_init_complete_signal();
 
-  TRACE(APP_CLI, "waiting for go signal from main\n");
+  TRACE(CLI_DRIVER, "waiting for go signal from main\n");
   completion_wait(&_go_signal);
-  TRACE(APP_CLI, "got go signal from main. entering main loop\n");
+  TRACE(CLI_DRIVER, "got go signal from main. entering main loop\n");
 }
 
 static void
@@ -316,7 +316,7 @@ cli_driver_thread_fini(evloop_thread_t* thrd)
 void
 cli_driver_init(void)
 {
-  TRACE(APP_CLI, "starting CLI\n");
+  TRACE(CLI_DRIVER, "starting CLI\n");
 
   completion_init(&_go_signal);
 
