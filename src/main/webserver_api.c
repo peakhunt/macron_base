@@ -4,8 +4,8 @@
 #include "app_config.h"
 #include "time_util.h"
 #include "trace.h"
-#include "app_webapi.h"
-#include "app_web_common.h"
+#include "webserver_api.h"
+#include "mongoose_util.h"
 
 struct __api_cmd_handler_t;
 typedef struct __api_cmd_handler_t api_cmd_handler_t;
@@ -45,7 +45,7 @@ struct __api_cmd_handler_t
 //
 ///////////////////////////////////////////////////////////////////////////////
 static inline void
-app_webapi_not_found(struct mg_connection* nc, struct http_message* hm)
+webapi_not_found(struct mg_connection* nc, struct http_message* hm)
 {
   mg_printf(nc, "%s",
       "HTTP/1.1 404 Not Found\r\n"
@@ -53,7 +53,7 @@ app_webapi_not_found(struct mg_connection* nc, struct http_message* hm)
 }
 
 static inline void
-app_webapi_server_error(struct mg_connection* nc, struct http_message* hm)
+webapi_server_error(struct mg_connection* nc, struct http_message* hm)
 {
   mg_printf(nc, "%s",
       "HTTP/1.1 500 Server Error\r\n"
@@ -77,11 +77,11 @@ execute_api_handler(api_cmd_handler_t* table, int num_entries,
   {
     if(table[i].exact)
     {
-      match = app_web_is_equal(current, &table[i].prefix);
+      match = mg_util_is_equal(current, &table[i].prefix);
     }
     else
     {
-      match = app_web_has_prefix(current, &table[i].prefix);
+      match = mg_util_has_prefix(current, &table[i].prefix);
     }
 
     if(match)
@@ -101,8 +101,8 @@ execute_api_handler(api_cmd_handler_t* table, int num_entries,
     }
   }
 
-  TRACE(APP_WEB, "can't find target handler: %s\n", app_web_to_c_str(current));
-  app_webapi_not_found(nc, hm);
+  TRACE(APP_WEB, "can't find target handler: %s\n", mg_util_to_c_str(current));
+  webapi_not_found(nc, hm);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -111,19 +111,19 @@ execute_api_handler(api_cmd_handler_t* table, int num_entries,
 //
 ///////////////////////////////////////////////////////////////////////////////
 static void
-app_webapi_get_channel_status(struct mg_connection* nc, struct http_message* hm, struct mg_str* subcmd)
+webapi_get_channel_status(struct mg_connection* nc, struct http_message* hm, struct mg_str* subcmd)
 {
   uint32_t            chnl_num;
   channel_status_t    status;
   char                data[128];
 
-  chnl_num = (uint32_t)app_web_get_int(subcmd);
+  chnl_num = (uint32_t)mg_util_get_int(subcmd);
 
   TRACE(APP_WEB, "channel status request for %d\n", chnl_num);
 
   if(channel_manager_get_channel_stat(chnl_num, &status) == -1)
   {
-    app_webapi_not_found(nc, hm);
+    webapi_not_found(nc, hm);
     return;
   }
 
@@ -148,19 +148,19 @@ app_webapi_get_channel_status(struct mg_connection* nc, struct http_message* hm,
 }
 
 static void
-app_webapi_get_alarm_status(struct mg_connection* nc, struct http_message* hm, struct mg_str* subcmd)
+webapi_get_alarm_status(struct mg_connection* nc, struct http_message* hm, struct mg_str* subcmd)
 {
   uint32_t          alarm_num;
   alarm_status_t    status;
   char              data[128];
 
-  alarm_num = (uint32_t)app_web_get_int(subcmd);
+  alarm_num = (uint32_t)mg_util_get_int(subcmd);
 
   TRACE(APP_WEB, "alarm status request for %d\n", alarm_num);
 
   if(alarm_manager_get_alarm_status(alarm_num, &status) == -1)
   {
-    app_webapi_not_found(nc, hm);
+    webapi_not_found(nc, hm);
     return;
   }
 
@@ -174,7 +174,7 @@ app_webapi_get_alarm_status(struct mg_connection* nc, struct http_message* hm, s
 }
 
 static void
-app_webapi_get_config_base(struct mg_connection* nc, struct http_message* hm, struct mg_str* subcmd)
+webapi_get_config_base(struct mg_connection* nc, struct http_message* hm, struct mg_str* subcmd)
 {
   const char*   json;
   int     len;
@@ -185,7 +185,7 @@ app_webapi_get_config_base(struct mg_connection* nc, struct http_message* hm, st
 
   if(json == NULL)
   {
-    app_webapi_server_error(nc, hm);
+    webapi_server_error(nc, hm);
   }
   else
   {
@@ -214,7 +214,7 @@ static api_cmd_handler_t    _channel_cmd_handlers[] =
 {
   {
     .prefix   = MG_MK_STR("status/"),
-    .handler  = app_webapi_get_channel_status,
+    .handler  = webapi_get_channel_status,
   },
 };
 
@@ -222,7 +222,7 @@ static api_cmd_handler_t  _alarm_cmd_handlers[] =
 {
   {
     .prefix   = MG_MK_STR("status/"),
-    .handler  = app_webapi_get_alarm_status,
+    .handler  = webapi_get_alarm_status,
   },
 };
 
@@ -231,7 +231,7 @@ static api_cmd_handler_t  _config_handlers[] =
   {
     .prefix   = MG_MK_STR("base"),
     .exact    = true,
-    .handler  = app_webapi_get_config_base,
+    .handler  = webapi_get_config_base,
   },
 };
 
@@ -260,14 +260,14 @@ static api_cmd_handler_t    _top_level_get_handlers[] =
 //
 ///////////////////////////////////////////////////////////////////////////////
 bool
-app_webapi_handler(struct mg_connection* nc, struct http_message* hm)
+webserver_api_handler(struct mg_connection* nc, struct http_message* hm)
 {
   struct mg_str     cmd;
   long              start;
 
   start = time_util_get_sys_clock_in_ms();
 
-  if(app_web_has_prefix(&hm->uri, &_api_v1_root) == false)
+  if(mg_util_has_prefix(&hm->uri, &_api_v1_root) == false)
   {
     return false;
   }
@@ -275,21 +275,21 @@ app_webapi_handler(struct mg_connection* nc, struct http_message* hm)
   cmd.p   = hm->uri.p     + _api_v1_root.len;
   cmd.len = hm->uri.len   - _api_v1_root.len;
 
-  if(app_web_is_equal(&hm->method, &_op_get))
+  if(mg_util_is_equal(&hm->method, &_op_get))
   {
     execute_api_handler(_top_level_get_handlers, NARRAY(_top_level_get_handlers), nc, hm, &cmd);
   }
-  else if(app_web_is_equal(&hm->method, &_op_put))
+  else if(mg_util_is_equal(&hm->method, &_op_put))
   {
-    app_webapi_not_found(nc, hm);
+    webapi_not_found(nc, hm);
   }
-  else if(app_web_is_equal(&hm->method, &_op_post))
+  else if(mg_util_is_equal(&hm->method, &_op_post))
   {
-    app_webapi_not_found(nc, hm);
+    webapi_not_found(nc, hm);
   }
   else
   {
-    app_webapi_not_found(nc, hm);
+    webapi_not_found(nc, hm);
   }
 
   TRACE(APP_WEB, "done handling api request. took %ld ms\n",

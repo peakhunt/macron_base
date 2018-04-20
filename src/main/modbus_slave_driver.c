@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include "common_def.h"
-#include "app_modbus_slave.h"
+#include "modbus_slave_driver.h"
 #include "app_config.h"
 #include "list.h"
 #include "trace.h"
@@ -20,11 +20,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 typedef struct
 {
-  struct list_head        le;
-  app_modbus_slave_type_t mb_type;
-  ModbusSlaveCTX          *ctx;
-  modbus_register_list_t  reg_map;
-} app_modbus_slave_t;
+  struct list_head            le;
+  modbus_slave_driver_type_t  mb_type;
+  ModbusSlaveCTX              *ctx;
+  modbus_register_list_t      reg_map;
+} modbus_slave_driver_t;
 
 static void app_mb_slave_thread_init(evloop_thread_t* thrd);
 static void app_mb_slave_thread_fini(evloop_thread_t* thrd);
@@ -49,7 +49,7 @@ static evloop_thread_t    _app_mb_slave_thread =
 //
 ////////////////////////////////////////////////////////////////////////////////
 static int32_t
-__get_mapped_channel(app_modbus_slave_t* slave, uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t addr)
+__get_mapped_channel(modbus_slave_driver_t* slave, uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t addr)
 {
   modbus_register_t*  reg;
 
@@ -74,18 +74,18 @@ static MBErrorCode
 __handle_modbus_u16(ModbusSlaveCTX* ctx, modbus_reg_type_t reg_type, uint8_t* bufPtr,
     uint16_t usAddress, uint16_t usNRegs, MBRegisterMode eMode)
 {
-  uint16_t            current_addr,
-                      end_addr;
-  uint8_t*            buffer;
-  int32_t             chnl_num;
-  uint16_t            v;
-  app_modbus_slave_t  *app_slave;
+  uint16_t                current_addr,
+                          end_addr;
+  uint8_t*                buffer;
+  int32_t                 chnl_num;
+  uint16_t                v;
+  modbus_slave_driver_t   *app_slave;
 
   current_addr  = usAddress;
   end_addr      = current_addr + usNRegs - 1;
   buffer        = bufPtr;
 
-  app_slave = (app_modbus_slave_t*)ctx->priv;
+  app_slave = (modbus_slave_driver_t*)ctx->priv;
 
   for(; current_addr <= end_addr; current_addr++, buffer += 2)
   {
@@ -128,17 +128,17 @@ static MBErrorCode
 __handle_modbus_u1(ModbusSlaveCTX* ctx, modbus_reg_type_t reg_type, uint8_t* bufPtr,
     uint16_t usAddress, uint16_t usNRegs, MBRegisterMode eMode)
 {
-  uint16_t            current_addr,
-                      end_addr;
-  int32_t             chnl_num;
-  uint16_t            v,
-                      bit_ndx;
-  app_modbus_slave_t  *app_slave;
+  uint16_t                current_addr,
+                          end_addr;
+  int32_t                 chnl_num;
+  uint16_t                v,
+                          bit_ndx;
+  modbus_slave_driver_t   *app_slave;
 
   current_addr  = usAddress;
   end_addr      = current_addr + usNRegs - 1;
 
-  app_slave = (app_modbus_slave_t*)ctx->priv;
+  app_slave = (modbus_slave_driver_t*)ctx->priv;
 
   for(bit_ndx = 0; current_addr <= end_addr; current_addr++, bit_ndx++)
   {
@@ -183,16 +183,16 @@ app_discrete_cb(ModbusSlaveCTX* ctx, uint8_t addr, uint8_t * pucRegBuffer,
 // utilities
 //
 ////////////////////////////////////////////////////////////////////////////////
-static app_modbus_slave_t*
-alloc_init_modbus_slave(app_modbus_slave_config_t* cfg)
+static modbus_slave_driver_t*
+alloc_init_modbus_slave(modbus_slave_driver_config_t* cfg)
 {
-  app_modbus_slave_t*   slave;
-  ModbusSlaveCTX*       ctx;
+  modbus_slave_driver_t*    slave;
+  ModbusSlaveCTX*           ctx;
 
-  slave = malloc(sizeof(app_modbus_slave_t));
+  slave = malloc(sizeof(modbus_slave_driver_t));
   if(slave == NULL)
   {
-    TRACE(APP_MB_SLAVE,"failed to alloc app_modbus_slave_t\n");
+    TRACE(APP_MB_SLAVE,"failed to alloc modbus_slave_driver_t\n");
     goto failed;
   }
 
@@ -200,7 +200,7 @@ alloc_init_modbus_slave(app_modbus_slave_config_t* cfg)
 
   slave->mb_type    = cfg->protocol;
 
-  if(slave->mb_type == app_modbus_slave_type_tcp)
+  if(slave->mb_type == modbus_slave_driver_type_tcp)
   {
     ModbusTCPSlave* tcp_slave;
 
@@ -250,11 +250,11 @@ failed:
 static void
 app_modbus_load_slaves(void)
 {
-  app_modbus_slave_config_t   cfg;
-  int                         num_slaves,
-                              num_regs,
-                              i;
-  app_modbus_slave_t*         slave;
+  modbus_slave_driver_config_t    cfg;
+  int                             num_slaves,
+                                  num_regs,
+                                  i;
+  modbus_slave_driver_t*          slave;
 
   num_slaves = app_config_get_num_modbus_slaves();
 
@@ -263,7 +263,7 @@ app_modbus_load_slaves(void)
   {
     app_config_get_modbus_slave_at(i, &cfg);
 
-    if(cfg.protocol == app_modbus_slave_type_tcp)
+    if(cfg.protocol == modbus_slave_driver_type_tcp)
     {
       TRACE(APP_MB_SLAVE,"initializing modbus tcp slave, port %d\n", cfg.tcp_port);
     }
@@ -290,7 +290,7 @@ app_modbus_load_slaves(void)
   // start phase
   list_for_each_entry(slave, &_modbus_slaves, le)
   {
-    if(slave->mb_type == app_modbus_slave_type_tcp)
+    if(slave->mb_type == modbus_slave_driver_type_tcp)
     {
       modbus_tcp_slave_start((ModbusTCPSlave*)slave->ctx);
     }
@@ -328,7 +328,7 @@ app_mb_slave_thread_fini(evloop_thread_t* thrd)
 //
 ////////////////////////////////////////////////////////////////////////////////
 void
-app_modbus_slave_init(void)
+modbus_slave_driver_init(void)
 {
   TRACE(APP_MB_SLAVE, "starting modbus slave driver\n");
 
@@ -371,11 +371,11 @@ app_modbus_slave_init(void)
  }
  */
 cJSON*
-app_api_modbus_slave_get_stat(void)
+modbus_slave_driver_get_stat(void)
 {
-  cJSON*                ret;
-  cJSON*                jslave_list;
-  app_modbus_slave_t*   slave;
+  cJSON*                    ret;
+  cJSON*                    jslave_list;
+  modbus_slave_driver_t*    slave;
 
   evloop_thread_lock(&_app_mb_slave_thread);
 
@@ -384,7 +384,7 @@ app_api_modbus_slave_get_stat(void)
   jslave_list = cJSON_CreateArray();
   list_for_each_entry(slave, &_modbus_slaves, le)
   {
-    if(slave->mb_type == app_modbus_slave_type_tcp)
+    if(slave->mb_type == modbus_slave_driver_type_tcp)
     {
       ModbusTCPSlave*   tcp_slave;
 

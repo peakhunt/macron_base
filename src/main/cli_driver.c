@@ -1,14 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "app_cli.h"
+#include "cli_driver.h"
 #include "app_config.h"
 #include "cli.h"
 #include "trace.h"
 #include "app_init_completion.h"
 #include "evloop_thread.h"
 #include "completion.h"
-#include "app_modbus_slave.h"
-#include "app_modbus_master.h"
+#include "modbus_slave_driver.h"
+#include "modbus_master_driver.h"
 #include "channel_manager.h"
 #include "alarm_manager.h"
 
@@ -75,7 +75,7 @@ cli_command_modbus(cli_intf_t* intf, int argc, const char** argv)
   {
     cJSON*    slave_list;
 
-    ret = app_api_modbus_slave_get_stat();
+    ret = modbus_slave_driver_get_stat();
     if(ret == NULL)
     {
       cli_printf(intf, "internal error!!!"CLI_EOL CLI_EOL);
@@ -129,7 +129,7 @@ cli_command_modbus(cli_intf_t* intf, int argc, const char** argv)
   {
     cJSON*    master_list;
 
-    ret = app_api_modbus_master_get_stat();
+    ret = modbus_master_driver_get_stat();
     if(ret == NULL)
     {
       cli_printf(intf, "internal error!!!"CLI_EOL CLI_EOL);
@@ -314,7 +314,7 @@ app_cli_thread_fini(evloop_thread_t* thrd)
 ////////////////////////////////////////////////////////////////////////////////
 
 void
-app_cli_init(void)
+cli_driver_init(void)
 {
   TRACE(APP_CLI, "starting CLI\n");
 
@@ -327,7 +327,7 @@ app_cli_init(void)
 }
 
 void
-app_cli_go(void)
+cli_driver_go(void)
 {
   completion_signal(&_go_signal);
 }

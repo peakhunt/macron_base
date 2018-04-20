@@ -6,11 +6,11 @@
 #include "evloop_thread.h"
 #include "trace.h"
 #include "app_config.h"
-#include "app_cli.h"
-#include "app_modbus_slave.h"
-#include "app_modbus_master.h"
-#include "app_core.h"
-#include "app_webserver.h"
+#include "cli_driver.h"
+#include "modbus_slave_driver.h"
+#include "modbus_master_driver.h"
+#include "core_driver.h"
+#include "webserver_driver.h"
 #include "completion.h"
 
 static void main_thread_init(evloop_thread_t* thrd);
@@ -65,15 +65,15 @@ main_thread_init(evloop_thread_t* thrd)
 {
   completion_init(&_comp);
 
-  app_core_init();
-  app_modbus_slave_init();
-  app_modbus_master_init();
+  core_driver_init();
+  modbus_slave_driver_init();
+  modbus_master_driver_init();
 
-  app_cli_init();
-  app_webserver_init();
+  cli_driver_init();
+  webserver_driver_init();
 
-  app_cli_go();
-  app_webserver_go();
+  cli_driver_go();
+  webserver_driver_go();
 }
 
 static void

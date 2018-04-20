@@ -1,8 +1,8 @@
 #include <string.h>
-#include "app_web_common.h"
+#include "mongoose_util.h"
 
 const char*
-app_web_to_c_str(struct mg_str* ms)
+mg_util_to_c_str(struct mg_str* ms)
 {
   static char str[1024 + 1];
   int   len;

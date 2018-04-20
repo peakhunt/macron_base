@@ -223,7 +223,7 @@ app_config_get_num_modbus_slaves(void)
 }
 
 void
-app_config_get_modbus_slave_at(int ndx, app_modbus_slave_config_t* cfg)
+app_config_get_modbus_slave_at(int ndx, modbus_slave_driver_config_t* cfg)
 {
   cJSON       *slave_list,
               *node,
@@ -238,18 +238,18 @@ app_config_get_modbus_slave_at(int ndx, app_modbus_slave_config_t* cfg)
   str = app_config_get_str(node, "protocol");
   if(strcmp(str, "tcp") == 0)
   {
-    cfg->protocol = app_modbus_slave_type_tcp;
+    cfg->protocol = modbus_slave_driver_type_tcp;
   }
   else
   {
-    cfg->protocol = app_modbus_slave_type_rtu;
+    cfg->protocol = modbus_slave_driver_type_rtu;
   }
 
   cfg->address = (uint16_t)app_config_get_int(node, "address");
 
   param = app_config_get_node(node, "param");
 
-  if(cfg->protocol == app_modbus_slave_type_tcp)
+  if(cfg->protocol == modbus_slave_driver_type_tcp)
   {
     cfg->tcp_port = app_config_get_int(param, "port");
   }
@@ -326,7 +326,7 @@ app_config_get_num_modbus_masters(void)
 }
 
 void
-app_config_get_modbus_master_at(int ndx, app_modbus_master_config_t* cfg)
+app_config_get_modbus_master_at(int ndx, modbus_master_driver_config_t* cfg)
 {
   cJSON       *master_list,
               *node,
@@ -345,13 +345,13 @@ app_config_get_modbus_master_at(int ndx, app_modbus_master_config_t* cfg)
   str = app_config_get_str(node, "protocol");
   if(strcmp(str, "tcp") == 0)
   {
-    cfg->protocol   = app_modbus_master_type_tcp;
+    cfg->protocol   = modbus_master_driver_type_tcp;
     cfg->dest_ip    = app_config_get_str(node, "dest_ip");
     cfg->dest_port  = app_config_get_int(node, "dest_port");
   }
   else
   {
-    cfg->protocol = app_modbus_master_type_rtu;
+    cfg->protocol = modbus_master_driver_type_rtu;
     param = app_config_get_node(node, "param");
     cfg->serial_port = app_config_get_str(param, "serial_port");
     app_config_get_serial_cfg(param, &cfg->serial_cfg);
@@ -420,7 +420,7 @@ app_config_get_modbus_master_num_request_schedules(int master_ndx)
 }
 
 void
-app_config_get_modbus_slave_request_schedule(int master_ndx, int req_ndx, app_modbus_master_request_config_t* cfg)
+app_config_get_modbus_slave_request_schedule(int master_ndx, int req_ndx, modbus_master_driver_request_config_t* cfg)
 {
   cJSON       *master_list,
               *master,
@@ -478,7 +478,7 @@ app_config_get_num_channels(void)
 }
 
 void
-app_config_get_channel_at(int ndx, app_channel_config_t* chnl_cfg)
+app_config_get_channel_at(int ndx, core_driver_channel_config_t* chnl_cfg)
 {
   cJSON       *channels,
               *node;
@@ -582,7 +582,7 @@ app_config_get_num_alarms(void)
 }
 
 void
-app_config_get_alarm_at(int ndx, app_alarm_config_t* alm_cfg)
+app_config_get_alarm_at(int ndx, core_driver_alarm_config_t* alm_cfg)
 {
   cJSON       *alarms,
               *node;

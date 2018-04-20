@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "common_def.h"
-#include "app_modbus_master.h"
+#include "modbus_master_driver.h"
 #include "app_config.h"
 #include "list.h"
 #include "modbus_master.h"
@@ -24,24 +24,24 @@
 
 typedef struct
 {
-  struct list_head          le;
-  app_modbus_master_type_t  mb_type;
-  ModbusMasterCTX*          ctx;
-  modbus_register_list_t    reg_map;
-  int                       current_request;
-  int                       num_reqs;
+  struct list_head              le;
+  modbus_master_driver_type_t   mb_type;
+  ModbusMasterCTX*              ctx;
+  modbus_register_list_t        reg_map;
+  int                           current_request;
+  int                           num_reqs;
 
-  uint32_t                  schedule_finish_delay;
-  uint32_t                  inter_request_delay;
-  uint32_t                  timeout;
+  uint32_t                      schedule_finish_delay;
+  uint32_t                      inter_request_delay;
+  uint32_t                      timeout;
 
-  long                      req_start_time;
+  long                          req_start_time;
 
-  evloop_timer_t            wait_timer;
-  evloop_timer_t            transaction_timer;
+  evloop_timer_t                wait_timer;
+  evloop_timer_t                transaction_timer;
 
-  app_modbus_master_request_config_t*   request_schedule;
-} app_modbus_master_t;
+  modbus_master_driver_request_config_t*   request_schedule;
+} modbus_master_driver_t;
 
 static void app_mb_master_thread_init(evloop_thread_t* thrd);
 static void app_mb_master_thread_fini(evloop_thread_t* thrd);
@@ -65,7 +65,7 @@ static evloop_thread_t    _app_mb_master_thread =
 //
 ////////////////////////////////////////////////////////////////////////////////
 static int32_t
-__get_mapped_channel(app_modbus_master_t* master, uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t addr)
+__get_mapped_channel(modbus_master_driver_t* master, uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t addr)
 {
   modbus_register_t*  reg;
 
@@ -82,13 +82,13 @@ __get_mapped_channel(app_modbus_master_t* master, uint32_t slave_id, modbus_reg_
 }
 
 static inline void
-mark_req_start_time(app_modbus_master_t* master)
+mark_req_start_time(modbus_master_driver_t* master)
 {
   master->req_start_time = time_util_get_sys_clock_in_ms();
 }
 
 static inline long
-get_time_took_for_transaction_in_ms(app_modbus_master_t* master)
+get_time_took_for_transaction_in_ms(modbus_master_driver_t* master)
 {
   long now;
 
@@ -103,7 +103,7 @@ get_time_took_for_transaction_in_ms(app_modbus_master_t* master)
 //
 ////////////////////////////////////////////////////////////////////////////////
 static void
-app_modbus_master_coil_write_req(app_modbus_master_t* master, app_modbus_master_request_config_t* req)
+app_modbus_master_coil_write_req(modbus_master_driver_t* master, modbus_master_driver_request_config_t* req)
 {
   ModbusMasterCTX* ctx = master->ctx;
   uint8_t           slave_addr;
@@ -150,7 +150,7 @@ app_modbus_master_coil_write_req(app_modbus_master_t* master, app_modbus_master_
 }
 
 static void
-app_modbus_master_holding_write_req(app_modbus_master_t* master, app_modbus_master_request_config_t* req)
+app_modbus_master_holding_write_req(modbus_master_driver_t* master, modbus_master_driver_request_config_t* req)
 {
   ModbusMasterCTX* ctx = master->ctx;
   uint8_t           slave_addr;
@@ -198,9 +198,9 @@ app_modbus_master_holding_write_req(app_modbus_master_t* master, app_modbus_mast
 }
 
 static void
-app_modbus_master_request(app_modbus_master_t* master)
+app_modbus_master_request(modbus_master_driver_t* master)
 {
-  app_modbus_master_request_config_t*   req;
+  modbus_master_driver_request_config_t*   req;
   ModbusMasterCTX* ctx = master->ctx;
   uint8_t           slave_addr;
   uint16_t          reg_addr;
@@ -250,7 +250,7 @@ app_modbus_master_request(app_modbus_master_t* master)
 }
 
 static void
-app_modbus_master_next(app_modbus_master_t* master)
+app_modbus_master_next(modbus_master_driver_t* master)
 {
   double wait_time;
   double target_delay;
@@ -300,7 +300,7 @@ app_modbus_master_next(app_modbus_master_t* master)
 static void
 modbus_master_wait_timeout(evloop_timer_t* te, void* unused)
 {
-  app_modbus_master_t* master = container_of(te, app_modbus_master_t, wait_timer);
+  modbus_master_driver_t* master = container_of(te, modbus_master_driver_t, wait_timer);
 
   app_modbus_master_request(master);
 }
@@ -308,8 +308,8 @@ modbus_master_wait_timeout(evloop_timer_t* te, void* unused)
 static void
 modbus_master_transaction_timeout(evloop_timer_t* te, void* unused)
 {
-  app_modbus_master_t* master = container_of(te, app_modbus_master_t, transaction_timer);
-  app_modbus_master_request_config_t*   req;
+  modbus_master_driver_t* master = container_of(te, modbus_master_driver_t, transaction_timer);
+  modbus_master_driver_request_config_t*   req;
 
   req = &master->request_schedule[master->current_request];
 
@@ -330,7 +330,7 @@ modbus_master_transaction_timeout(evloop_timer_t* te, void* unused)
 //
 ////////////////////////////////////////////////////////////////////////////////
 static void
-__handle_coil_discrete_read_response(app_modbus_master_t* master, modbus_reg_type_t reg_type,
+__handle_coil_discrete_read_response(modbus_master_driver_t* master, modbus_reg_type_t reg_type,
     uint8_t slave, uint16_t addr, uint16_t nreg, uint8_t* data_buf)
 {
   uint16_t      i,
@@ -356,7 +356,7 @@ __handle_coil_discrete_read_response(app_modbus_master_t* master, modbus_reg_typ
 }
 
 static void
-__handle_holding_input_read_response(app_modbus_master_t* master, modbus_reg_type_t reg_type,
+__handle_holding_input_read_response(modbus_master_driver_t* master, modbus_reg_type_t reg_type,
     uint8_t slave, uint16_t addr, uint16_t nreg, uint8_t* data_buf)
 {
   uint16_t      i,
@@ -384,7 +384,7 @@ __handle_holding_input_read_response(app_modbus_master_t* master, modbus_reg_typ
 static void
 __input_regs_cb(ModbusMasterCTX* ctx, uint8_t slave, uint16_t addr, uint16_t nreg, uint8_t* regs)
 {
-  app_modbus_master_t* master = (app_modbus_master_t*)ctx->priv;
+  modbus_master_driver_t* master = (modbus_master_driver_t*)ctx->priv;
 
   evloop_timer_stop(&master->transaction_timer);
 
@@ -396,7 +396,7 @@ __input_regs_cb(ModbusMasterCTX* ctx, uint8_t slave, uint16_t addr, uint16_t nre
 static void
 __holding_regs_cb(ModbusMasterCTX* ctx, uint8_t slave, uint16_t addr, uint16_t nreg, uint8_t* regs, MBRegisterMode mode)
 {
-  app_modbus_master_t* master = (app_modbus_master_t*)ctx->priv;
+  modbus_master_driver_t* master = (modbus_master_driver_t*)ctx->priv;
 
   evloop_timer_stop(&master->transaction_timer);
 
@@ -411,7 +411,7 @@ __holding_regs_cb(ModbusMasterCTX* ctx, uint8_t slave, uint16_t addr, uint16_t n
 static void
 __coil_cb(ModbusMasterCTX* ctx, uint8_t slave, uint16_t addr, uint16_t nreg, uint8_t* regs, MBRegisterMode mode)
 {
-  app_modbus_master_t* master = (app_modbus_master_t*)ctx->priv;
+  modbus_master_driver_t* master = (modbus_master_driver_t*)ctx->priv;
 
   evloop_timer_stop(&master->transaction_timer);
 
@@ -426,7 +426,7 @@ __coil_cb(ModbusMasterCTX* ctx, uint8_t slave, uint16_t addr, uint16_t nreg, uin
 static void
 __discrete_cb(ModbusMasterCTX* ctx, uint8_t slave, uint16_t addr, uint16_t nreg, uint8_t* regs)
 {
-  app_modbus_master_t* master = (app_modbus_master_t*)ctx->priv;
+  modbus_master_driver_t* master = (modbus_master_driver_t*)ctx->priv;
 
   evloop_timer_stop(&master->transaction_timer);
 
@@ -438,9 +438,9 @@ __discrete_cb(ModbusMasterCTX* ctx, uint8_t slave, uint16_t addr, uint16_t nreg,
 static void
 __modbus_master_event_cb(ModbusMasterCTX* ctx, modbus_master_event_t event)
 {
-  app_modbus_master_t* master;
+  modbus_master_driver_t* master;
 
-  master = (app_modbus_master_t*)ctx->priv;
+  master = (modbus_master_driver_t*)ctx->priv;
 
   switch(event)
   {
@@ -475,16 +475,16 @@ __modbus_master_event_cb(ModbusMasterCTX* ctx, modbus_master_event_t event)
 // private utilities
 //
 ////////////////////////////////////////////////////////////////////////////////
-static app_modbus_master_t*
-alloc_init_modbus_master(app_modbus_master_config_t* cfg)
+static modbus_master_driver_t*
+alloc_init_modbus_master(modbus_master_driver_config_t* cfg)
 {
-  app_modbus_master_t*    master;
-  ModbusMasterCTX*        ctx;
+  modbus_master_driver_t*     master;
+  ModbusMasterCTX*            ctx;
 
-  master = malloc(sizeof(app_modbus_master_t));
+  master = malloc(sizeof(modbus_master_driver_t));
   if(master == NULL)
   {
-    TRACE(APP_MB_MASTER,"failed to alloc app_modbus_master_t\n");
+    TRACE(APP_MB_MASTER,"failed to alloc modbus_master_driver_t\n");
     goto failed;
   }
 
@@ -492,7 +492,7 @@ alloc_init_modbus_master(app_modbus_master_config_t* cfg)
 
   master->mb_type   = cfg->protocol;
 
-  if(master->mb_type == app_modbus_master_type_tcp)
+  if(master->mb_type == modbus_master_driver_type_tcp)
   {
     ModbusTCPMaster*    tcp_master;
 
@@ -551,12 +551,12 @@ failed:
 static void
 app_modbus_load_masters(void)
 {
-  app_modbus_master_config_t      cfg;
+  modbus_master_driver_config_t   cfg;
   int                             num_masters,
                                   num_regs,
                                   num_reqs,
                                   i;
-  app_modbus_master_t*            master;
+  modbus_master_driver_t*         master;
 
   num_masters = app_config_get_num_modbus_masters();
 
@@ -564,7 +564,7 @@ app_modbus_load_masters(void)
   {
     app_config_get_modbus_master_at(i, &cfg);
 
-    if(cfg.protocol == app_modbus_master_type_tcp)
+    if(cfg.protocol == modbus_master_driver_type_tcp)
     {
       TRACE(APP_MB_MASTER,"initializing modbus tcp master for %s:%d\n", cfg.dest_ip, cfg.dest_port);
     }
@@ -590,7 +590,7 @@ app_modbus_load_masters(void)
     // load request schedule
     num_reqs = app_config_get_modbus_master_num_request_schedules(i);
     master->num_reqs = num_reqs;
-    master->request_schedule  = malloc(sizeof(app_modbus_master_request_config_t) * num_reqs);
+    master->request_schedule  = malloc(sizeof(modbus_master_driver_request_config_t) * num_reqs);
     if(master->request_schedule == NULL)
     {
       TRACE(APP_MB_MASTER,"failed to malloc request_schedule\n");
@@ -608,7 +608,7 @@ app_modbus_load_masters(void)
   // start phase
   list_for_each_entry(master, &_modbus_masters, le)
   {
-    if(master->mb_type == app_modbus_master_type_tcp)
+    if(master->mb_type == modbus_master_driver_type_tcp)
     {
       modbus_tcp_master_start((ModbusTCPMaster*)master->ctx);
     }
@@ -647,7 +647,7 @@ app_mb_master_thread_fini(evloop_thread_t* thrd)
 //
 ////////////////////////////////////////////////////////////////////////////////
 void
-app_modbus_master_init(void)
+modbus_master_driver_init(void)
 {
   TRACE(APP_MB_MASTER, "starting modbus master driver\n");
 
@@ -683,11 +683,11 @@ app_modbus_master_init(void)
  }
  */
 cJSON*
-app_api_modbus_master_get_stat(void)
+modbus_master_driver_get_stat(void)
 {
-  cJSON*                ret;
-  cJSON*                jmaster_list;
-  app_modbus_master_t*  master;
+  cJSON*                    ret;
+  cJSON*                    jmaster_list;
+  modbus_master_driver_t*   master;
 
   evloop_thread_lock(&_app_mb_master_thread);
 
@@ -695,7 +695,7 @@ app_api_modbus_master_get_stat(void)
   jmaster_list = cJSON_CreateArray();
   list_for_each_entry(master, &_modbus_masters, le)
   {
-    if(master->mb_type == app_modbus_master_type_tcp)
+    if(master->mb_type == modbus_master_driver_type_tcp)
     {
       ModbusTCPMaster*    tcp_master;
 

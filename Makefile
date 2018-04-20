@@ -55,7 +55,8 @@ src/modbus/modbus_regs.c                            \
 src/modbus/modbus_crc.c
 
 MONGOOSE_SOURCES =                                  \
-src/mongoose/mongoose.c
+src/mongoose/mongoose.c                             \
+src/mongoose/mongoose_util.c
 
 LIB_CORE_SOURCES =                                  \
 src/core/channel.c                                  \
@@ -64,15 +65,14 @@ src/core/channel_manager.c                          \
 src/core/alarm_manager.c
 
 APP_SOURCES =                                       \
-src/app/main.c                                      \
-src/app/app_core.c                                  \
-src/app/app_cli.c                                   \
-src/app/app_modbus_slave.c                          \
-src/app/app_modbus_master.c                         \
-src/app/app_webserver.c                             \
-src/app/app_webapi.c                                \
-src/app/app_web_common.c                            \
-src/app/app_config.c
+src/main/main.c                                     \
+src/main/core_driver.c                              \
+src/main/cli_driver.c                               \
+src/main/modbus_slave_driver.c                      \
+src/main/modbus_master_driver.c                     \
+src/main/webserver_driver.c                         \
+src/main/webserver_api.c                            \
+src/main/app_config.c
 
 TEST_C_SOURCE =                                     \
 test/cmd_option_test.c                              \
@@ -98,7 +98,7 @@ C_INCLUDES =                              \
 -Isrc/utils                               \
 -Isrc/modbus                              \
 -Isrc/core                                \
--Isrc/app                                 \
+-Isrc/main                                \
 -Isrc/mongoose                            \
 -I$(LIBEV_DIR)/include
 

@@ -1,11 +1,11 @@
 #include <pthread.h>
-#include "app_webserver.h"
+#include "webserver_driver.h"
 #include "trace.h"
 #include "mongoose.h"
 #include "app_init_completion.h"
 #include "completion.h"
-#include "app_web_common.h"
-#include "app_webapi.h"
+#include "mongoose_util.h"
+#include "webserver_api.h"
 
 #define WEB_SERVER_PORT         "8000"
 
@@ -32,7 +32,7 @@ ev_handler(struct mg_connection* nc, int ev, void* ev_data)
   switch(ev)
   {
   case MG_EV_HTTP_REQUEST:
-    if(app_webapi_handler(nc, hm))
+    if(webserver_api_handler(nc, hm))
     {
       return;
     }
@@ -102,7 +102,7 @@ __mongoose_thread(void* arg)
 //
 ///////////////////////////////////////////////////////////////////////////////
 void
-app_webserver_init(void)
+webserver_driver_init(void)
 {
   TRACE(APP_WEB, "starting web server interface\n");
 
@@ -113,7 +113,7 @@ app_webserver_init(void)
 }
 
 void
-app_webserver_go(void)
+webserver_driver_go(void)
 {
   completion_signal(&_go_signal);
 }

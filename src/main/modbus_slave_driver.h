@@ -1,5 +1,5 @@
-#ifndef __APP_MODBUS_SLAVE_DEF_H__
-#define __APP_MODBUS_SLAVE_DEF_H__
+#ifndef __MODBUS_SLAVE_DRIVER_DEF_H__
+#define __MODBUS_SLAVE_DRIVER_DEF_H__
 
 #include "common_def.h"
 #include "serial.h"
@@ -8,26 +8,26 @@
 
 typedef enum
 {
-  app_modbus_slave_type_tcp,
-  app_modbus_slave_type_rtu
-} app_modbus_slave_type_t;
+  modbus_slave_driver_type_tcp,
+  modbus_slave_driver_type_rtu
+} modbus_slave_driver_type_t;
 
 typedef struct
 {
-  app_modbus_slave_type_t     protocol;
+  modbus_slave_driver_type_t  protocol;
   uint16_t                    address;
   int                         tcp_port;
   char*                       serial_port;
   SerialConfig                serial_cfg;
-} app_modbus_slave_config_t;
+} modbus_slave_driver_config_t;
 
-extern void app_modbus_slave_init(void);
+extern void modbus_slave_driver_init(void);
 
 ////////////////////////////////////////////////////////////
 //
 // module APIs
 //
 ////////////////////////////////////////////////////////////
-extern cJSON* app_api_modbus_slave_get_stat(void);
+extern cJSON* modbus_slave_driver_get_stat(void);
 
-#endif /* !__APP_MODBUS_SLAVE_DEF_H__ */
+#endif /* !__MODBUS_SLAVE_DRIVER_DEF_H__ */

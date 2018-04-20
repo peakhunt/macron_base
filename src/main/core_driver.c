@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "app_core.h"
+#include "core_driver.h"
 #include "app_config.h"
 #include "evloop_thread.h"
 #include "evloop_timer.h"
@@ -85,9 +85,9 @@ __load_lookup_table(int chnl_ndx)
 static void
 __load_channels(void)
 {
-  int num_channels;
-  app_channel_config_t    chnl_cfg;
-  channel_t*              chnl;
+  int                             num_channels;
+  core_driver_channel_config_t    chnl_cfg;
+  channel_t*                      chnl;
 
   TRACE(APP_CORE, "loading channels\n");
   num_channels = app_config_get_num_channels();
@@ -110,9 +110,9 @@ __load_channels(void)
 static void
 __load_alarms(void)
 {
-  int num_alarms;
-  app_alarm_config_t      alm_cfg;
-  alarm_t*                alarm;
+  int                         num_alarms;
+  core_driver_alarm_config_t  alm_cfg;
+  alarm_t*                    alarm;
 
   TRACE(APP_CORE, "loading alarms\n");
   num_alarms = app_config_get_num_alarms();
@@ -132,9 +132,9 @@ __load_alarms(void)
 }
 
 void
-app_core_init(void)
+core_driver_init(void)
 {
-  TRACE(APP_CORE, "starting up app core\n");
+  TRACE(APP_CORE, "starting up core driver\n");
 
   evloop_thread_init(&_app_core_thread);
 
