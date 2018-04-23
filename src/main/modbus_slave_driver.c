@@ -12,6 +12,7 @@
 #include "modbus_util.h"
 #include "modbus_regs.h"
 #include "app_init_completion.h"
+#include "bit_util.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -48,21 +49,77 @@ static evloop_thread_t    _mb_slave_driver_thread =
 // common modbus request handlers
 //
 ////////////////////////////////////////////////////////////////////////////////
-static int32_t
-__get_mapped_channel(modbus_slave_driver_t* slave, uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t addr)
+static modbus_register_t*
+__get_modbus_register(modbus_slave_driver_t* slave, uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t addr)
 {
-  modbus_register_t*  reg;
+  return modbus_register_list_lookup_by_mb_type_addr(&slave->reg_map,
+                                                     slave_id,
+                                                     reg_type,
+                                                     addr);
+}
 
-  reg = modbus_register_list_lookup_by_mb_type_addr(&slave->reg_map,
-                                                    slave_id,
-                                                    reg_type,
-                                                    addr);
+static bool
+__encode_modbus_register(modbus_slave_driver_t* slave, uint8_t slave_id, modbus_reg_type_t reg_type, uint32_t reg_addr, uint16_t* ret)
+{
+  modbus_register_t*    mreg;
+  uint16_t              v = 0;
 
-  if(reg == NULL)
+  mreg = __get_modbus_register(slave, slave_id, reg_type, reg_addr);
+  if(mreg == NULL)
   {
-    return -1;
+    TRACE(MBM_DRIVER, "can't find channel for %d, %d:%d\n", modbus_reg_coil, slave_id, reg_addr);
+    return FALSE;
   }
-  return reg->chnl_num;
+
+  if(mreg->filter.d_mask != 0)
+  {
+    v = (uint32_t)channel_manager_get_raw_value(mreg->chnl_num);
+    v = ((v & mreg->filter.d_mask) << mreg->filter.d_shift);
+  }
+  else
+  {
+    v = 0;
+  }
+
+  if(mreg->filter.s_mask != 0)
+  {
+    if(channel_manager_get_sensor_fault_status(mreg->chnl_num))
+    {
+      v |= ((mreg->filter.fault << mreg->filter.s_shift) & mreg->filter.s_mask);
+    }
+  }
+
+  *ret = v;
+  return TRUE;
+}
+
+static bool
+__decode_modbus_register(modbus_slave_driver_t* slave, uint8_t slave_id, modbus_reg_type_t reg_type, uint32_t reg_addr, uint16_t v)
+{
+  modbus_register_t*    mreg;
+  uint16_t              final_v;
+
+  mreg = __get_modbus_register(slave, slave_id, reg_type, reg_addr);
+  if(mreg == NULL)
+  {
+    TRACE(MBM_DRIVER, "can't find channel for %d, %d:%d\n", reg_type, slave_id, reg_addr);
+    return FALSE;
+  }
+
+  if(mreg->filter.d_mask != 0)
+  {
+    // data response
+    final_v = u16_filter(mreg->filter.d_mask, mreg->filter.d_shift, v);
+    channel_manager_set_raw_value(mreg->chnl_num, final_v);
+  }
+
+  if(mreg->filter.s_mask != 0)
+  {
+    // sensor status response
+    final_v = u16_filter(mreg->filter.s_mask, mreg->filter.s_shift, v);
+    channel_manager_set_sensor_fault_status(mreg->chnl_num, final_v == mreg->filter.fault ? TRUE : FALSE);
+  }
+  return TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -77,34 +134,34 @@ __handle_modbus_u16(ModbusSlaveCTX* ctx, modbus_reg_type_t reg_type, uint8_t* bu
   uint16_t                current_addr,
                           end_addr;
   uint8_t*                buffer;
-  int32_t                 chnl_num;
   uint16_t                v;
-  modbus_slave_driver_t   *app_slave;
+  modbus_slave_driver_t   *slave;
 
   current_addr  = usAddress;
   end_addr      = current_addr + usNRegs - 1;
   buffer        = bufPtr;
 
-  app_slave = (modbus_slave_driver_t*)ctx->priv;
+  slave = (modbus_slave_driver_t*)ctx->priv;
 
   for(; current_addr <= end_addr; current_addr++, buffer += 2)
   {
-    chnl_num = __get_mapped_channel(app_slave, 0, reg_type, current_addr);
-    if(chnl_num == -1)
-    {
-      TRACE(MAIN, "no channel mapping for %d:%d\n", reg_type, current_addr);
-      return MB_ENORES;
-    }
-
     if(eMode == MB_REG_READ)
     {
-      v = (uint32_t)channel_manager_get_raw_value((uint32_t)chnl_num);
+      if(__encode_modbus_register(slave, 0, reg_type, current_addr, &v) == FALSE)
+      {
+        TRACE(MAIN, "no channel mapping for %d:%d\n", reg_type, current_addr);
+        return MB_ENORES;
+      }
       U16_TO_BUFFER(v, buffer);
     }
     else
     {
       v = BUFFER_TO_U16(buffer);
-      channel_manager_set_raw_value((uint32_t)chnl_num, (uint32_t)v);
+      if(__decode_modbus_register(slave, 0, reg_type, current_addr, v) == FALSE)
+      {
+        TRACE(MAIN, "no channel mapping for %d:%d\n", reg_type, current_addr);
+        return MB_ENORES;
+      }
     }
   }
   return MB_ENOERR;
@@ -130,34 +187,34 @@ __handle_modbus_u1(ModbusSlaveCTX* ctx, modbus_reg_type_t reg_type, uint8_t* buf
 {
   uint16_t                current_addr,
                           end_addr;
-  int32_t                 chnl_num;
   uint16_t                v,
                           bit_ndx;
-  modbus_slave_driver_t   *app_slave;
+  modbus_slave_driver_t   *slave;
 
   current_addr  = usAddress;
   end_addr      = current_addr + usNRegs - 1;
 
-  app_slave = (modbus_slave_driver_t*)ctx->priv;
+  slave = (modbus_slave_driver_t*)ctx->priv;
 
   for(bit_ndx = 0; current_addr <= end_addr; current_addr++, bit_ndx++)
   {
-    chnl_num = __get_mapped_channel(app_slave, 0, reg_type, current_addr);
-    if(chnl_num == -1)
-    {
-      TRACE(MAIN, "no channel mapping for %d:%d\n", reg_type, current_addr);
-      return MB_ENORES;
-    }
-
     if(eMode == MB_REG_READ)
     {
-      v = channel_manager_get_raw_value((uint32_t)chnl_num);
+      if(__encode_modbus_register(slave, 0, reg_type, current_addr, &v) == FALSE)
+      {
+        TRACE(MAIN, "no channel mapping for %d:%d\n", reg_type, current_addr);
+        return MB_ENORES;
+      }
       xMBUtilSetBits(bufPtr, bit_ndx, 1, v == 0 ? 0 : 1);
     }
     else
     {
       v = xMBUtilGetBits(bufPtr, bit_ndx, 1);
-      channel_manager_set_raw_value((uint32_t)chnl_num, (uint32_t)v);
+      if(__decode_modbus_register(slave, 0, reg_type, current_addr, v) == FALSE)
+      {
+        TRACE(MAIN, "no channel mapping for %d:%d\n", reg_type, current_addr);
+        return MB_ENORES;
+      }
     }
   }
   return MB_ENOERR;
@@ -280,10 +337,11 @@ modbus_slave_driver_load_slaves(void)
     {
       uint32_t            chnl;
       modbus_address_t    reg;
+      modbus_reg_filter_t         filter;
 
-      cfg_mgr_get_modbus_slave_reg(i, reg_ndx, &reg, &chnl);
+      cfg_mgr_get_modbus_slave_reg(i, reg_ndx, &reg, &chnl, &filter);
       modbus_register_list_add(&slave->reg_map,
-          reg.slave_id, reg.reg_type, reg.mb_address, chnl, NULL);
+          reg.slave_id, reg.reg_type, reg.mb_address, chnl, &filter);
     }
   }
 

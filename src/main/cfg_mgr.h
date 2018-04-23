@@ -29,7 +29,7 @@ extern void cfg_mgr_get_alarm_at(int ndx, core_driver_alarm_config_t* alm_cfg);
 extern int cfg_mgr_get_num_modbus_slaves(void);
 extern void cfg_mgr_get_modbus_slave_at(int ndx, modbus_slave_driver_config_t* cfg);
 extern int cfg_mgr_get_modbus_slave_num_regs(int slave_ndx);
-extern void cfg_mgr_get_modbus_slave_reg(int slave_ndx, int reg_ndx, modbus_address_t* mb_reg, uint32_t* chnl);
+extern void cfg_mgr_get_modbus_slave_reg(int slave_ndx, int reg_ndx, modbus_address_t* mb_reg, uint32_t* chnl, modbus_reg_filter_t* filter);
 
 // for modbus masters
 extern int cfg_mgr_get_num_modbus_masters(void);

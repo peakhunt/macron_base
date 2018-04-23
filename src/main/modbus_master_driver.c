@@ -65,23 +65,6 @@ static evloop_thread_t    _mb_master_driver_thread =
 // utilities
 //
 ////////////////////////////////////////////////////////////////////////////////
-static int32_t
-__get_mapped_channel(modbus_master_driver_t* master, uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t addr)
-{
-  modbus_register_t*  reg;
-
-  reg = modbus_register_list_lookup_by_mb_type_addr(&master->reg_map,
-                                                    slave_id,
-                                                    reg_type,
-                                                    addr);
-
-  if(reg == NULL)
-  {
-    return -1;
-  }
-  return reg->chnl_num;
-}
-
 static modbus_register_t*
 __get_modbus_register(modbus_master_driver_t* master, uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t addr)
 {
@@ -89,6 +72,70 @@ __get_modbus_register(modbus_master_driver_t* master, uint32_t slave_id, modbus_
                                                      slave_id,
                                                      reg_type,
                                                      addr);
+}
+
+static bool
+__encode_modbus_register(modbus_master_driver_t* master, uint8_t slave_addr, modbus_reg_type_t reg_type, uint32_t reg_addr, uint16_t* ret)
+{
+  modbus_register_t*    mreg;
+  uint16_t              v = 0;
+
+  mreg = __get_modbus_register(master, slave_addr, reg_type, reg_addr);
+  if(mreg == NULL)
+  {
+    TRACE(MBM_DRIVER, "can't find channel for %d, %d:%d\n", modbus_reg_coil, slave_addr, reg_addr);
+    return FALSE;
+  }
+
+  if(mreg->filter.d_mask != 0)
+  {
+    v = (uint32_t)channel_manager_get_raw_value(mreg->chnl_num);
+    v = ((v & mreg->filter.d_mask) << mreg->filter.d_shift);
+  }
+  else
+  {
+    v = 0;
+  }
+
+  if(mreg->filter.s_mask != 0)
+  {
+    if(channel_manager_get_sensor_fault_status(mreg->chnl_num))
+    {
+      v |= ((mreg->filter.fault << mreg->filter.s_shift) & mreg->filter.s_mask);
+    }
+  }
+
+  *ret = v;
+  return TRUE;
+}
+
+static bool
+__decode_modbus_register(modbus_master_driver_t* master, uint8_t slave_addr, modbus_reg_type_t reg_type, uint32_t reg_addr, uint16_t v)
+{
+  modbus_register_t*    mreg;
+  uint16_t              final_v;
+
+  mreg = __get_modbus_register(master, slave_addr, reg_type, reg_addr);
+  if(mreg == NULL)
+  {
+    TRACE(MBM_DRIVER, "can't find channel for %d, %d:%d\n", reg_type, slave_addr, reg_addr);
+    return FALSE;
+  }
+
+  if(mreg->filter.d_mask != 0)
+  {
+    // data response
+    final_v = u16_filter(mreg->filter.d_mask, mreg->filter.d_shift, v);
+    channel_manager_set_raw_value(mreg->chnl_num, final_v);
+  }
+
+  if(mreg->filter.s_mask != 0)
+  {
+    // sensor status response
+    final_v = u16_filter(mreg->filter.s_mask, mreg->filter.s_shift, v);
+    channel_manager_set_sensor_fault_status(mreg->chnl_num, final_v == mreg->filter.fault ? TRUE : FALSE);
+  }
+  return TRUE;
 }
 
 static inline void
@@ -119,8 +166,7 @@ modbus_master_driver_coil_write_req(modbus_master_driver_t* master, modbus_maste
   uint8_t           slave_addr;
   uint16_t          reg_addr;
   uint16_t          num_regs;
-  int32_t           chnl_num;
-  uint32_t          v;
+  uint16_t          v;
   uint8_t           bounce_buffer[APP_MODBUS_MAXTER_BOUNCE_BUFFER_SIZE];
 
   slave_addr  = (uint8_t)req->slave_id;
@@ -129,14 +175,11 @@ modbus_master_driver_coil_write_req(modbus_master_driver_t* master, modbus_maste
 
   if(num_regs == 1)
   {
-    chnl_num = __get_mapped_channel(master, slave_addr, modbus_reg_coil, reg_addr);
-    if(chnl_num == -1)
+    if(__encode_modbus_register(master, slave_addr, modbus_reg_coil, reg_addr, &v) == FALSE)
     {
       TRACE(MBM_DRIVER, "can't find channel for %d, %d:%d\n", modbus_reg_coil, slave_addr, reg_addr);
       return;
     }
-
-    v = (uint32_t)channel_manager_get_raw_value((uint32_t)chnl_num);
     mb_master_write_single_coil(ctx, slave_addr, reg_addr, v == 0 ? 0 : 1);
     return;
   }
@@ -144,14 +187,11 @@ modbus_master_driver_coil_write_req(modbus_master_driver_t* master, modbus_maste
   memset(bounce_buffer, 0, num_regs / 8 + 1);
   for(uint16_t i = 0; i < num_regs; i++)
   {
-    chnl_num = __get_mapped_channel(master, slave_addr, modbus_reg_coil, reg_addr + i);
-    if(chnl_num == -1)
+    if(__encode_modbus_register(master, slave_addr, modbus_reg_coil, reg_addr + i, &v) == FALSE)
     {
       TRACE(MBM_DRIVER, "can't find channel for %d, %d:%d\n", modbus_reg_coil, slave_addr, reg_addr + i);
       return;
     }
-
-    v = (uint32_t)channel_manager_get_raw_value((uint32_t)chnl_num);
 
     xMBUtilSetBits(bounce_buffer, i, 1, v == 0 ? 0 : 1);
   }
@@ -166,8 +206,7 @@ modbus_master_driver_holding_write_req(modbus_master_driver_t* master, modbus_ma
   uint8_t           slave_addr;
   uint16_t          reg_addr;
   uint16_t          num_regs;
-  int32_t           chnl_num;
-  uint32_t          v;
+  uint16_t          v;
   uint16_t          bounce_buffer[APP_MODBUS_MAXTER_BOUNCE_BUFFER_SIZE];
   uint8_t*          u8Ptr;
 
@@ -177,28 +216,23 @@ modbus_master_driver_holding_write_req(modbus_master_driver_t* master, modbus_ma
 
   if(num_regs == 1)
   {
-    chnl_num = __get_mapped_channel(master, slave_addr, modbus_reg_holding, reg_addr);
-    if(chnl_num == -1)
+    if(__encode_modbus_register(master, slave_addr, modbus_reg_holding, reg_addr, &v) == FALSE)
     {
       TRACE(MBM_DRIVER, "can't find channel for %d, %d:%d\n", modbus_reg_holding, slave_addr, reg_addr);
       return;
     }
 
-    v = (uint32_t)channel_manager_get_raw_value((uint32_t)chnl_num);
     mb_master_write_single_register(ctx, slave_addr, reg_addr, (uint16_t)v);
     return;
   }
 
   for(uint16_t i = 0; i < num_regs; i++)
   {
-    chnl_num = __get_mapped_channel(master, slave_addr, modbus_reg_holding, reg_addr + i);
-    if(chnl_num == -1)
+    if(__encode_modbus_register(master, slave_addr, modbus_reg_holding, reg_addr + i, &v) == FALSE)
     {
       TRACE(MBM_DRIVER, "can't find channel for %d, %d:%d\n", modbus_reg_holding, slave_addr, reg_addr + i);
       return;
     }
-
-    v = (uint32_t)channel_manager_get_raw_value((uint32_t)chnl_num);
 
     u8Ptr = (uint8_t*)&bounce_buffer[i];
     U16_TO_BUFFER((uint16_t)v, u8Ptr);
@@ -345,35 +379,17 @@ __handle_coil_discrete_read_response(modbus_master_driver_t* master, modbus_reg_
 {
   uint16_t      i,
                 current;
-  uint8_t       v,
-                final_v;
-  modbus_register_t*    mreg;
+  uint16_t      v;
 
   for(i = 0; i < nreg; i++)
   {
     current = addr + i;
 
-    mreg = __get_modbus_register(master, slave, reg_type, current);
-    if(mreg == NULL)
+    v = xMBUtilGetBits(data_buf, i, 1);
+    if(__decode_modbus_register(master, slave, reg_type, current, v) == FALSE)
     {
       TRACE(MBM_DRIVER, "can't find channel for %d, %d:%d\n", reg_type, slave, current);
       continue;
-    }
-
-    v = xMBUtilGetBits(data_buf, i, 1);
-
-    if(mreg->filter.d_mask != 0)
-    {
-      // data response
-      final_v = u16_filter(mreg->filter.d_mask, mreg->filter.d_shift, v);
-      channel_manager_set_raw_value(mreg->chnl_num, final_v == 0 ? 0 : 1);
-    }
-
-    if(mreg->filter.s_mask != 0)
-    {
-      // sensor status response
-      final_v = u16_filter(mreg->filter.s_mask, mreg->filter.s_shift, v);
-      channel_manager_set_sensor_fault_status(mreg->chnl_num, final_v == mreg->filter.fault ? TRUE : FALSE);
     }
   }
 }
@@ -384,35 +400,17 @@ __handle_holding_input_read_response(modbus_master_driver_t* master, modbus_reg_
 {
   uint16_t      i,
                 current;
-  uint16_t      v,
-                final_v;
-  modbus_register_t*    mreg;
+  uint16_t      v;
 
   for(i = 0; i < nreg; i++, data_buf += 2)
   {
     current = addr + i;
 
-    mreg = __get_modbus_register(master, slave, reg_type, current);
-    if(mreg == NULL)
+    v = BUFFER_TO_U16(data_buf);
+    if(__decode_modbus_register(master, slave, reg_type, current, v) == FALSE)
     {
       TRACE(MBM_DRIVER, "can't find channel for %d, %d:%d\n", reg_type, slave, current);
       continue;
-    }
-
-    v = BUFFER_TO_U16(data_buf);
-
-    if(mreg->filter.d_mask != 0)
-    {
-      // data response
-      final_v = u16_filter(mreg->filter.d_mask, mreg->filter.d_shift, v);
-      channel_manager_set_raw_value(mreg->chnl_num, final_v);
-    }
-
-    if(mreg->filter.s_mask != 0)
-    {
-      // sensor status response
-      final_v = u16_filter(mreg->filter.s_mask, mreg->filter.s_shift, v);
-      channel_manager_set_sensor_fault_status(mreg->chnl_num, final_v == mreg->filter.fault ? TRUE : FALSE);
     }
   }
 }

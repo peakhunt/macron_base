@@ -174,11 +174,20 @@ cfg_mgr_get_modbus_reg_filter(cJSON* node, modbus_reg_filter_t* filter)
 
     filter->fault = (uint16_t)tmp;
 
-    debug_log("d_mask : %x, d_shift: %d, s_mask: %x, s_shift: %d\n",
+#if 1
+    debug_log("d_start: %d, d_end: %d, s_start: %d, s_end: %d, fault: %d\n",
+        d_start,
+        d_end,
+        s_start,
+        s_end,
+        tmp);
+    debug_log("d_mask : %x, d_shift: %d, s_mask: %x, s_shift: %d, fault: %d\n",
         filter->d_mask, 
         filter->d_shift,
         filter->s_mask,
-        filter->s_shift);
+        filter->s_shift,
+        filter->fault);
+#endif
   }
 }
 
@@ -321,7 +330,7 @@ cfg_mgr_get_modbus_slave_num_regs(int slave_ndx)
 }
 
 void
-cfg_mgr_get_modbus_slave_reg(int slave_ndx, int reg_ndx, modbus_address_t* mb_reg, uint32_t* chnl)
+cfg_mgr_get_modbus_slave_reg(int slave_ndx, int reg_ndx, modbus_address_t* mb_reg, uint32_t* chnl, modbus_reg_filter_t* filter)
 {
   cJSON       *slave_list,
               *slave,
@@ -336,6 +345,7 @@ cfg_mgr_get_modbus_slave_reg(int slave_ndx, int reg_ndx, modbus_address_t* mb_re
   reg         = cJSON_GetArrayItem(reg_map, reg_ndx);
 
   cfg_mgr_get_modbus_reg_cfg(reg, mb_reg, chnl);
+  cfg_mgr_get_modbus_reg_filter(reg, filter);
 
   cfg_mgr_unlock();
 }
@@ -431,7 +441,6 @@ cfg_mgr_get_modbus_master_reg(int master_ndx, int reg_ndx, modbus_address_t* mb_
   master_list = cfg_mgr_get_node(_jroot, "modbus_master_list");
   master      = cJSON_GetArrayItem(master_list, master_ndx);
   reg_map     = cfg_mgr_get_node(master, "reg_map");
-
   reg         = cJSON_GetArrayItem(reg_map, reg_ndx);
 
   cfg_mgr_get_modbus_reg_cfg(reg, mb_reg, chnl);

@@ -55,7 +55,12 @@
         { "slave": 0,   "reg": "inpt", "address": 1002, "channel": 17     },
         { "slave": 0,   "reg": "inpt", "address": 1003, "channel": 18     },
         { "slave": 0,   "reg": "inpt", "address": 1004, "channel": 19     },
-        { "slave": 0,   "reg": "inpt", "address": 1005, "channel": 20     }
+        { "slave": 0,   "reg": "inpt", "address": 1005, "channel": 20     },
+
+        { "slave": 0,   "reg": "inpt", "address": 3000, "channel": 3000   },
+        { "slave": 0,   "reg": "inpt", "address": 4000, "channel": 1212   },
+        { "slave": 0,   "reg": "disc", "address": 3000, "channel": 3000,  "filter":"0:-1,0:0,fault=0x01"},
+        { "slave": 0,   "reg": "inpt", "address": 3004,  "channel": 3004, "filter":"0:14,15:15,fault=0x01"   }
       ]
     },
     {
@@ -141,8 +146,8 @@
         { "slave": 1,   "reg": "hold", "address": 1025,  "channel": 235    },
         { "slave": 1,   "reg": "hold", "address": 1026,  "channel": 236    },
         { "slave": 1,   "reg": "hold", "address": 1027,  "channel": 237    },
-        { "slave": 1,   "reg": "hold", "address": 1028,  "channel": 238, "filter": "0:13,14:15,fault=0x01" },
-        { "slave": 1,   "reg": "hold", "address": 1029,  "channel": 239, "filter": "0:13,14:15,fault=0x01" },
+        { "slave": 1,   "reg": "hold", "address": 1028,  "channel": 238    },
+        { "slave": 1,   "reg": "hold", "address": 1029,  "channel": 239    },
 
         { "slave": 1,   "reg": "disc", "address": 1010,  "channel": 240    },
         { "slave": 1,   "reg": "disc", "address": 1011,  "channel": 241    },
@@ -166,7 +171,7 @@
     },
     {
       "schedule_finish_delay": 0,
-      "inter_request_delay": 20,
+      "inter_request_delay": 5,
       "timeout": 2000,
       "protocol": "tcp",
       "dest_ip": "192.168.227.211",
@@ -179,8 +184,8 @@
         { "slave": 1,   "reg": "coil", "address": 1009,  "channel": 1204    },
         { "slave": 1,   "reg": "coil", "address": 1010,  "channel": 1205    },
 
-        { "slave": 1,   "reg": "inpt", "address": 1010,  "channel": 1210, "filter": "0:13,14:15,fault=0x01"    },
-        { "slave": 1,   "reg": "inpt", "address": 1011,  "channel": 1211, "filter": "0:13,14:15,fault=0x01"    },
+        { "slave": 1,   "reg": "inpt", "address": 1010,  "channel": 1210    },
+        { "slave": 1,   "reg": "inpt", "address": 1011,  "channel": 1211    },
         { "slave": 1,   "reg": "inpt", "address": 1012,  "channel": 1212    },
         { "slave": 1,   "reg": "inpt", "address": 1013,  "channel": 1213    },
         { "slave": 1,   "reg": "inpt", "address": 1014,  "channel": 1214    },
@@ -222,16 +227,21 @@
         { "slave": 1,   "reg": "disc", "address": 1018,  "channel": 1248    },
         { "slave": 1,   "reg": "disc", "address": 1019,  "channel": 1249    },
 
-        { "slave": 1,   "reg": "disc", "address": 2010, "channel": 1220, "filter": "0:-1,0:0,fault=0x01"   },
-        { "slave": 1,   "reg": "disc", "address": 2011, "channel": 1221, "filter": "0:-1,0:0,fault=0x01"   },
-        { "slave": 1,   "reg": "disc", "address": 2012, "channel": 1222, "filter": "0:-1,0:0,fault=0x01"   },
-        { "slave": 1,   "reg": "disc", "address": 2013, "channel": 1223, "filter": "0:-1,0:0,fault=0x01"   },
-        { "slave": 1,   "reg": "disc", "address": 2014, "channel": 1224, "filter": "0:-1,0:0,fault=0x01"   },
-        { "slave": 1,   "reg": "disc", "address": 2015, "channel": 1225, "filter": "0:-1,0:0,fault=0x01"   },
-        { "slave": 1,   "reg": "disc", "address": 2016, "channel": 1226, "filter": "0:-1,0:0,fault=0x01"   },
-        { "slave": 1,   "reg": "disc", "address": 2017, "channel": 1227, "filter": "0:-1,0:0,fault=0x01"   },
-        { "slave": 1,   "reg": "disc", "address": 2018, "channel": 1228, "filter": "0:-1,0:0,fault=0x01"   },
-        { "slave": 1,   "reg": "disc", "address": 2019, "channel": 1229, "filter": "0:-1,0:0,fault=0x01"   }
+        { "slave": 1,   "reg": "disc", "address": 2010, "channel": 1220     },
+        { "slave": 1,   "reg": "disc", "address": 2011, "channel": 1221     },
+        { "slave": 1,   "reg": "disc", "address": 2012, "channel": 1222     },
+        { "slave": 1,   "reg": "disc", "address": 2013, "channel": 1223     },
+        { "slave": 1,   "reg": "disc", "address": 2014, "channel": 1224     },
+        { "slave": 1,   "reg": "disc", "address": 2015, "channel": 1225     },
+        { "slave": 1,   "reg": "disc", "address": 2016, "channel": 1226     },
+        { "slave": 1,   "reg": "disc", "address": 2017, "channel": 1227     },
+        { "slave": 1,   "reg": "disc", "address": 2018, "channel": 1228     },
+        { "slave": 1,   "reg": "disc", "address": 2019, "channel": 1229     },
+
+        { "slave": 1,   "reg": "inpt", "address": 3000,  "channel": 3000, "filter":"0:15,0:-1,fault=0x00"   },
+        { "slave": 1,   "reg": "disc", "address": 3000,  "channel": 3000, "filter":"0:-1,0:0,fault=0x01"    },
+
+        { "slave": 1,   "reg": "inpt", "address": 3004,  "channel": 3004, "filter":"0:14,15:15,fault=0x01"   }
       ],
       "request_schedule": [
         { "slave": 1,   "op": "read",     "reg": "coil",      "reg_addr": 1005,     "num_regs": 5   },
@@ -240,7 +250,11 @@
         { "slave": 1,   "op": "read",     "reg": "hold",      "reg_addr": 1010,     "num_regs": 10  },
         { "slave": 1,   "op": "write",    "reg": "hold",      "reg_addr": 1020,     "num_regs": 10  },
         { "slave": 1,   "op": "read",     "reg": "disc",      "reg_addr": 1010,     "num_regs": 10  },
-        { "slave": 1,   "op": "read",     "reg": "disc",      "reg_addr": 2010,     "num_regs": 10  }
+        { "slave": 1,   "op": "read",     "reg": "disc",      "reg_addr": 2010,     "num_regs": 10  },
+
+        { "slave": 1,   "op": "read",     "reg": "inpt",      "reg_addr": 3000,     "num_regs": 1   },
+        { "slave": 1,   "op": "read",     "reg": "disc",      "reg_addr": 3000,     "num_regs": 1   },
+        { "slave": 1,   "op": "read",     "reg": "inpt",      "reg_addr": 3004,     "num_regs": 1   }
       ]
     }
   ],
