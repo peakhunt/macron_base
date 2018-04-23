@@ -59,12 +59,52 @@
 
         { "slave": 0,   "reg": "inpt", "address": 3000, "channel": 3000   },
         { "slave": 0,   "reg": "inpt", "address": 4000, "channel": 1212   },
-        { "slave": 0,   "reg": "disc", "address": 3000, "channel": 3000,  "filter":"0:-1,0:0,fault=0x01"},
-        { "slave": 0,   "reg": "inpt", "address": 3004,  "channel": 3004, "filter":"0:14,15:15,fault=0x01"   },
+        { "slave": 0,   "reg": "disc", "address": 3000, "channel": 3000,  
+          "codec" : {
+            "type": "data_and_status",
+            "d_start": 0,
+            "d_end": -1,
+            "s_start": 0,
+            "s_end": 0,
+            "fault": 1,
+            "ok": 0
+          }
+        },
+        { "slave": 0,   "reg": "inpt", "address": 3004,  "channel": 3004,
+          "codec" : {
+            "type": "data_and_status",
+            "d_start": 0,
+            "d_end": 14,
+            "s_start": 15,
+            "s_end": 15,
+            "fault": 1,
+            "ok": 0
+          }
+        },
 
         { "slave": 0,   "reg": "hold", "address": 3008, "channel": 3008   },
-        { "slave": 0,   "reg": "coil", "address": 3008, "channel": 3008 , "filter":"0:-1,0:0,fault=0x01"  },
-        { "slave": 0,   "reg": "hold", "address": 3012, "channel": 3012,  "filter":"0:14,15:15,fault=0x01"   }
+        { "slave": 0,   "reg": "coil", "address": 3008, "channel": 3008 , 
+          "codec" : {
+            "type": "data_and_status",
+            "d_start": 0,
+            "d_end": -1,
+            "s_start": 0,
+            "s_end": 0,
+            "fault": 1,
+            "ok": 0
+          }
+        },
+        { "slave": 0,   "reg": "hold", "address": 3012, "channel": 3012,
+          "codec" : {
+            "type": "data_and_status",
+            "d_start": 0,
+            "d_end": 14,
+            "s_start": 15,
+            "s_end": 15,
+            "fault": 1,
+            "ok": 0
+          }
+        }
       ]
     },
     {
@@ -242,13 +282,62 @@
         { "slave": 1,   "reg": "disc", "address": 2018, "channel": 1228     },
         { "slave": 1,   "reg": "disc", "address": 2019, "channel": 1229     },
 
-        { "slave": 1,   "reg": "inpt", "address": 3000,  "channel": 3000, "filter":"0:15,0:-1,fault=0x00"   },
-        { "slave": 1,   "reg": "disc", "address": 3000,  "channel": 3000, "filter":"0:-1,0:0,fault=0x01"    },
-        { "slave": 1,   "reg": "inpt", "address": 3004,  "channel": 3004, "filter":"0:14,15:15,fault=0x01"   },
-
+        { "slave": 1,   "reg": "inpt", "address": 3000,  "channel": 3000,
+          "codec" : {
+            "type": "data_and_status",
+            "d_start": 0,
+            "d_end": 15,
+            "s_start": 0,
+            "s_end": -1,
+            "fault": 0,
+            "ok": 0
+          }
+        },
+        { "slave": 1,   "reg": "disc", "address": 3000,  "channel": 3000,
+          "codec" : {
+            "type": "data_and_status",
+            "d_start": 0,
+            "d_end": -1,
+            "s_start": 0,
+            "s_end": 0,
+            "fault": 1,
+            "ok": 0
+          }
+        },
+        { "slave": 1,   "reg": "inpt", "address": 3004,  "channel": 3004,
+          "codec" : {
+            "type": "data_and_status",
+            "d_start": 0,
+            "d_end": 14,
+            "s_start": 15,
+            "s_end": 15,
+            "fault": 1,
+            "ok": 0
+          }
+        },
         { "slave": 1,   "reg": "hold", "address": 4000,  "channel": 3000 },
-        { "slave": 1,   "reg": "coil", "address": 4000,  "channel": 3000, "filter": "0:-1,0:0,fault=0x01" },
-        { "slave": 1,   "reg": "hold", "address": 4004,  "channel": 3004, "filter":"0:13,14:15,fault=0x03"   }
+        { "slave": 1,   "reg": "coil", "address": 4000,  "channel": 3000,
+          "codec" : {
+            "type": "data_and_status",
+            "d_start": 0,
+            "d_end": -1,
+            "s_start": 0,
+            "s_end": 0,
+            "fault": 1,
+            "ok": 0
+          }
+        },
+        { "slave": 1,   "reg": "hold", "address": 4004,  "channel": 3004,
+          "codec" : {
+            "type": "data_and_status",
+            "d_start": 0,
+            "d_end": 13,
+            "s_start": 14,
+            "s_end": 15,
+            "fault": 3,
+            "ok": 0
+          }
+        }
         
       ],
       "request_schedule": [

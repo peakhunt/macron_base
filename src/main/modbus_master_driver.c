@@ -87,21 +87,25 @@ __encode_modbus_register(modbus_master_driver_t* master, uint8_t slave_addr, mod
     return FALSE;
   }
 
-  if(mreg->filter.d_mask != 0)
+  if(mreg->codec.d_mask != 0)
   {
     v = (uint32_t)channel_manager_get_raw_value(mreg->chnl_num);
-    v = ((v & mreg->filter.d_mask) << mreg->filter.d_shift);
+    v = ((v << mreg->codec.d_shift) & mreg->codec.d_mask);
   }
   else
   {
     v = 0;
   }
 
-  if(mreg->filter.s_mask != 0)
+  if(mreg->codec.s_mask != 0)
   {
     if(channel_manager_get_sensor_fault_status(mreg->chnl_num))
     {
-      v |= ((mreg->filter.fault << mreg->filter.s_shift) & mreg->filter.s_mask);
+      v |= ((mreg->codec.fault << mreg->codec.s_shift) & mreg->codec.s_mask);
+    }
+    else
+    {
+      v |= ((mreg->codec.ok << mreg->codec.s_shift) & mreg->codec.s_mask);
     }
   }
 
@@ -122,18 +126,18 @@ __decode_modbus_register(modbus_master_driver_t* master, uint8_t slave_addr, mod
     return FALSE;
   }
 
-  if(mreg->filter.d_mask != 0)
+  if(mreg->codec.d_mask != 0)
   {
     // data response
-    final_v = u16_filter(mreg->filter.d_mask, mreg->filter.d_shift, v);
+    final_v = u16_filter(mreg->codec.d_mask, mreg->codec.d_shift, v);
     channel_manager_set_raw_value(mreg->chnl_num, final_v);
   }
 
-  if(mreg->filter.s_mask != 0)
+  if(mreg->codec.s_mask != 0)
   {
     // sensor status response
-    final_v = u16_filter(mreg->filter.s_mask, mreg->filter.s_shift, v);
-    channel_manager_set_sensor_fault_status(mreg->chnl_num, final_v == mreg->filter.fault ? TRUE : FALSE);
+    final_v = u16_filter(mreg->codec.s_mask, mreg->codec.s_shift, v);
+    channel_manager_set_sensor_fault_status(mreg->chnl_num, final_v == mreg->codec.fault ? TRUE : FALSE);
   }
   return TRUE;
 }
@@ -615,11 +619,11 @@ modbus_driver_load_masters(void)
     {
       uint32_t                    chnl;
       modbus_address_t            reg;
-      modbus_reg_filter_t         filter;
+      modbus_reg_codec_t          codec;
 
-      cfg_mgr_get_modbus_master_reg(i, reg_ndx, &reg, &chnl, &filter);
+      cfg_mgr_get_modbus_master_reg(i, reg_ndx, &reg, &chnl, &codec);
       modbus_register_list_add(&master->reg_map,
-          reg.slave_id, reg.reg_type, reg.mb_address, chnl, &filter);
+          reg.slave_id, reg.reg_type, reg.mb_address, chnl, &codec);
     }
 
     // load request schedule

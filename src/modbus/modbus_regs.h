@@ -28,14 +28,21 @@ typedef struct
   modbus_reg_type_t     reg_type;
 } modbus_address_t;
 
+typedef enum
+{
+  modbus_reg_codec_type_data_and_status,
+} modbus_reg_codec_type_t;
+
 typedef struct
 {
-  uint16_t              d_mask;           // data mask
-  uint16_t              s_mask;           // sensor status mask
-  uint8_t               d_shift;          // data shift left
-  uint8_t               s_shift;          // sensor status shift left
-  uint16_t              fault;
-} modbus_reg_filter_t;
+  modbus_reg_codec_type_t   codec_type;
+  uint16_t                  d_mask;           // data mask
+  uint16_t                  s_mask;           // sensor status mask
+  uint8_t                   d_shift;          // data shift left
+  uint8_t                   s_shift;          // sensor status shift left
+  uint16_t                  fault;
+  uint16_t                  ok;
+} modbus_reg_codec_t;
 
 typedef struct
 {
@@ -43,7 +50,7 @@ typedef struct
   BHashElement              bh_by_mb_addr;
   modbus_address_t          mb_addr;
   uint32_t                  chnl_num;
-  modbus_reg_filter_t       filter;
+  modbus_reg_codec_t        codec;
 } modbus_register_t;
 
 typedef struct
@@ -55,7 +62,7 @@ typedef struct
 
 extern void modbus_register_list_init(modbus_register_list_t* mb_list);
 extern void modbus_register_list_add(modbus_register_list_t* mb_list,
-    uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t mb_addr, uint32_t chnl_num, modbus_reg_filter_t* filter);
+    uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t mb_addr, uint32_t chnl_num, modbus_reg_codec_t* codec);
 extern modbus_register_t* modbus_register_list_lookup_by_mb_type_addr(modbus_register_list_t* mb_list,
     uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t mb_addr);
 

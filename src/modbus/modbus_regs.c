@@ -25,7 +25,7 @@ modbus_register_list_init(modbus_register_list_t* mb_list)
 void
 modbus_register_list_add(modbus_register_list_t* mb_list, uint32_t slave_id,
     modbus_reg_type_t reg_type, uint32_t mb_addr, uint32_t chnl_num,
-    modbus_reg_filter_t* filter)
+    modbus_reg_codec_t* codec)
 {
   modbus_register_t*    reg;
 
@@ -38,17 +38,19 @@ modbus_register_list_add(modbus_register_list_t* mb_list, uint32_t slave_id,
   reg->mb_addr.reg_type     = reg_type;
   reg->chnl_num             = chnl_num;
 
-  if(filter)
+  if(codec)
   {
-    reg->filter               = *filter;
+    reg->codec               = *codec;
   }
   else
   {
-    reg->filter.d_mask  = 0xffff;
-    reg->filter.s_mask  = 0x0;
-    reg->filter.d_shift = 0;
-    reg->filter.s_shift = 0;
-    reg->filter.fault   = 0;
+    reg->codec.codec_type   = modbus_reg_codec_type_data_and_status;
+    reg->codec.d_mask       = 0xffff;
+    reg->codec.s_mask       = 0x0;
+    reg->codec.d_shift      = 0;
+    reg->codec.s_shift      = 0;
+    reg->codec.fault        = 0;
+    reg->codec.ok           = 0;
   }
 
   bhash_add(&mb_list->hash_by_mb_addr, (void*)reg);
