@@ -60,7 +60,11 @@
         { "slave": 0,   "reg": "inpt", "address": 3000, "channel": 3000   },
         { "slave": 0,   "reg": "inpt", "address": 4000, "channel": 1212   },
         { "slave": 0,   "reg": "disc", "address": 3000, "channel": 3000,  "filter":"0:-1,0:0,fault=0x01"},
-        { "slave": 0,   "reg": "inpt", "address": 3004,  "channel": 3004, "filter":"0:14,15:15,fault=0x01"   }
+        { "slave": 0,   "reg": "inpt", "address": 3004,  "channel": 3004, "filter":"0:14,15:15,fault=0x01"   },
+
+        { "slave": 0,   "reg": "hold", "address": 3008, "channel": 3008   },
+        { "slave": 0,   "reg": "coil", "address": 3008, "channel": 3008 , "filter":"0:-1,0:0,fault=0x01"  },
+        { "slave": 0,   "reg": "hold", "address": 3012, "channel": 3012,  "filter":"0:14,15:15,fault=0x01"   }
       ]
     },
     {
@@ -240,8 +244,12 @@
 
         { "slave": 1,   "reg": "inpt", "address": 3000,  "channel": 3000, "filter":"0:15,0:-1,fault=0x00"   },
         { "slave": 1,   "reg": "disc", "address": 3000,  "channel": 3000, "filter":"0:-1,0:0,fault=0x01"    },
+        { "slave": 1,   "reg": "inpt", "address": 3004,  "channel": 3004, "filter":"0:14,15:15,fault=0x01"   },
 
-        { "slave": 1,   "reg": "inpt", "address": 3004,  "channel": 3004, "filter":"0:14,15:15,fault=0x01"   }
+        { "slave": 1,   "reg": "hold", "address": 4000,  "channel": 3000 },
+        { "slave": 1,   "reg": "coil", "address": 4000,  "channel": 3000, "filter": "0:-1,0:0,fault=0x01" },
+        { "slave": 1,   "reg": "hold", "address": 4004,  "channel": 3004, "filter":"0:13,14:15,fault=0x03"   }
+        
       ],
       "request_schedule": [
         { "slave": 1,   "op": "read",     "reg": "coil",      "reg_addr": 1005,     "num_regs": 5   },
@@ -254,7 +262,10 @@
 
         { "slave": 1,   "op": "read",     "reg": "inpt",      "reg_addr": 3000,     "num_regs": 1   },
         { "slave": 1,   "op": "read",     "reg": "disc",      "reg_addr": 3000,     "num_regs": 1   },
-        { "slave": 1,   "op": "read",     "reg": "inpt",      "reg_addr": 3004,     "num_regs": 1   }
+        { "slave": 1,   "op": "read",     "reg": "inpt",      "reg_addr": 3004,     "num_regs": 1   },
+        { "slave": 1,   "op": "write",    "reg": "coil",      "reg_addr": 4000,     "num_regs": 1   },
+        { "slave": 1,   "op": "write",    "reg": "hold",      "reg_addr": 4000,     "num_regs": 1   },
+        { "slave": 1,   "op": "write",    "reg": "hold",      "reg_addr": 4004,     "num_regs": 1   }
       ]
     }
   ],
