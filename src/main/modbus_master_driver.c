@@ -623,7 +623,9 @@ modbus_driver_load_masters(void)
 
       cfg_mgr_get_modbus_master_reg(i, reg_ndx, &reg, &chnl, &codec);
       modbus_register_list_add(&master->reg_map,
-          reg.slave_id, reg.reg_type, reg.mb_address, chnl, &codec);
+          reg.slave_id, reg.reg_type, reg.mb_address,
+          chnl, modbus_reg_mapping_to_channel,
+          &codec);
     }
 
     // load request schedule

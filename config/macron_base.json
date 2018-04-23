@@ -104,7 +104,10 @@
             "fault": 1,
             "ok": 0
           }
-        }
+        },
+        { "slave": 0,   "reg": "inpt", "address": 6000, "channel": 1, "mapping_to": "alarm"     },
+        { "slave": 0,   "reg": "inpt", "address": 6001, "channel": 2, "mapping_to": "alarm"     },
+        { "slave": 0,   "reg": "inpt", "address": 6002, "channel": 3, "mapping_to": "alarm"     }
       ]
     },
     {

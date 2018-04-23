@@ -24,7 +24,7 @@ modbus_register_list_init(modbus_register_list_t* mb_list)
 
 void
 modbus_register_list_add(modbus_register_list_t* mb_list, uint32_t slave_id,
-    modbus_reg_type_t reg_type, uint32_t mb_addr, uint32_t chnl_num,
+    modbus_reg_type_t reg_type, uint32_t mb_addr, uint32_t chnl_num, modbus_reg_mapping_to_t mapping_to,
     modbus_reg_codec_t* codec)
 {
   modbus_register_t*    reg;
@@ -37,6 +37,7 @@ modbus_register_list_add(modbus_register_list_t* mb_list, uint32_t slave_id,
   reg->mb_addr.mb_address   = mb_addr;
   reg->mb_addr.reg_type     = reg_type;
   reg->chnl_num             = chnl_num;
+  reg->mapping_to           = mapping_to;
 
   if(codec)
   {

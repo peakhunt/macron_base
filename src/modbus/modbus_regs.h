@@ -44,12 +44,20 @@ typedef struct
   uint16_t                  ok;
 } modbus_reg_codec_t;
 
+typedef enum
+{
+  modbus_reg_mapping_to_channel,
+  modbus_reg_mapping_to_alarm,
+  modbus_reg_mapping_to_cfg_mgr,
+} modbus_reg_mapping_to_t;
+
 typedef struct
 {
   struct list_head          le;
   BHashElement              bh_by_mb_addr;
   modbus_address_t          mb_addr;
   uint32_t                  chnl_num;
+  modbus_reg_mapping_to_t   mapping_to;
   modbus_reg_codec_t        codec;
 } modbus_register_t;
 
@@ -62,7 +70,7 @@ typedef struct
 
 extern void modbus_register_list_init(modbus_register_list_t* mb_list);
 extern void modbus_register_list_add(modbus_register_list_t* mb_list,
-    uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t mb_addr, uint32_t chnl_num, modbus_reg_codec_t* codec);
+    uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t mb_addr, uint32_t chnl_num, modbus_reg_mapping_to_t mapping_to, modbus_reg_codec_t* codec);
 extern modbus_register_t* modbus_register_list_lookup_by_mb_type_addr(modbus_register_list_t* mb_list,
     uint32_t slave_id, modbus_reg_type_t reg_type, uint32_t mb_addr);
 

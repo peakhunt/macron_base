@@ -66,6 +66,19 @@ cfg_mgr_get_bool(cJSON* node, const char* name)
   return (bool)(cfg_mgr_get_node(node, name)->valueint);
 }
 
+static inline bool
+cfg_mgr_get_bool_optional(cJSON* node, const char* name, bool default_value)
+{
+  cJSON* child;
+
+  child = cJSON_GetObjectItem(node, name);
+  if(child == NULL)
+  {
+    return default_value;
+  }
+  return (bool)(cfg_mgr_get_node(node, name)->valueint);
+}
+
 static inline int
 cfg_mgr_get_int(cJSON* node, const char* name)
 {
@@ -82,6 +95,19 @@ static inline char*
 cfg_mgr_get_str(cJSON* node, const char* name)
 {
   return cfg_mgr_get_node(node, name)->valuestring;
+}
+
+static inline const char*
+cfg_mgr_get_str_optional(cJSON* node, const char* name, const char* default_value)
+{
+  cJSON* child;
+
+  child = cJSON_GetObjectItem(node, name);
+  if(child == NULL)
+  {
+    return default_value;
+  }
+  return child->valuestring;
 }
 
 static inline SerialParity
@@ -143,7 +169,29 @@ cfg_mgr_get_modbus_reg_cfg(cJSON* node, modbus_address_t* mb_reg, uint32_t* chnl
 
   mb_reg->reg_type = cfg_mgr_get_modbus_reg_type(node, "reg");
   mb_reg->mb_address  = (uint32_t)cfg_mgr_get_int(node, "address");
+
   *chnl               = cfg_mgr_get_int(node, "channel");
+}
+
+static inline void
+cfg_mgr_get_modbus_reg_mapping_to(cJSON* node, modbus_reg_mapping_to_t* mapping_to)
+{
+  const char* str;
+
+  str =  cfg_mgr_get_str_optional(node, "mapping_to", "channel");
+
+  if(strcmp(str, "channel") == 0)
+  {
+    *mapping_to = modbus_reg_mapping_to_channel;
+  }
+  else if(strcmp(str, "alarm") == 0)
+  {
+    *mapping_to = modbus_reg_mapping_to_alarm;
+  }
+  else
+  {
+    *mapping_to = modbus_reg_mapping_to_cfg_mgr;
+  }
 }
 
 static inline void
@@ -341,7 +389,7 @@ cfg_mgr_get_modbus_slave_num_regs(int slave_ndx)
 }
 
 void
-cfg_mgr_get_modbus_slave_reg(int slave_ndx, int reg_ndx, modbus_address_t* mb_reg, uint32_t* chnl, modbus_reg_codec_t* codec)
+cfg_mgr_get_modbus_slave_reg(int slave_ndx, int reg_ndx, modbus_address_t* mb_reg, uint32_t* chnl, modbus_reg_mapping_to_t* mapping_to, modbus_reg_codec_t* codec)
 {
   cJSON       *slave_list,
               *slave,
@@ -357,6 +405,7 @@ cfg_mgr_get_modbus_slave_reg(int slave_ndx, int reg_ndx, modbus_address_t* mb_re
 
   cfg_mgr_get_modbus_reg_cfg(reg, mb_reg, chnl);
   cfg_mgr_get_modbus_reg_codec(reg, codec);
+  cfg_mgr_get_modbus_reg_mapping_to(reg, mapping_to);
 
   cfg_mgr_unlock();
 }

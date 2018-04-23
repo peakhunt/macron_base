@@ -115,6 +115,13 @@ channel_manager_add_channel(channel_t* chnl)
   pthread_mutex_unlock(&_chnl_mgr_lock);
 }
 
+void
+channel_manager_init_channels(void)
+{
+  // FIXME
+  // initialize channels so that they all have default init value
+}
+
 uint32_t
 channel_manager_get_raw_value(uint32_t chnl_num)
 {

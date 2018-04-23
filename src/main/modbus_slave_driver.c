@@ -7,6 +7,7 @@
 #include "list.h"
 #include "trace.h"
 #include "channel_manager.h"
+#include "alarm_manager.h"
 #include "modbus_rtu_slave.h"
 #include "modbus_tcp_slave.h"
 #include "modbus_util.h"
@@ -69,6 +70,21 @@ __encode_modbus_register(modbus_slave_driver_t* slave, uint8_t slave_id, modbus_
   {
     TRACE(MBM_DRIVER, "can't find channel for %d, %d:%d\n", modbus_reg_coil, slave_id, reg_addr);
     return FALSE;
+  }
+
+  if(mreg->mapping_to == modbus_reg_mapping_to_alarm)
+  {
+    alarm_status_t   status;
+
+    if(alarm_manager_get_alarm_status(mreg->chnl_num, &status) != -1)
+    {
+      *ret = status.state;
+    }
+    else
+    {
+      *ret = 0;
+    }
+    return TRUE;
   }
 
   if(mreg->codec.d_mask != 0)
@@ -342,10 +358,13 @@ modbus_slave_driver_load_slaves(void)
       uint32_t            chnl;
       modbus_address_t    reg;
       modbus_reg_codec_t  codec;
+      modbus_reg_mapping_to_t   mapping_to;
 
-      cfg_mgr_get_modbus_slave_reg(i, reg_ndx, &reg, &chnl, &codec);
+      cfg_mgr_get_modbus_slave_reg(i, reg_ndx, &reg, &chnl, &mapping_to, &codec);
       modbus_register_list_add(&slave->reg_map,
-          reg.slave_id, reg.reg_type, reg.mb_address, chnl, &codec);
+          reg.slave_id, reg.reg_type, reg.mb_address,
+          chnl, mapping_to,
+          &codec);
     }
   }
 

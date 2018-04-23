@@ -150,6 +150,8 @@ core_driver_init(void)
   __load_channels();
   __load_alarms();
 
+  channel_manager_init_channels();
+
   evloop_thread_run(&_app_core_thread);
 
   app_init_complete_wait();

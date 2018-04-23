@@ -14,6 +14,7 @@ typedef struct
 
 extern void channel_manager_init(void);
 extern void channel_manager_add_channel(channel_t* chnl);
+extern void channel_manager_init_channels(void);
 
 extern uint32_t channel_manager_get_raw_value(uint32_t chnl_num);
 extern void channel_manager_set_raw_value(uint32_t chnl_num, uint32_t v);
