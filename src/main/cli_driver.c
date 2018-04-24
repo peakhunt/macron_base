@@ -177,6 +177,8 @@ command_error:
 static void
 cli_command_channel(cli_intf_t* intf, int argc, const char** argv)
 {
+  uint32_t            chnl_num;
+
   if(argc < 2)
   {
     goto command_error;
@@ -185,7 +187,6 @@ cli_command_channel(cli_intf_t* intf, int argc, const char** argv)
   if(strcmp(argv[1], "status") == 0)
   {
     channel_status_t    status;
-    uint32_t            chnl_num;
 
     if(argc != 3)
     {
@@ -213,6 +214,67 @@ cli_command_channel(cli_intf_t* intf, int argc, const char** argv)
     }
     cli_printf(intf, "sensor fault: %s"CLI_EOL, status.sensor_fault ? "fault" : "normal");
   }
+  else if(strcmp(argv[1], "config_dig") == 0)
+  {
+    // channel config_dig #num <init>[on|off] <fail>[on|off]
+    channel_runtime_config_t    cfg;
+
+    if(argc != 5)
+    {
+      goto command_error;
+    }
+
+    chnl_num = atoi(argv[2]);
+
+    if(strcmp(argv[3], "on") == 0)
+    {
+      cfg.init_value.b = TRUE;
+    }
+    else if(strcmp(argv[4], "off") == 0)
+    {
+      cfg.init_value.b = FALSE;
+    }
+    else
+    {
+      goto command_error;
+    }
+
+    if(strcmp(argv[4], "on") == 0)
+    {
+      cfg.failsafe_value.b = TRUE;
+    }
+    else if(strcmp(argv[4], "off") == 0)
+    {
+      cfg.failsafe_value.b = FALSE;
+    }
+    else
+    {
+      goto command_error;
+    }
+
+    cfg_mgr_update_channel_cfg(chnl_num, &cfg);
+    cli_printf(intf, "done updating channel %d"CLI_EOL, chnl_num);
+  }
+  else if(strcmp(argv[1], "config_ana") == 0)
+  {
+    // channel config_dig #num <init> <fail> <min> <max>
+    channel_runtime_config_t    cfg;
+
+    if(argc != 7)
+    {
+      goto command_error;
+    }
+
+    chnl_num = atoi(argv[2]);
+
+    cfg.init_value.f      = atod_round_off(argv[3], 2);
+    cfg.failsafe_value.f  = atod_round_off(argv[4], 2);
+    cfg.min_val           = atod_round_off(argv[5], 2);
+    cfg.max_val           = atod_round_off(argv[6], 2);
+
+    cfg_mgr_update_channel_cfg(chnl_num, &cfg);
+    cli_printf(intf, "done updating channel %d"CLI_EOL, chnl_num);
+  }
   else
   {
     goto command_error;
@@ -223,6 +285,8 @@ cli_command_channel(cli_intf_t* intf, int argc, const char** argv)
 command_error:
   cli_printf(intf, "invalid argument!!!"CLI_EOL CLI_EOL);
   cli_printf(intf, "%s status chnl-num"CLI_EOL, argv[0]);
+  cli_printf(intf, "%s config_dig chnl-num init(on|off) fail(on|off)"CLI_EOL, argv[0]);
+  cli_printf(intf, "%s config_ana chnl-num init fail min max"CLI_EOL, argv[0]);
 }
 
 static void

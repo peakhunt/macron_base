@@ -58,7 +58,7 @@ static lookup_table_t*
 __load_lookup_table(int chnl_ndx)
 {
   int                     num_entries;
-  float                   raw,
+  double                  raw,
                           eng;
   lookup_table_t*         lut;
   lookup_table_item_t*    items;

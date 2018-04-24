@@ -282,6 +282,27 @@ cfg_mgr_find_alarm(uint32_t alarm_num)
   return NULL;
 }
 
+static inline cJSON*
+cfg_mgr_find_channel(uint32_t chnl_num)
+{
+  cJSON       *channels,
+              *chnl;
+  int         num_channels;
+
+  channels      = cfg_mgr_get_node(_jroot, "channels");
+  num_channels  = cJSON_GetArraySize(channels);
+
+  for(int i = 0; i < num_channels; i++)
+  {
+    chnl = cJSON_GetArrayItem(channels, i);
+    if((uint32_t)cfg_mgr_get_int(chnl, "chnl_num") == chnl_num)
+    {
+      return chnl;
+    }
+  }
+  return NULL;
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // file update
@@ -739,7 +760,7 @@ cfg_mgr_get_num_lookup_table_of_channel_at(int ndx)
 }
 
 void
-cfg_mgr_get_lookup_table_of_channel_at(int chnl_ndx, int lt_ndx, float* raw, float* eng)
+cfg_mgr_get_lookup_table_of_channel_at(int chnl_ndx, int lt_ndx, double* raw, double* eng)
 {
   cJSON       *channels,
               *channel,
@@ -753,8 +774,8 @@ cfg_mgr_get_lookup_table_of_channel_at(int chnl_ndx, int lt_ndx, float* raw, flo
   lookup_table  = cfg_mgr_get_node(channel, "lookup_table");
   entry         =  cJSON_GetArrayItem(lookup_table, lt_ndx);
 
-  *raw          = (float)cfg_mgr_get_double(entry, "raw");
-  *eng          = (float)cfg_mgr_get_double(entry, "eng");
+  *raw          = (double)cfg_mgr_get_double(entry, "raw");
+  *eng          = (double)cfg_mgr_get_double(entry, "eng");
 
   cfg_mgr_unlock();
 }
@@ -907,6 +928,58 @@ cfg_mgr_update_alarm_cfg(uint32_t alarm_num, alarm_runtime_config_t* cfg)
 
   // step 2. update alarm manager
   alarm_manager_update_alarm_config(alarm_num, cfg);
+
+  // step 3. regenerate in memeory config and save
+  cfg_mgr_udpate_confg_file();
+
+  cfg_mgr_unlock();
+  return TRUE;
+}
+
+bool
+cfg_mgr_update_channel_cfg(uint32_t chnl_num, channel_runtime_config_t* cfg)
+{
+  cJSON   *chnl;
+  const char* str;
+
+  cfg_mgr_write_lock();
+
+  chnl = cfg_mgr_find_channel(chnl_num);
+  if(chnl == NULL)
+  {
+    debug_log("can't find channel %d\n", chnl_num);
+    cfg_mgr_unlock();
+    return FALSE;
+  }
+
+  // step 1. update JSON database
+  str = cfg_mgr_get_str(chnl, "chnl_type");
+
+  if(strcmp(str, "digital") == 0)
+  {
+    cJSON_DeleteItemFromObject(chnl, "init_val");
+    cJSON_AddBoolToObject(chnl, "init_val", cfg->init_value.b);
+
+    cJSON_DeleteItemFromObject(chnl, "failsafe_val");
+    cJSON_AddBoolToObject(chnl, "failsafe_val", cfg->failsafe_value.b);
+  }
+  else
+  {
+    cJSON_DeleteItemFromObject(chnl, "init_val");
+    cJSON_AddNumberToObject(chnl, "init_val", cfg->init_value.f);
+
+    cJSON_DeleteItemFromObject(chnl, "failsafe_val");
+    cJSON_AddNumberToObject(chnl, "failsafe_val", cfg->failsafe_value.f);
+
+    cJSON_DeleteItemFromObject(chnl, "min_val");
+    cJSON_AddNumberToObject(chnl, "min_val", cfg->min_val);
+
+    cJSON_DeleteItemFromObject(chnl, "max_val");
+    cJSON_AddNumberToObject(chnl, "max_val", cfg->max_val);
+  }
+
+  // step 2. update channel manager
+  channel_manager_update_channel_config(chnl_num, cfg);
 
   // step 3. regenerate in memeory config and save
   cfg_mgr_udpate_confg_file();

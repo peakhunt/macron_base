@@ -4,8 +4,8 @@
 		"last_update":	"Mar/30/2018"
 	},
 	"update_info":	{
-		"revision":	17,
-		"update_time":	"Tue Apr 24 11:35:42 2018\n"
+		"revision":	19,
+		"update_time":	"Tue Apr 24 13:47:03 2018\n"
 	},
 	"cli":	{
 		"prompt":	"macron_bog> ",
@@ -47284,24 +47284,24 @@
 			"chnl_num":	4999,
 			"chnl_dir":	"output",
 			"chnl_type":	"digital",
-			"init_val":	false,
-			"failsafe_val":	false
+			"init_val":	true,
+			"failsafe_val":	true
 		}, {
 			"name":	"test channel #5000",
 			"chnl_num":	5000,
 			"chnl_dir":	"input",
 			"chnl_type":	"analog",
-			"init_val":	0,
-			"failsafe_val":	0,
-			"min_val":	0,
-			"max_val":	100000,
 			"lookup_table":	[{
 					"raw":	0,
 					"eng":	0
 				}, {
 					"raw":	20,
 					"eng":	20
-				}]
+				}],
+			"init_val":	1.5,
+			"failsafe_val":	2.5,
+			"min_val":	0.5,
+			"max_val":	10.5
 		}],
 	"alarms":	[{
 			"name":	"test alarm #1",

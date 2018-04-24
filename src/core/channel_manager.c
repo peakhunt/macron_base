@@ -250,7 +250,7 @@ channel_manager_update_output(void)
   }
 }
 
-void
+bool
 channel_manager_update_lookup_table(uint32_t chnl_num, lookup_table_t* lookup_table)
 {
   channel_t* chnl;
@@ -259,12 +259,13 @@ channel_manager_update_lookup_table(uint32_t chnl_num, lookup_table_t* lookup_ta
   if(chnl == NULL)
   {
     TRACE(CHANNELM, "%s can't find channel %d\n", __func__, chnl_num);
-    return;
+    return FALSE;
   }
 
   channel_set_lookup_table(chnl, lookup_table);
 
   channel_manager_chnl_put(chnl);
+  return TRUE;
 }
 
 void
@@ -343,4 +344,28 @@ channel_manager_get_channel_stat(uint32_t chnl_num, channel_status_t* status)
   channel_manager_chnl_put(chnl);
 
   return 0;
+}
+
+bool
+channel_manager_update_channel_config(uint32_t chnl_num, channel_runtime_config_t* cfg)
+{
+  channel_t* chnl;
+
+  chnl = channel_manager_chnl_get(chnl_num);
+  if(chnl == NULL)
+  {
+    return FALSE;
+  }
+
+  chnl->eng_value       = cfg->init_value;
+  chnl->init_value      = cfg->init_value;
+  chnl->failsafe_value  = cfg->failsafe_value;
+  chnl->min_val         = cfg->min_val;
+  chnl->max_val         = cfg->max_val;
+
+  // FIXME update raw value depending on channel type
+
+  channel_manager_chnl_put(chnl);
+
+  return TRUE;
 }

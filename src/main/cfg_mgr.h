@@ -8,6 +8,7 @@
 #include "webserver_driver.h"
 #include "core_driver.h"
 #include "alarm_manager.h"
+#include "channel_manager.h"
 
 extern void cfg_mgr_init(const char* cfg_file);
 
@@ -20,7 +21,7 @@ extern void cfg_mgr_get_channel_at(int ndx, core_driver_channel_config_t* chnl_c
 
 // for analog lookup table
 extern int cfg_mgr_get_num_lookup_table_of_channel_at(int ndx);
-extern void cfg_mgr_get_lookup_table_of_channel_at(int chnl_ndx, int lt_ndx, float* raw, float* eng);
+extern void cfg_mgr_get_lookup_table_of_channel_at(int chnl_ndx, int lt_ndx, double* raw, double* eng);
 
 // for alarm core
 extern int cfg_mgr_get_num_alarms(void);
@@ -50,5 +51,6 @@ extern void cfg_mgr_write_lock(void);
 extern void cfg_mgr_unlock(void);
 
 extern bool cfg_mgr_update_alarm_cfg(uint32_t alarm_num, alarm_runtime_config_t* cfg);
+extern bool cfg_mgr_update_channel_cfg(uint32_t chnl_num, channel_runtime_config_t* cfg);
 
 #endif /* !__CFG_MGR_DEF_H__ */
