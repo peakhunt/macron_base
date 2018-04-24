@@ -85,8 +85,8 @@ lookup_table_deinit(lookup_table_t* table)
   free(table->tree_ndx);
 }
 
-float
-lookup_table_interpolate(lookup_table_t* table, float v)
+double
+lookup_table_interpolate(lookup_table_t* table, double v)
 {
   int   ndx, adj, node;
   lookup_table_item_t *item, *first, *second;
@@ -141,14 +141,14 @@ lookup_table_interpolate(lookup_table_t* table, float v)
   first   = ndx < adj ? &table->items[ndx] : &table->items[adj];
   second  = ndx < adj ? &table->items[adj] : &table->items[ndx];
 
-  return linear_interpolate_float(
+  return linear_interpolate_double(
               first->v1, first->v2,
               second->v1, second->v2,
               v);
 }
 
-float
-lookup_table_interpolate_reverse(lookup_table_t* table, float v)
+double
+lookup_table_interpolate_reverse(lookup_table_t* table, double v)
 {
   int   ndx, adj, node;
   lookup_table_item_t *item, *first, *second;
@@ -203,7 +203,7 @@ lookup_table_interpolate_reverse(lookup_table_t* table, float v)
   first   = ndx < adj ? &table->items_reverse[ndx] : &table->items_reverse[adj];
   second  = ndx < adj ? &table->items_reverse[adj] : &table->items_reverse[ndx];
 
-  return linear_interpolate_float(
+  return linear_interpolate_double(
               first->v2, first->v1,
               second->v2, second->v1,
               v);

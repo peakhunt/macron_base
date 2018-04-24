@@ -192,7 +192,7 @@ alarm_alloc_digital(uint32_t alarm_num, uint32_t chnl_num, alarm_severity_t seve
 
 alarm_t*
 alarm_alloc_analog(uint32_t alarm_num, uint32_t chnl_num, alarm_severity_t severity,
-    bool high, float set_point, uint32_t delay)
+    bool high, double set_point, uint32_t delay)
 {
   alarm_setpoint_t p;
 

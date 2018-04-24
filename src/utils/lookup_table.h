@@ -3,8 +3,8 @@
 
 typedef struct 
 {
-  float     v1;
-  float     v2;
+  double     v1;
+  double     v2;
 } lookup_table_item_t;
 
 typedef struct
@@ -18,7 +18,7 @@ typedef struct
 
 extern void lookup_table_init(lookup_table_t* table, lookup_table_item_t* items, int size);
 extern void lookup_table_deinit(lookup_table_t* table);
-extern float lookup_table_interpolate(lookup_table_t* table, float v);
-extern float lookup_table_interpolate_reverse(lookup_table_t* table, float v);
+extern double lookup_table_interpolate(lookup_table_t* table, double v);
+extern double lookup_table_interpolate_reverse(lookup_table_t* table, double v);
 
 #endif /* !__LOOKUP_TABLE_DEF_H__ */

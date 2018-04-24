@@ -15,8 +15,8 @@ typedef struct
   //
   // only for analog channels
   //
-  float               min_val;
-  float               max_val;
+  double              min_val;
+  double              max_val;
 } core_driver_channel_config_t;
 
 typedef struct

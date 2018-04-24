@@ -40,7 +40,7 @@ typedef enum
 
 typedef union
 {
-  float       f;
+  double      f;
   bool        b;
 } alarm_setpoint_t;
 
@@ -71,7 +71,7 @@ extern alarm_t* alarm_alloc(uint32_t alarm_num, uint32_t chnl_num, alarm_severit
 extern alarm_t* alarm_alloc_digital(uint32_t alarm_num, uint32_t chnl_num, alarm_severity_t severity,
     bool set_point, uint32_t delay);
 extern alarm_t* alarm_alloc_analog(uint32_t alarm_num, uint32_t chnl_num, alarm_severity_t severity,
-    bool high, float set_point, uint32_t delay);
+    bool high, double set_point, uint32_t delay);
 
 extern void alarm_update(alarm_t* alarm, channel_eng_value_t v);
 extern void alarm_ack(alarm_t* alarm);

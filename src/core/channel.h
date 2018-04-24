@@ -22,7 +22,7 @@ typedef enum
 
 typedef union
 {
-  float   f;
+  double  f;
   bool    b;
 } channel_eng_value_t;
 
@@ -40,8 +40,8 @@ typedef struct
   channel_eng_value_t init_value;
   channel_eng_value_t failsafe_value;
 
-  float               min_val;
-  float               max_val;
+  double              min_val;
+  double              max_val;
 
   bool                sensor_fault;
 

@@ -11,6 +11,7 @@
 #include "modbus_master_driver.h"
 #include "channel_manager.h"
 #include "alarm_manager.h"
+#include "math_util.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -298,6 +299,20 @@ cli_command_alarm(cli_intf_t* intf, int argc, const char** argv)
   else if(strcmp(argv[1], "config_ana") == 0)
   {
     // alarm config_dig #num set_point delay
+    alarm_runtime_config_t  cfg;
+
+    if(argc != 5)
+    {
+      goto command_error;
+    }
+
+    alarm_num = atoi(argv[2]);
+
+    cfg.set_point.f = atod_round_off(argv[3], 2);
+
+    cfg.delay = atoi(argv[4]);
+    cfg_mgr_update_alarm_cfg(alarm_num, &cfg);
+    cli_printf(intf, "done updating alarm %d"CLI_EOL, alarm_num);
   }
   else
   {

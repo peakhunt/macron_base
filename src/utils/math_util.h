@@ -16,6 +16,16 @@ linear_interpolate_float(float x0, float y0, float x1, float y1, float x)
   return y;
 }
 
+static inline double
+linear_interpolate_double(double x0, double y0, double x1, double y1, double x)
+{
+  double a = (y1 - y0) / (x1 - x0);
+  double b = -a*x0 + y0;
+  double y = a * x + b;
+
+  return y;
+}
+
 static inline float
 relative_diff(float a, float b)
 {
@@ -35,6 +45,17 @@ almost_equal(float a, float b)
     return TRUE;
   }
   return fabs(a - b) <= EPSILON;
+}
+
+static inline double
+atod_round_off(const char* str, int points)
+{
+  int n = pow(10, points);
+  double v;
+
+  v = atof(str);
+  
+  return round(n * v) / n;
 }
 
 #endif /* MATH_UTILS_H_ */

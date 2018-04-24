@@ -4,8 +4,8 @@
 		"last_update":	"Mar/30/2018"
 	},
 	"update_info":	{
-		"revision":	3,
-		"update_time":	"Tue Apr 24 10:27:17 2018\n"
+		"revision":	17,
+		"update_time":	"Tue Apr 24 11:35:42 2018\n"
 	},
 	"cli":	{
 		"prompt":	"macron_bog> ",
@@ -47316,9 +47316,9 @@
 			"alarm_num":	2,
 			"chnl_num":	2,
 			"trigger_type":	"low",
-			"set_point":	10,
 			"severity":	"major",
-			"delay":	0
+			"set_point":	15.3,
+			"delay":	12
 		}, {
 			"name":	"test alarm #3",
 			"alarm_num":	3,
