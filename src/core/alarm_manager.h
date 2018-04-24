@@ -8,11 +8,19 @@ typedef struct
   alarm_state_t         state;
 } alarm_status_t;
 
+typedef struct
+{
+  alarm_setpoint_t    set_point;
+  uint32_t            delay;
+} alarm_runtime_config_t;
+
 extern void alarm_manager_init(void);
 extern void alarm_manager_add_alarm(alarm_t* alarm);
 extern void alarm_manager_update(void);
 
 extern void alarm_manager_ack_alarm(uint32_t alarm_num);
 extern int alarm_manager_get_alarm_status(uint32_t alarm_num, alarm_status_t* status);
+
+extern bool alarm_manager_update_alarm_config(uint32_t alarm_num, alarm_runtime_config_t* cfg);
 
 #endif /* !__ALARM_MANAGER_DEF_H__ */

@@ -1,11 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+#include <time.h>
 #include "cfg_mgr.h"
 #include "config_reader.h"
 #include "debug_log.h"
 #include "cJSON.h"
 #include "bit_util.h"
+#include "atomic_file_update.h"
 #include <pthread.h>
 
 
@@ -19,14 +22,26 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static cJSON*             _jroot = NULL;
 static pthread_rwlock_t   _jroot_lock;
-static const char*        _json_str;
-static int                _json_str_len;
+static char*              _json_str = NULL;
+static int                _json_str_len = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // utilities
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void
+cfg_mgr_regenerate_in_memory_string(void)
+{
+  if(_json_str)
+  {
+    free(_json_str);
+  }
+
+  _json_str     = cJSON_Print(_jroot);
+  _json_str_len = strlen(_json_str);
+}
+
 void
 cfg_mgr_read_lock(void)
 {
@@ -246,6 +261,80 @@ cfg_mgr_get_modbus_reg_codec(cJSON* node, modbus_reg_codec_t* codec)
   }
 }
 
+static inline cJSON*
+cfg_mgr_find_alarm(uint32_t alarm_num)
+{
+  cJSON       *alarms,
+              *alarm;
+  int         num_alarms;
+
+  alarms      = cfg_mgr_get_node(_jroot, "alarms");
+  num_alarms  =  cJSON_GetArraySize(alarms);
+
+  for(int i = 0; i < num_alarms; i++)
+  {
+    alarm = cJSON_GetArrayItem(alarms, i);
+    if((uint32_t)cfg_mgr_get_int(alarm, "alarm_num") == alarm_num)
+    {
+      return alarm;
+    }
+  }
+  return NULL;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// file update
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static int
+cfg_mgr_atomic_file_update_cb(int fd)
+{
+  int   nwritten = 0,
+        ret;
+
+  while(nwritten < _json_str_len)
+  {
+    ret = write(fd, &_json_str[nwritten], _json_str_len - nwritten);
+    if(ret <= 0)
+    {
+      return -1;
+    }
+    nwritten += ret;
+  }
+  return 0;
+}
+
+static void
+cfg_mgr_inc_revision(void)
+{
+  char str_buf[256];
+  time_t    now = time(NULL);
+  cJSON*    update_info;
+  cJSON*    revision;
+  int       r;
+
+  ctime_r(&now, str_buf);
+
+  update_info = cJSON_GetObjectItem(_jroot, "update_info");
+
+  cJSON_DeleteItemFromObject(update_info, "update_time");
+  cJSON_AddStringToObject(update_info, "update_time", str_buf);
+
+  revision = cJSON_GetObjectItem(update_info, "revision");
+  r = revision->valueint;
+  r++;
+  cJSON_SetNumberValue(revision, r);
+}
+
+static void
+cfg_mgr_udpate_confg_file(void)
+{
+  cfg_mgr_inc_revision();
+  cfg_mgr_regenerate_in_memory_string();
+  atomic_file_update(APP_CONFIG_DEFAULT_FILE, cfg_mgr_atomic_file_update_cb);
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // app config initializer
@@ -267,8 +356,7 @@ cfg_mgr_init(const char* cfg_file)
     exit(-2);
   }
 
-  _json_str = cJSON_PrintUnformatted(_jroot);
-  _json_str_len = strlen(_json_str);
+  cfg_mgr_regenerate_in_memory_string();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -782,4 +870,47 @@ cfg_mgr_get_webserver_config(webserver_config_t* cfg)
   cfg->doc_root     = cfg_mgr_get_str(web, "doc_root");
 
   cfg_mgr_unlock();
+}
+
+bool
+cfg_mgr_update_alarm_cfg(uint32_t alarm_num, alarm_runtime_config_t* cfg)
+{
+  cJSON         *alarm;
+  const char    *str;
+
+  cfg_mgr_write_lock();
+
+  alarm = cfg_mgr_find_alarm(alarm_num);
+  if(alarm == NULL)
+  {
+    debug_log("can't find alarm %d\n", alarm_num);
+    cfg_mgr_unlock();
+    return FALSE;
+  }
+
+  // step 1. update JSON database
+  str = cfg_mgr_get_str(alarm, "trigger_type");
+
+  cJSON_DeleteItemFromObject(alarm, "set_point");
+
+  if(strcmp(str, "digital") == 0)
+  {
+    cJSON_AddStringToObject(alarm, "set_point", cfg->set_point.b == TRUE ? "on" : "off");
+  }
+  else
+  {
+    cJSON_AddNumberToObject(alarm, "set_point", cfg->set_point.f);
+  }
+
+  cJSON_DeleteItemFromObject(alarm, "delay");
+  cJSON_AddNumberToObject(alarm, "delay", cfg->delay);
+
+  // step 2. update alarm manager
+  alarm_manager_update_alarm_config(alarm_num, cfg);
+
+  // step 3. regenerate in memeory config and save
+  cfg_mgr_udpate_confg_file();
+
+  cfg_mgr_unlock();
+  return TRUE;
 }

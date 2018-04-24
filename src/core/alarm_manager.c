@@ -117,7 +117,6 @@ alarm_manager_ack_alarm(uint32_t alarm_num)
   alarm = alarm_manager_alarm_get(alarm_num);
   if(alarm == NULL)
   {
-    alarm_manager_alarm_put(alarm);
     return;
   }
 
@@ -134,7 +133,6 @@ alarm_manager_get_alarm_status(uint32_t alarm_num, alarm_status_t* status)
   alarm = alarm_manager_alarm_get(alarm_num);
   if(alarm == NULL)
   {
-    alarm_manager_alarm_put(alarm);
     return -1;
   }
 
@@ -143,4 +141,23 @@ alarm_manager_get_alarm_status(uint32_t alarm_num, alarm_status_t* status)
   alarm_manager_alarm_put(alarm);
 
   return 0;
+}
+
+bool
+alarm_manager_update_alarm_config(uint32_t alarm_num, alarm_runtime_config_t* cfg)
+{
+  alarm_t*    alarm;
+
+  alarm = alarm_manager_alarm_get(alarm_num);
+  if(alarm == NULL)
+  {
+    return FALSE;
+  }
+
+  alarm->delay      = cfg->delay;
+  alarm->set_point  = cfg->set_point;
+
+  alarm_manager_alarm_put(alarm);
+
+  return TRUE;
 }

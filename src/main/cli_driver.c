@@ -227,6 +227,8 @@ command_error:
 static void
 cli_command_alarm(cli_intf_t* intf, int argc, const char** argv)
 {
+  uint32_t          alarm_num;
+
   if(argc < 2)
   {
     goto command_error;
@@ -235,7 +237,6 @@ cli_command_alarm(cli_intf_t* intf, int argc, const char** argv)
   if(strcmp(argv[1], "status") == 0)
   {
     alarm_status_t    status;
-    uint32_t          alarm_num;
 
     if(argc != 3)
     {
@@ -255,8 +256,6 @@ cli_command_alarm(cli_intf_t* intf, int argc, const char** argv)
   }
   else if(strcmp(argv[1], "ack") == 0)
   {
-    uint32_t          alarm_num;
-
     if(argc != 3)
     {
       goto command_error;
@@ -265,6 +264,40 @@ cli_command_alarm(cli_intf_t* intf, int argc, const char** argv)
     alarm_num = atoi(argv[2]);
     cli_printf(intf, "acking alarm #%d"CLI_EOL, alarm_num);
     alarm_manager_ack_alarm(alarm_num);
+  }
+  else if(strcmp(argv[1], "config_dig") == 0)
+  {
+    // alarm config_dig #num [on|off] delay
+
+    alarm_runtime_config_t  cfg;
+
+    if(argc != 5)
+    {
+      goto command_error;
+    }
+
+    alarm_num = atoi(argv[2]);
+
+    if(strcmp(argv[3], "on") == 0)
+    {
+      cfg.set_point.b = TRUE;
+    }
+    else if(strcmp(argv[3], "off") == 0)
+    {
+      cfg.set_point.b = FALSE;
+    }
+    else
+    {
+      goto command_error;
+    }
+
+    cfg.delay = atoi(argv[4]);
+    cfg_mgr_update_alarm_cfg(alarm_num, &cfg);
+    cli_printf(intf, "done updating alarm %d"CLI_EOL, alarm_num);
+  }
+  else if(strcmp(argv[1], "config_ana") == 0)
+  {
+    // alarm config_dig #num set_point delay
   }
   else
   {
@@ -277,6 +310,8 @@ command_error:
   cli_printf(intf, "invalid argument!!!"CLI_EOL CLI_EOL);
   cli_printf(intf, "%s status alarm-num"CLI_EOL, argv[0]);
   cli_printf(intf, "%s ack alarm-num"CLI_EOL, argv[0]);
+  cli_printf(intf, "%s config_dig alarm-num [on|off] delay"CLI_EOL, argv[0]);
+  cli_printf(intf, "%s config_ana alarm-num set_point delay"CLI_EOL, argv[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

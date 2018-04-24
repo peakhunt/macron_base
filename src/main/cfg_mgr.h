@@ -7,6 +7,7 @@
 #include "modbus_master_driver.h"
 #include "webserver_driver.h"
 #include "core_driver.h"
+#include "alarm_manager.h"
 
 extern void cfg_mgr_init(const char* cfg_file);
 
@@ -48,5 +49,6 @@ extern void cfg_mgr_read_lock(void);
 extern void cfg_mgr_write_lock(void);
 extern void cfg_mgr_unlock(void);
 
+extern bool cfg_mgr_update_alarm_cfg(uint32_t alarm_num, alarm_runtime_config_t* cfg);
 
 #endif /* !__CFG_MGR_DEF_H__ */
