@@ -4,8 +4,8 @@
 		"last_update":	"Mar/30/2018"
 	},
 	"update_info":	{
-		"revision":	22,
-		"update_time":	"Tue Apr 24 14:47:28 2018\n"
+		"revision":	24,
+		"update_time":	"Tue Apr 24 16:53:16 2018\n"
 	},
 	"cli":	{
 		"prompt":	"macron_bog> ",
@@ -47263,17 +47263,17 @@
 			"chnl_num":	4996,
 			"chnl_dir":	"input",
 			"chnl_type":	"analog",
-			"init_val":	0,
-			"failsafe_val":	0,
-			"min_val":	0,
-			"max_val":	100000,
 			"lookup_table":	[{
 					"raw":	0,
 					"eng":	0
 				}, {
 					"raw":	20,
 					"eng":	20
-				}]
+				}],
+			"init_val":	1.5,
+			"failsafe_val":	2.5,
+			"min_val":	3.5,
+			"max_val":	4.5
 		}, {
 			"name":	"test channel #4997",
 			"chnl_num":	4997,
@@ -47286,8 +47286,8 @@
 			"chnl_num":	4998,
 			"chnl_dir":	"input",
 			"chnl_type":	"digital",
-			"init_val":	false,
-			"failsafe_val":	false
+			"init_val":	true,
+			"failsafe_val":	true
 		}, {
 			"name":	"test channel #4999",
 			"chnl_num":	4999,

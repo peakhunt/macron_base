@@ -13,3 +13,15 @@ mg_util_to_c_str(struct mg_str* ms)
   
   return str;
 }
+
+char*
+mg_util_to_c_str_alloc(struct mg_str* ms)
+{
+  char* str;
+  
+  str = malloc(ms->len + 1);
+  strncpy(str, ms->p, ms->len);
+  str[ms->len] = '\0';
+  
+  return str;
+}

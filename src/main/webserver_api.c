@@ -6,6 +6,8 @@
 #include "trace.h"
 #include "webserver_api.h"
 #include "mongoose_util.h"
+#include "cJSON.h"
+#include "json_util.h"
 
 struct __api_cmd_handler_t;
 typedef struct __api_cmd_handler_t api_cmd_handler_t;
@@ -27,7 +29,7 @@ struct __api_cmd_handler_t
 
    GET /api/v1/channel/status/<channel_num>
        {
-          "eng_value": xxx or true or false
+          "eng_value": xxx or true or false,
           "raw_val": xxx
        }
 
@@ -38,7 +40,66 @@ struct __api_cmd_handler_t
                     "inactive_pending" or
                     "active"
       }
+
+  POST /api/v1/channel/update/config/<chnl_num>
+    request
+    {
+      "init_val": true/false or number,
+      "failsafe_val": true/false or number,
+      // only for analog channel
+      "min_val": number,
+      "max_val": number
+    }
+
+  POST /api/v1/alarm/update/config/<chnl_num>
+    request
+    {
+      "set_point": true/false or number,
+      "delay": number
+    }
+
+  POST /api/v1/channel/update/lookup_table/<chnl_num>
+    request
+    {
+      "lookup_table": [
+        {   "raw": number, "eng": number },
+        {   "raw": number, "eng": number },
+        {   "raw": number, "eng": number }
+        ...
+      ]
+    }
 */
+///////////////////////////////////////////////////////////////////////////////
+//
+// common utilities
+//
+///////////////////////////////////////////////////////////////////////////////
+static cJSON*
+webapi_parse_json_body(struct mg_str* str, bool* internal_error)
+{
+  cJSON*              json;
+  char*               body;
+
+  *internal_error = FALSE;
+
+  body = mg_util_to_c_str_alloc(str);
+  if(body == NULL)
+  {
+    *internal_error = TRUE;
+    return NULL;
+  }
+
+  json = cJSON_Parse(body);
+  free(body);
+
+  if(json == NULL)
+  {
+    return NULL;
+  }
+
+  return json;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // common error handler
@@ -53,10 +114,26 @@ webapi_not_found(struct mg_connection* nc, struct http_message* hm)
 }
 
 static inline void
+webapi_bad_request(struct mg_connection* nc, struct http_message* hm)
+{
+  mg_printf(nc, "%s",
+      "HTTP/1.1 400 Bad Request\r\n"
+      "Content-Length: 0\r\n\r\n");
+}
+
+static inline void
 webapi_server_error(struct mg_connection* nc, struct http_message* hm)
 {
   mg_printf(nc, "%s",
       "HTTP/1.1 500 Server Error\r\n"
+      "Content-Length: 0\r\n\r\n");
+}
+
+static inline void
+webapi_server_error_other(struct mg_connection* nc, struct http_message* hm)
+{
+  mg_printf(nc, "%s",
+      "HTTP/1.1 503 Server Error\r\n"
       "Content-Length: 0\r\n\r\n");
 }
 
@@ -145,6 +222,96 @@ webapi_get_channel_status(struct mg_connection* nc, struct http_message* hm, str
       "Content-Type: text/json\r\n"
       "Content-Length: %d\r\n\r\n%s",
       (int)strlen(data), data);
+}
+
+static void
+webapi_update_channel_config(struct mg_connection* nc, struct http_message* hm, struct mg_str* subcmd)
+{
+  uint32_t                    chnl_num;
+  cJSON*                      req;
+  channel_runtime_config_t    cfg;
+  bool                        internal_error;
+  const static json_util_field_t           _param_type1[] = 
+  {
+    { "init_val",     cJSON_False | cJSON_True      },
+    { "failsafe_val", cJSON_False | cJSON_True      },
+  };
+  const static json_util_field_t           _param_type2[] = 
+  {
+    { "init_val",     cJSON_Number                  },
+    { "failsafe_val", cJSON_Number                  },
+    { "min_val",      cJSON_Number                  },
+    { "max_val",      cJSON_Number                  },
+  };
+  bool success;
+
+  chnl_num = (uint32_t)mg_util_get_int(subcmd);
+
+  TRACE(WEBS_DRIVER, "channel config update request for %d\n", chnl_num);
+
+  /* request
+     {
+     "init_val": true/false or number,
+     "failsafe_val": true/false or number,
+     // only for analog channel
+     "min_val": number,
+     "max_val": number
+     }
+   */
+  req = webapi_parse_json_body(&hm->body, &internal_error);
+  if(req == NULL)
+  {
+    if(internal_error)
+    {
+      webapi_server_error(nc, hm);
+    }
+    else
+    {
+      webapi_bad_request(nc, hm);
+    }
+    return;
+  }
+
+  if(json_util_simple_validate_message(req, _param_type1, NARRAY(_param_type1)))
+  {   
+    cfg.init_value.b      = cJSON_GetObjectItem(req, "init_val")->valueint;
+    cfg.failsafe_value.b  = cJSON_GetObjectItem(req, "failsafe_val")->valueint;
+  }
+  else if(json_util_simple_validate_message(req, _param_type2, NARRAY(_param_type2)))
+  {   
+    cfg.init_value.f      = cJSON_GetObjectItem(req, "init_val")->valuedouble;
+    cfg.failsafe_value.f  = cJSON_GetObjectItem(req, "failsafe_val")->valuedouble;
+    cfg.min_val           = cJSON_GetObjectItem(req, "min_val")->valuedouble;
+    cfg.max_val           = cJSON_GetObjectItem(req, "max_val")->valuedouble;
+  }
+  else
+  {
+    webapi_bad_request(nc, hm);
+    goto out;
+  }
+
+  success = cfg_mgr_update_channel_cfg(chnl_num, &cfg);
+
+  if(success)
+  {
+    mg_printf(nc,
+        "HTTP/1.1 200 OK\r\n"
+        "Content-Length: 0\r\n\r\n");
+  }
+  else
+  {
+    webapi_server_error_other(nc, hm);
+  }
+
+out:
+  (void)cfg;
+  cJSON_Delete(req);
+}
+
+static void
+webapi_update_channel_lookup_table(struct mg_connection* nc, struct http_message* hm, struct mg_str* subcmd)
+{
+  // FIXME
 }
 
 static void
@@ -254,6 +421,18 @@ static api_cmd_handler_t    _top_level_get_handlers[] =
   },
 };
 
+static api_cmd_handler_t  _top_level_post_handlers[] =
+{
+  {
+    .prefix   = MG_MK_STR("channel/update/config/"),
+    .handler  = webapi_update_channel_config,
+  },
+  {
+    .prefix   = MG_MK_STR("channel/update/lookup_table/"),
+    .handler  = webapi_update_channel_lookup_table,
+  },
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // API handling entry
@@ -285,7 +464,7 @@ webserver_api_handler(struct mg_connection* nc, struct http_message* hm)
   }
   else if(mg_util_is_equal(&hm->method, &_op_post))
   {
-    webapi_not_found(nc, hm);
+    execute_api_handler(_top_level_post_handlers, NARRAY(_top_level_post_handlers), nc, hm, &cmd);
   }
   else
   {

@@ -6,6 +6,7 @@
 #include "mongoose.h"
 
 extern const char* mg_util_to_c_str(struct mg_str* ms);
+extern char* mg_util_to_c_str_alloc(struct mg_str* ms);
 
 static inline bool
 mg_util_has_prefix(const struct mg_str* uri, const struct mg_str* prefix)

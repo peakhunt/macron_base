@@ -35,6 +35,7 @@ src/utils/trace.c                                   \
 src/utils/lookup_table.c                            \
 src/utils/publish_observe.c                         \
 src/utils/atomic_file_update.c                      \
+src/utils/json_util.c                               \
 src/utils/debug_log.c
 
 LIB_MODBUS_SOURCES =                                \
@@ -56,7 +57,8 @@ src/modbus/modbus_crc.c
 
 MONGOOSE_SOURCES =                                  \
 src/mongoose/mongoose.c                             \
-src/mongoose/mongoose_util.c
+src/mongoose/mongoose_util.c                        \
+src/mongoose/frozen.c
 
 LIB_CORE_SOURCES =                                  \
 src/core/channel.c                                  \
