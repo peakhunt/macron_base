@@ -51,7 +51,7 @@ struct __api_cmd_handler_t
       "max_val": number
     }
 
-  POST /api/v1/alarm/update/config/<chnl_num>
+  POST /api/v1/alarm/update/config/<alarm_num>
     request
     {
       "set_point": true/false or number,
@@ -69,36 +69,6 @@ struct __api_cmd_handler_t
       ]
     }
 */
-///////////////////////////////////////////////////////////////////////////////
-//
-// common utilities
-//
-///////////////////////////////////////////////////////////////////////////////
-static cJSON*
-webapi_parse_json_body(struct mg_str* str, bool* internal_error)
-{
-  cJSON*              json;
-  char*               body;
-
-  *internal_error = FALSE;
-
-  body = mg_util_to_c_str_alloc(str);
-  if(body == NULL)
-  {
-    *internal_error = TRUE;
-    return NULL;
-  }
-
-  json = cJSON_Parse(body);
-  free(body);
-
-  if(json == NULL)
-  {
-    return NULL;
-  }
-
-  return json;
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -137,6 +107,35 @@ webapi_server_error_other(struct mg_connection* nc, struct http_message* hm)
       "Content-Length: 0\r\n\r\n");
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//
+// common utilities
+//
+///////////////////////////////////////////////////////////////////////////////
+static cJSON*
+webapi_parse_json_body(struct mg_str* str, struct mg_connection* nc, struct http_message* hm)
+{
+  cJSON*              json;
+  char*               body;
+
+  body = mg_util_to_c_str_alloc(str);
+  if(body == NULL)
+  {
+    webapi_server_error(nc, hm);
+    return NULL;
+  }
+
+  json = cJSON_Parse(body);
+  free(body);
+
+  if(json == NULL)
+  {
+    webapi_bad_request(nc, hm);
+    return NULL;
+  }
+
+  return json;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -230,7 +229,8 @@ webapi_update_channel_config(struct mg_connection* nc, struct http_message* hm, 
   uint32_t                    chnl_num;
   cJSON*                      req;
   channel_runtime_config_t    cfg;
-  bool                        internal_error;
+  bool success;
+
   const static json_util_field_t           _param_type1[] = 
   {
     { "init_val",     cJSON_False | cJSON_True      },
@@ -243,32 +243,14 @@ webapi_update_channel_config(struct mg_connection* nc, struct http_message* hm, 
     { "min_val",      cJSON_Number                  },
     { "max_val",      cJSON_Number                  },
   };
-  bool success;
 
   chnl_num = (uint32_t)mg_util_get_int(subcmd);
 
   TRACE(WEBS_DRIVER, "channel config update request for %d\n", chnl_num);
 
-  /* request
-     {
-     "init_val": true/false or number,
-     "failsafe_val": true/false or number,
-     // only for analog channel
-     "min_val": number,
-     "max_val": number
-     }
-   */
-  req = webapi_parse_json_body(&hm->body, &internal_error);
+  req = webapi_parse_json_body(&hm->body, nc, hm);
   if(req == NULL)
   {
-    if(internal_error)
-    {
-      webapi_server_error(nc, hm);
-    }
-    else
-    {
-      webapi_bad_request(nc, hm);
-    }
     return;
   }
 
@@ -291,7 +273,6 @@ webapi_update_channel_config(struct mg_connection* nc, struct http_message* hm, 
   }
 
   success = cfg_mgr_update_channel_cfg(chnl_num, &cfg);
-
   if(success)
   {
     mg_printf(nc,
@@ -304,7 +285,67 @@ webapi_update_channel_config(struct mg_connection* nc, struct http_message* hm, 
   }
 
 out:
-  (void)cfg;
+  cJSON_Delete(req);
+}
+
+static void
+webapi_update_alarm_config(struct mg_connection* nc, struct http_message* hm, struct mg_str* subcmd)
+{
+  uint32_t                    alarm_num;
+  cJSON*                      req;
+  alarm_runtime_config_t      cfg;
+  bool                        success;
+
+  const static json_util_field_t           _param_type1[] = 
+  {
+    { "set_point",    cJSON_False | cJSON_True      },
+    { "delay",        cJSON_Number                  },
+  };
+  const static json_util_field_t           _param_type2[] = 
+  {
+    { "set_point",    cJSON_Number                  },
+    { "delay",        cJSON_Number                  },
+  };
+
+  alarm_num = (uint32_t)mg_util_get_int(subcmd);
+
+  TRACE(WEBS_DRIVER, "alarm config update request for %d\n", alarm_num);
+
+  req = webapi_parse_json_body(&hm->body, nc, hm);
+  if(req == NULL)
+  {
+    return;
+  }
+
+  if(json_util_simple_validate_message(req, _param_type1, NARRAY(_param_type1)))
+  {   
+    cfg.set_point.b       = cJSON_GetObjectItem(req, "set_point")->valueint;
+    cfg.delay             = cJSON_GetObjectItem(req, "delay")->valuedouble;
+  }
+  else if(json_util_simple_validate_message(req, _param_type2, NARRAY(_param_type2)))
+  {   
+    cfg.set_point.f       = cJSON_GetObjectItem(req, "set_point")->valuedouble;
+    cfg.delay             = cJSON_GetObjectItem(req, "delay")->valuedouble;
+  }
+  else
+  {
+    webapi_bad_request(nc, hm);
+    goto out;
+  }
+
+  success = cfg_mgr_update_alarm_cfg(alarm_num, &cfg);
+  if(success)
+  {
+    mg_printf(nc,
+        "HTTP/1.1 200 OK\r\n"
+        "Content-Length: 0\r\n\r\n");
+  }
+  else
+  {
+    webapi_server_error_other(nc, hm);
+  }
+
+out:
   cJSON_Delete(req);
 }
 
@@ -430,6 +471,10 @@ static api_cmd_handler_t  _top_level_post_handlers[] =
   {
     .prefix   = MG_MK_STR("channel/update/lookup_table/"),
     .handler  = webapi_update_channel_lookup_table,
+  },
+  {
+    .prefix   = MG_MK_STR("alarm/update/config/"),
+    .handler  = webapi_update_alarm_config,
   },
 };
 
