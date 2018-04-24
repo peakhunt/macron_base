@@ -48,7 +48,6 @@ typedef enum
 {
   modbus_reg_mapping_to_channel,
   modbus_reg_mapping_to_alarm,
-  modbus_reg_mapping_to_cfg_mgr,
 } modbus_reg_mapping_to_t;
 
 typedef struct

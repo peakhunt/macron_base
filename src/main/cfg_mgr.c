@@ -188,10 +188,6 @@ cfg_mgr_get_modbus_reg_mapping_to(cJSON* node, modbus_reg_mapping_to_t* mapping_
   {
     *mapping_to = modbus_reg_mapping_to_alarm;
   }
-  else
-  {
-    *mapping_to = modbus_reg_mapping_to_cfg_mgr;
-  }
 }
 
 static inline void
