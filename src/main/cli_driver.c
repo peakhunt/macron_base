@@ -275,6 +275,49 @@ cli_command_channel(cli_intf_t* intf, int argc, const char** argv)
     cfg_mgr_update_channel_cfg(chnl_num, &cfg);
     cli_printf(intf, "done updating channel %d"CLI_EOL, chnl_num);
   }
+  else if(strcmp(argv[1], "config_ltable") == 0)
+  {
+    // channel config_ltable #num v1 v2 v1 v2 v1 v2 ...
+    lookup_table_item_t*  entries;
+    lookup_table_t*       lut;
+    int                   num_entries;
+
+    if(argc < 3)
+    {
+      goto command_error;
+    }
+
+    chnl_num = atoi(argv[2]);
+
+    if(argc == 3)
+    {
+      // delete lookup table
+      cfg_mgr_update_lookup_table(chnl_num, NULL);
+      cli_printf(intf, "done cleaning lookup table for  channel %d"CLI_EOL, chnl_num);
+      return;
+    }
+
+    if((argc -3) < 4 || ((argc -3) % 2) != 0)
+    {
+      // at least 2 entries and even number of arguments
+      goto command_error;
+    }
+
+    num_entries = (argc - 3) / 2;
+
+    lut = malloc(sizeof(lookup_table_t));
+    entries = malloc(sizeof(lookup_table_item_t) * num_entries);
+    for(int i = 0; i < num_entries; i++ )
+    {
+      entries[i].v1 = atod_round_off(argv[3 + i * 2], 2);
+      entries[i].v2 = atod_round_off(argv[3 + i * 2 + 1], 2);
+    }
+
+    lookup_table_init(lut, entries, num_entries);
+    cfg_mgr_update_lookup_table(chnl_num, lut);
+
+    free(entries);
+  }
   else
   {
     goto command_error;
@@ -287,6 +330,7 @@ command_error:
   cli_printf(intf, "%s status chnl-num"CLI_EOL, argv[0]);
   cli_printf(intf, "%s config_dig chnl-num init(on|off) fail(on|off)"CLI_EOL, argv[0]);
   cli_printf(intf, "%s config_ana chnl-num init fail min max"CLI_EOL, argv[0]);
+  cli_printf(intf, "%s config_ltable chnl-num v1 v2 v1 v2 ..."CLI_EOL, argv[0]);
 }
 
 static void

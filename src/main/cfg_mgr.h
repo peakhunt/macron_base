@@ -52,5 +52,6 @@ extern void cfg_mgr_unlock(void);
 
 extern bool cfg_mgr_update_alarm_cfg(uint32_t alarm_num, alarm_runtime_config_t* cfg);
 extern bool cfg_mgr_update_channel_cfg(uint32_t chnl_num, channel_runtime_config_t* cfg);
+extern bool cfg_mgr_update_lookup_table(uint32_t chnl_num, lookup_table_t* lookup_table);
 
 #endif /* !__CFG_MGR_DEF_H__ */

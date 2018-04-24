@@ -4,8 +4,8 @@
 		"last_update":	"Mar/30/2018"
 	},
 	"update_info":	{
-		"revision":	19,
-		"update_time":	"Tue Apr 24 13:47:03 2018\n"
+		"revision":	22,
+		"update_time":	"Tue Apr 24 14:47:28 2018\n"
 	},
 	"cli":	{
 		"prompt":	"macron_bog> ",
@@ -1086,8 +1086,17 @@
 					"raw":	0,
 					"eng":	0
 				}, {
+					"raw":	10,
+					"eng":	5
+				}, {
+					"raw":	15,
+					"eng":	7.5
+				}, {
 					"raw":	20,
-					"eng":	20
+					"eng":	10
+				}, {
+					"raw":	25,
+					"eng":	12.5
 				}]
 		}, {
 			"name":	"test channel #5",

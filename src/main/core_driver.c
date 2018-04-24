@@ -64,6 +64,11 @@ __load_lookup_table(int chnl_ndx)
   lookup_table_item_t*    items;
 
   num_entries = cfg_mgr_get_num_lookup_table_of_channel_at(chnl_ndx);
+  if(num_entries == 0)
+  {
+    return NULL;
+  }
+
   items = malloc(sizeof(lookup_table_item_t) * num_entries);
   lut   = malloc(sizeof(lookup_table_t));
 

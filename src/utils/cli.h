@@ -5,7 +5,7 @@
 #include "serial.h"
 #include "list.h"
 
-#define CLI_COMMAND_MAX_ARGS          16
+#define CLI_COMMAND_MAX_ARGS          32
 #define CLI_RX_BUFFER_LENGTH          252
 #define CLI_MAX_COMMAND_LEN           252
 

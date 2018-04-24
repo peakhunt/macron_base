@@ -987,3 +987,52 @@ cfg_mgr_update_channel_cfg(uint32_t chnl_num, channel_runtime_config_t* cfg)
   cfg_mgr_unlock();
   return TRUE;
 }
+
+bool
+cfg_mgr_update_lookup_table(uint32_t chnl_num, lookup_table_t* ltable)
+{
+  cJSON   *chnl,
+          *lookup_table;
+
+  cfg_mgr_write_lock();
+  chnl = cfg_mgr_find_channel(chnl_num);
+  if(chnl == NULL)
+  {
+    debug_log("can't find channel %d\n", chnl_num);
+    cfg_mgr_unlock();
+    return FALSE;
+  }
+
+  lookup_table = cJSON_GetObjectItem(chnl, "lookup_table");
+  if(lookup_table != NULL)
+  {
+    cJSON_DeleteItemFromObject(chnl, "lookup_table");
+  }
+  lookup_table = cJSON_AddArrayToObject(chnl, "lookup_table");
+
+  if(ltable != NULL)
+  {
+    for(int i = 0; i < ltable->size; i++)
+    {
+      lookup_table_item_t* item;
+      cJSON*    entry;
+
+      item = &ltable->items[i];
+
+      entry = cJSON_CreateObject();
+      cJSON_AddNumberToObject(entry, "raw", item->v1);
+      cJSON_AddNumberToObject(entry, "eng", item->v2);
+
+      cJSON_AddItemToArray(lookup_table, entry);
+    }
+  }
+
+  // step 2. update channel manager
+  channel_manager_update_lookup_table(chnl_num, ltable);
+
+  // step 3. regenerate in memeory config and save
+  cfg_mgr_udpate_confg_file();
+
+  cfg_mgr_unlock();
+  return TRUE;
+}
