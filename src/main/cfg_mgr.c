@@ -9,6 +9,8 @@
 #include "cJSON.h"
 #include "bit_util.h"
 #include "atomic_file_update.h"
+#include "indexer.h"
+#include "time_util.h"
 #include <pthread.h>
 
 
@@ -24,6 +26,13 @@ static cJSON*             _jroot = NULL;
 static pthread_rwlock_t   _jroot_lock;
 static char*              _json_str = NULL;
 static int                _json_str_len = 0;
+
+//
+// the following indexers are assumed to be static and non changing for the life time of application.
+// thus those indexers don't require any locking.
+//
+static indexer_t        _channel_indexer,
+                        _alarm_indexer;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -341,6 +350,100 @@ cfg_mgr_find_channel(uint32_t chnl_num)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
+// indexer related
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static void
+cfg_mgr_build_indexers(void)
+{
+  cJSON       *channels,
+              *channel,
+              *alarms,
+              *alarm;
+  int         num_channels,
+              num_alarms,
+              ndx;
+  uint32_t    chnl_num,
+              alarm_num;
+  unsigned long                   start_time;
+
+  debug_log("building channel/alarm indexers\n");
+  start_time = time_util_get_sys_clock_in_ms();
+
+  channels      = cfg_mgr_get_node(_jroot, "channels");
+  alarms        = cfg_mgr_get_node(_jroot, "alarms");
+  num_channels  = cJSON_GetArraySize(channels);
+  num_alarms    = cJSON_GetArraySize(alarms);
+
+  indexer_init(&_channel_indexer, num_channels);
+  indexer_init(&_alarm_indexer, num_alarms);
+
+  ndx = 0;
+  channel = channels->child;
+
+  while(channel != NULL)
+  {
+    chnl_num = (uint32_t)cfg_mgr_get_int(channel, "chnl_num");
+    indexer_set(&_channel_indexer, ndx, chnl_num);
+    channel = channel->next;
+    ndx++;
+  }
+
+  ndx = 0;
+  alarm = alarms->child;
+  while(alarm != NULL)
+  {
+    alarm_num = (uint32_t)cfg_mgr_get_int(alarm, "alarm_num");
+    indexer_set(&_alarm_indexer, ndx, alarm_num);
+    alarm = alarm->next;
+    ndx++;
+  }
+
+  indexer_build(&_channel_indexer);
+  indexer_build(&_alarm_indexer);
+
+  debug_log("done building channel/alarm indexers. took %d ms\n",
+      time_util_get_sys_clock_elapsed_in_ms(start_time));
+}
+
+int
+cfg_mgr_get_channel_index_equal_or_bigger(uint32_t chnl_num)
+{
+  return indexer_find_equal_or_bigger(&_channel_indexer, chnl_num);
+}
+
+int
+cfg_mgr_get_channel_next(int ndx)
+{
+  return indexer_get_next(&_channel_indexer, ndx);
+}
+
+uint32_t
+cfg_mgr_get_channel_from_index(int ndx)
+{
+  return indexer_get(&_channel_indexer, ndx);
+}
+
+int
+cfg_mgr_get_alarm_index_equal_or_bigger(uint32_t alarm_num)
+{
+  return indexer_find_equal_or_bigger(&_alarm_indexer, alarm_num);
+}
+
+int
+cfg_mgr_get_alarm_next(int ndx)
+{
+  return indexer_get_next(&_alarm_indexer, ndx);
+}
+
+uint32_t
+cfg_mgr_get_alarm_from_index(int ndx)
+{
+  return indexer_get(&_alarm_indexer, ndx);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
 // file update
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -414,6 +517,7 @@ cfg_mgr_init(const char* cfg_file)
   }
 
   cfg_mgr_regenerate_in_memory_string();
+  cfg_mgr_build_indexers();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////

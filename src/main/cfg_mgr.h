@@ -54,4 +54,13 @@ extern bool cfg_mgr_update_alarm_cfg(uint32_t alarm_num, alarm_runtime_config_t*
 extern bool cfg_mgr_update_channel_cfg(uint32_t chnl_num, channel_runtime_config_t* cfg);
 extern bool cfg_mgr_update_lookup_table(uint32_t chnl_num, lookup_table_t* lookup_table);
 
+
+// channel/alarm indexer
+extern int cfg_mgr_get_channel_index_equal_or_bigger(uint32_t chnl_num);
+extern int cfg_mgr_get_channel_next(int ndx);
+extern uint32_t cfg_mgr_get_channel_from_index(int ndx);
+extern int cfg_mgr_get_alarm_index_equal_or_bigger(uint32_t alarm_num);
+extern int cfg_mgr_get_alarm_next(int ndx);
+extern uint32_t cfg_mgr_get_alarm_from_index(int ndx);
+
 #endif /* !__CFG_MGR_DEF_H__ */
