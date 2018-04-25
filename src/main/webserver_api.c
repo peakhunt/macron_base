@@ -29,12 +29,31 @@ struct __api_cmd_handler_t
 
    GET /api/v1/channel/status/<channel_num>
        {
+          "chnl_num": number,
           "eng_value": xxx or true or false,
           "raw_val": xxx
        }
 
+   GET /api/v1/channel/status_ranged/start-chnl/end-chnl
+      {
+        "channels": [
+           {
+              "chnl_num": number,
+              "eng_value": xxx or true or false,
+              "raw_val": xxx
+           },
+           {
+              "chnl_num": number,
+              "eng_value": xxx or true or false,
+              "raw_val": xxx
+           },
+           ...
+        ]
+      }
+
    GET /api/v1/alarm/status/<alarm_num>
       {
+        "alarm_num": xxx,
         "state":    "inactive" or
                     "pending" or
                     "inactive_pending" or
@@ -223,13 +242,15 @@ webapi_get_channel_status(struct mg_connection* nc, struct http_message* hm, str
 
   if(status.chnl_type == channel_type_digital)
   {
-    sprintf(data, "{ \"eng_value\": %.2f, \"raw_val\": %d }",
+    sprintf(data, "{ \"chnl_num\": %d, \"eng_value\": %.2f, \"raw_val\": %d }",
+        chnl_num,
         status.eng_val.f,
         status.raw_val);
   }
   else
   {
-    sprintf(data, "{ \"eng_value\": %s, \"raw_val\": %d }",
+    sprintf(data, "{ \"chnl_num\": %d, \"eng_value\": %s, \"raw_val\": %d }",
+        chnl_num,
         status.eng_val.b ? "true" : "false",
         status.raw_val);
   }
@@ -456,7 +477,9 @@ webapi_get_alarm_status(struct mg_connection* nc, struct http_message* hm, struc
     return;
   }
 
-  sprintf(data, "{ \"state\": \"%s\" }", alarm_get_string_state(status.state));
+  sprintf(data, "{ \"alarm_num\": %d, \"state\": \"%s\" }",
+      alarm_num,
+      alarm_get_string_state(status.state));
   webapi_server_json_response_ok(nc, data, strlen(data));
 }
 
