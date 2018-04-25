@@ -16,7 +16,7 @@ time_util_get_sys_clock_in_ms(void)
 }
 
 static inline unsigned long
-time_util_get_sys_clock_elapsed_in_ms(long start)
+time_util_get_sys_clock_elapsed_in_ms(unsigned long start)
 {
   unsigned long now = time_util_get_sys_clock_in_ms();
 
