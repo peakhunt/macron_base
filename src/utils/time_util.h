@@ -3,11 +3,11 @@
 
 #include <time.h>
 
-static inline long
+static inline unsigned long
 time_util_get_sys_clock_in_ms(void)
 {
   struct timespec now;
-  long            ret;
+  unsigned long   ret;
 
   clock_gettime(CLOCK_MONOTONIC, &now);
 
@@ -15,10 +15,10 @@ time_util_get_sys_clock_in_ms(void)
   return ret;
 }
 
-static inline long
+static inline unsigned long
 time_util_get_sys_clock_elapsed_in_ms(long start)
 {
-  long now = time_util_get_sys_clock_in_ms();
+  unsigned long now = time_util_get_sys_clock_in_ms();
 
   return now - start;
 }

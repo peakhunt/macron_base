@@ -562,7 +562,7 @@ bool
 webserver_api_handler(struct mg_connection* nc, struct http_message* hm)
 {
   struct mg_str     cmd;
-  long              start;
+  unsigned long     start;
 
   start = time_util_get_sys_clock_in_ms();
 

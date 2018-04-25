@@ -36,7 +36,7 @@ typedef struct
   uint32_t                      inter_request_delay;
   uint32_t                      timeout;
 
-  long                          req_start_time;
+  unsigned long                 req_start_time;
 
   evloop_timer_t                wait_timer;
   evloop_timer_t                transaction_timer;
@@ -148,10 +148,10 @@ mark_req_start_time(modbus_master_driver_t* master)
   master->req_start_time = time_util_get_sys_clock_in_ms();
 }
 
-static inline long
+static inline unsigned long
 get_time_took_for_transaction_in_ms(modbus_master_driver_t* master)
 {
-  long now;
+  unsigned long now;
 
   now = time_util_get_sys_clock_in_ms();
 
@@ -302,7 +302,7 @@ modbus_driver_master_next(modbus_master_driver_t* master)
 {
   double wait_time;
   double target_delay;
-  long   time_took_for_prev_transacion = get_time_took_for_transaction_in_ms(master);
+  unsigned long   time_took_for_prev_transacion = get_time_took_for_transaction_in_ms(master);
 
   master->current_request++;
 

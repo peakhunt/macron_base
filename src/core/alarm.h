@@ -59,7 +59,7 @@ typedef struct
   alarm_setpoint_t      set_point;
 
   uint32_t              delay;
-  long                  start_time;
+  unsigned long         start_time;
 
   time_t                occur_time;
 
