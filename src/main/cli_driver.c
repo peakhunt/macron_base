@@ -368,6 +368,13 @@ command_error:
 }
 
 static void
+__print_out_alarm_status(cli_intf_t* intf, uint32_t alarm_num, alarm_status_t* status)
+{
+  cli_printf(intf, "alarm status for alarm #%d"CLI_EOL, alarm_num);
+  cli_printf(intf, "alarm state: %s"CLI_EOL, alarm_get_string_state(status->state));
+}
+
+static void
 cli_command_alarm(cli_intf_t* intf, int argc, const char** argv)
 {
   uint32_t          alarm_num;
@@ -394,8 +401,35 @@ cli_command_alarm(cli_intf_t* intf, int argc, const char** argv)
       return;
     }
 
-    cli_printf(intf, "alarm status for alarm #%d"CLI_EOL, alarm_num);
-    cli_printf(intf, "alarm state: %s"CLI_EOL, alarm_get_string_state(status.state));
+    __print_out_alarm_status(intf, alarm_num, &status);
+  }
+  else if(strcmp(argv[1], "status_ranged") == 0)
+  {
+    alarm_status_t    status;
+    uint32_t          end_alarm;
+    int               ndx;
+
+    if(argc != 4)
+    {
+      goto command_error;
+    }
+
+    alarm_num = atoi(argv[2]);
+    end_alarm = atoi(argv[3]);
+
+    ndx = cfg_mgr_get_alarm_index_equal_or_bigger(alarm_num);
+    while(ndx != -1)
+    {
+      alarm_num = cfg_mgr_get_alarm_from_index(ndx);
+      if(alarm_num > end_alarm)
+      {
+        break;
+      }
+
+      alarm_manager_get_alarm_status(alarm_num, &status);
+      __print_out_alarm_status(intf, alarm_num, &status);
+      ndx = cfg_mgr_get_alarm_next(ndx);
+    }
   }
   else if(strcmp(argv[1], "ack") == 0)
   {
@@ -466,6 +500,7 @@ cli_command_alarm(cli_intf_t* intf, int argc, const char** argv)
 command_error:
   cli_printf(intf, "invalid argument!!!"CLI_EOL CLI_EOL);
   cli_printf(intf, "%s status alarm-num"CLI_EOL, argv[0]);
+  cli_printf(intf, "%s status_ranged start end"CLI_EOL, argv[0]);
   cli_printf(intf, "%s ack alarm-num"CLI_EOL, argv[0]);
   cli_printf(intf, "%s config_dig alarm-num [on|off] delay"CLI_EOL, argv[0]);
   cli_printf(intf, "%s config_ana alarm-num set_point delay"CLI_EOL, argv[0]);
