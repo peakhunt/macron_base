@@ -7,6 +7,7 @@
 #include "alarm_manager.h"
 #include "app_init_completion.h"
 #include "trace.h"
+#include "time_util.h"
 
 static void app_core_thread_init(evloop_thread_t* thrd);
 static void app_core_thread_fini(evloop_thread_t* thrd);
@@ -93,6 +94,9 @@ __load_channels(void)
   int                             num_channels;
   core_driver_channel_config_t    chnl_cfg;
   channel_t*                      chnl;
+  unsigned long                   start_time;
+
+  start_time = time_util_get_sys_clock_in_ms();
 
   TRACE(CORE_DRIVER, "loading channels\n");
   num_channels = cfg_mgr_get_num_channels();
@@ -115,7 +119,9 @@ __load_channels(void)
     }
     channel_manager_add_channel(chnl);
   }
-  TRACE(CORE_DRIVER, "done loading %d channels\n", num_channels);
+  TRACE(CORE_DRIVER, "done loading %d channels, took %d ms\n",
+      num_channels,
+      time_util_get_sys_clock_elapsed_in_ms(start_time));
 }
 
 static void
@@ -124,7 +130,9 @@ __load_alarms(void)
   int                         num_alarms;
   core_driver_alarm_config_t  alm_cfg;
   alarm_t*                    alarm;
+  unsigned long                   start_time;
 
+  start_time = time_util_get_sys_clock_in_ms();
   TRACE(CORE_DRIVER, "loading alarms\n");
   num_alarms = cfg_mgr_get_num_alarms();
 
@@ -139,7 +147,9 @@ __load_alarms(void)
 
     alarm_manager_add_alarm(alarm);
   }
-  TRACE(CORE_DRIVER, "done loading %d alarms\n", num_alarms);
+  TRACE(CORE_DRIVER, "done loading %d alarms, took %d ms\n",
+      num_alarms,
+      time_util_get_sys_clock_elapsed_in_ms(start_time));
 }
 
 void
