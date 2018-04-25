@@ -36,6 +36,7 @@ src/utils/lookup_table.c                            \
 src/utils/publish_observe.c                         \
 src/utils/atomic_file_update.c                      \
 src/utils/json_util.c                               \
+src/utils/indexer.c                                 \
 src/utils/debug_log.c
 
 LIB_MODBUS_SOURCES =                                \
@@ -80,7 +81,8 @@ TEST_C_SOURCE =                                     \
 test/cmd_option_test.c                              \
 test/mb_reg_test.c                                  \
 test/lookup_table_test.c                            \
-test/alarm_test.c
+test/alarm_test.c                                   \
+test/indexer_test.c
 
 TEST_MAIN_C_SOURCE =                                \
 test/test_main.c
