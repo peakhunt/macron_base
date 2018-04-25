@@ -241,7 +241,7 @@ cfg_mgr_get_modbus_reg_codec(cJSON* node, modbus_reg_codec_t* codec)
     codec->fault        = (uint16_t)fault;
     codec->ok           = (uint16_t)ok;
 
-#if 1
+#if 0
     debug_log("d_start: %d, d_end: %d, s_start: %d, s_end: %d, fault: %d, ok: %d\n",
         d_start,
         d_end,
