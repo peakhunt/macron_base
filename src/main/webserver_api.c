@@ -34,7 +34,7 @@ struct __api_cmd_handler_t
           "raw_val": xxx
        }
 
-   GET /api/v1/channel/status_ranged/start-chnl/end-chnl
+   GET /api/v1/channel/status_ranged?start=xxx&end=xxx
       {
         "channels": [
            {
@@ -256,6 +256,74 @@ webapi_get_channel_status(struct mg_connection* nc, struct http_message* hm, str
   }
 
   webapi_server_json_response_ok(nc, data, strlen(data));
+}
+
+static void
+webapi_get_channel_status_ranged(struct mg_connection* nc, struct http_message* hm, struct mg_str* subcmd)
+{
+  char*   qstr;
+  uint32_t    start,end,
+              chnl_num;
+  int         ndx;
+  channel_status_t    status;
+  bool comma_needed = false;
+
+  qstr = mg_util_to_c_str_alloc(&hm->query_string);
+  TRACE(WEBS_DRIVER, "channel status ranged request %s\n", qstr);
+
+  if(sscanf(qstr, "start=%d&end=%d", &start, &end) != 2 ||
+     end < start)
+  {
+    webapi_bad_request(nc,hm);
+    goto out;
+  }
+
+  TRACE(WEBS_DRIVER, "channel status ranged request %d, %d\n", start, end);
+  mg_printf(nc, "%s",
+      "HTTP/1.1 200 OK\r\n"
+      "Content-Type: text/json\r\n"
+      "Transfer-Encoding: chunked\r\n\r\n");
+  mg_printf_http_chunk(nc, "{\"channels\": [");
+
+  ndx = cfg_mgr_get_channel_index_equal_or_bigger(start);
+  while(ndx != -1)
+  {
+    chnl_num = cfg_mgr_get_channel_from_index(ndx);
+    if(chnl_num > end)
+    {
+      break;
+    }
+
+    if(comma_needed)
+    {
+      mg_printf_http_chunk(nc, ",");
+    }
+
+    channel_manager_get_channel_stat(chnl_num, &status);
+
+    if(status.chnl_type == channel_type_digital)
+    {
+      mg_printf_http_chunk(nc, "{\"chnl_num\": %d, \"eng_value\": %.2f, \"raw_val\": %d }",
+          chnl_num,
+          status.eng_val.f,
+          status.raw_val);
+    }
+    else
+    {
+      mg_printf_http_chunk(nc, "{ \"chnl_num\": %d, \"eng_value\": %s, \"raw_val\": %d }",
+          chnl_num,
+          status.eng_val.b ? "true" : "false",
+          status.raw_val);
+    }
+    comma_needed = true;
+    ndx = cfg_mgr_get_channel_next(ndx);
+  }
+
+  mg_printf_http_chunk(nc, "]}");
+  mg_send_http_chunk(nc, "", 0);
+
+out:
+  free(qstr);
 }
 
 static void
@@ -521,6 +589,11 @@ static api_cmd_handler_t    _channel_cmd_handlers[] =
   {
     .prefix   = MG_MK_STR("status/"),
     .handler  = webapi_get_channel_status,
+  },
+  {
+    .prefix   = MG_MK_STR("status_ranged"),
+    .exact    = true,
+    .handler  = webapi_get_channel_status_ranged,
   },
 };
 
