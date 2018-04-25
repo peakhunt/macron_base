@@ -175,6 +175,23 @@ command_error:
 }
 
 static void
+__print_out_channel_status(cli_intf_t* intf, uint32_t chnl_num, channel_status_t* status)
+{
+  cli_printf(intf, "channel status for channel #%d"CLI_EOL, chnl_num);
+  cli_printf(intf, "raw value:    %d"CLI_EOL, status->raw_val);
+
+  if(status->chnl_type == channel_type_digital)
+  {
+    cli_printf(intf, "eng value:    %s"CLI_EOL, status->eng_val.b ? "on" : "off");
+  }
+  else
+  {
+    cli_printf(intf, "eng value:    %.2f"CLI_EOL, status->eng_val.f);
+  }
+  cli_printf(intf, "sensor fault: %s"CLI_EOL, status->sensor_fault ? "fault" : "normal");
+}
+
+static void
 cli_command_channel(cli_intf_t* intf, int argc, const char** argv)
 {
   uint32_t            chnl_num;
@@ -200,19 +217,35 @@ cli_command_channel(cli_intf_t* intf, int argc, const char** argv)
       cli_printf(intf, "can't find channel number %d"CLI_EOL, chnl_num);
       return;
     }
+    __print_out_channel_status(intf, chnl_num, &status);
+  }
+  else if(strcmp(argv[1], "status_ranged") == 0)
+  {
+    uint32_t    end_chnl;
+    int         ndx;
+    channel_status_t    status;
 
-    cli_printf(intf, "channel status for channel #%d"CLI_EOL, chnl_num);
-    cli_printf(intf, "raw value:    %d"CLI_EOL, status.raw_val);
+    if(argc != 4)
+    {
+      goto command_error;
+    }
 
-    if(status.chnl_type == channel_type_digital)
+    chnl_num = atoi(argv[2]);
+    end_chnl = atoi(argv[3]);
+
+    ndx = cfg_mgr_get_channel_index_equal_or_bigger(chnl_num);
+    while(ndx != -1)
     {
-      cli_printf(intf, "eng value:    %s"CLI_EOL, status.eng_val.b ? "on" : "off");
+      chnl_num = cfg_mgr_get_channel_from_index(ndx);
+      if(chnl_num > end_chnl)
+      {
+        break;
+      }
+      channel_manager_get_channel_stat(chnl_num, &status);
+      __print_out_channel_status(intf, chnl_num, &status);
+
+      ndx = cfg_mgr_get_channel_next(ndx);
     }
-    else
-    {
-      cli_printf(intf, "eng value:    %.2f"CLI_EOL, status.eng_val.f);
-    }
-    cli_printf(intf, "sensor fault: %s"CLI_EOL, status.sensor_fault ? "fault" : "normal");
   }
   else if(strcmp(argv[1], "config_dig") == 0)
   {
@@ -328,6 +361,7 @@ cli_command_channel(cli_intf_t* intf, int argc, const char** argv)
 command_error:
   cli_printf(intf, "invalid argument!!!"CLI_EOL CLI_EOL);
   cli_printf(intf, "%s status chnl-num"CLI_EOL, argv[0]);
+  cli_printf(intf, "%s status_ranged start end"CLI_EOL, argv[0]);
   cli_printf(intf, "%s config_dig chnl-num init(on|off) fail(on|off)"CLI_EOL, argv[0]);
   cli_printf(intf, "%s config_ana chnl-num init fail min max"CLI_EOL, argv[0]);
   cli_printf(intf, "%s config_ltable chnl-num v1 v2 v1 v2 ..."CLI_EOL, argv[0]);
