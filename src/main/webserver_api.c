@@ -107,6 +107,24 @@ webapi_server_error_other(struct mg_connection* nc, struct http_message* hm)
       "Content-Length: 0\r\n\r\n");
 }
 
+static inline void
+webapi_server_json_response_ok(struct mg_connection* nc, const char* json, int len)
+{
+  mg_printf(nc,
+      "HTTP/1.1 200 OK\r\n"
+      "Content-Type: text/json\r\n"
+      "Content-Length: %d\r\n\r\n%s",
+      len, json);
+}
+
+static inline void
+webapi_server_response_ok(struct mg_connection* nc)
+{
+  mg_printf(nc,
+      "HTTP/1.1 200 OK\r\n"
+      "Content-Length: 0\r\n\r\n");
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // common utilities
@@ -216,11 +234,7 @@ webapi_get_channel_status(struct mg_connection* nc, struct http_message* hm, str
         status.raw_val);
   }
 
-  mg_printf(nc,
-      "HTTP/1.1 200 OK\r\n"
-      "Content-Type: text/json\r\n"
-      "Content-Length: %d\r\n\r\n%s",
-      (int)strlen(data), data);
+  webapi_server_json_response_ok(nc, data, strlen(data));
 }
 
 static void
@@ -229,7 +243,6 @@ webapi_update_channel_config(struct mg_connection* nc, struct http_message* hm, 
   uint32_t                    chnl_num;
   cJSON*                      req;
   channel_runtime_config_t    cfg;
-  bool success;
 
   const static json_util_field_t           _param_type1[] = 
   {
@@ -272,12 +285,9 @@ webapi_update_channel_config(struct mg_connection* nc, struct http_message* hm, 
     goto out;
   }
 
-  success = cfg_mgr_update_channel_cfg(chnl_num, &cfg);
-  if(success)
+  if(cfg_mgr_update_channel_cfg(chnl_num, &cfg) == TRUE)
   {
-    mg_printf(nc,
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Length: 0\r\n\r\n");
+    webapi_server_response_ok(nc);
   }
   else
   {
@@ -294,7 +304,6 @@ webapi_update_alarm_config(struct mg_connection* nc, struct http_message* hm, st
   uint32_t                    alarm_num;
   cJSON*                      req;
   alarm_runtime_config_t      cfg;
-  bool                        success;
 
   const static json_util_field_t           _param_type1[] = 
   {
@@ -333,12 +342,9 @@ webapi_update_alarm_config(struct mg_connection* nc, struct http_message* hm, st
     goto out;
   }
 
-  success = cfg_mgr_update_alarm_cfg(alarm_num, &cfg);
-  if(success)
+  if(cfg_mgr_update_alarm_cfg(alarm_num, &cfg) == TRUE)
   {
-    mg_printf(nc,
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Length: 0\r\n\r\n");
+    webapi_server_response_ok(nc);
   }
   else
   {
@@ -352,7 +358,85 @@ out:
 static void
 webapi_update_channel_lookup_table(struct mg_connection* nc, struct http_message* hm, struct mg_str* subcmd)
 {
-  // FIXME
+  uint32_t                    chnl_num;
+  cJSON                       *req,
+                              *ltable,
+                              *entry;
+  int                         num_entries;
+  lookup_table_item_t*        items;
+  lookup_table_t*             lookup_table;
+
+  const static json_util_field_t      _param_req1[] = 
+  {
+    { "lookup_table",     cJSON_Array                  },
+  };
+
+  const static json_util_field_t    _param_req2[] =
+  {
+    { "raw",     cJSON_Number                  },
+    { "eng",     cJSON_Number                  },
+  };
+
+  chnl_num = (uint32_t)mg_util_get_int(subcmd);
+
+  TRACE(WEBS_DRIVER, "lookup table update request for %d\n", chnl_num);
+
+  req = webapi_parse_json_body(&hm->body, nc, hm);
+  if(req == NULL)
+  {
+    return;
+  }
+
+  if(json_util_simple_validate_message(req, _param_req1, NARRAY(_param_req1)) == FALSE)
+  {
+    webapi_bad_request(nc, hm);
+    goto out;
+  }
+
+  ltable = cJSON_GetObjectItem(req, "lookup_table");
+  num_entries = cJSON_GetArraySize(ltable);
+
+  if(num_entries != 0)
+  {
+    for(int i = 0; i < num_entries; i++)
+    {
+      entry = cJSON_GetArrayItem(ltable, i);
+      if(json_util_simple_validate_message(entry, _param_req2, NARRAY(_param_req2)) == FALSE)
+      {
+        webapi_bad_request(nc, hm);
+        goto out;
+      }
+    }
+
+    items = malloc(sizeof(lookup_table_item_t) * num_entries);
+
+    for(int i = 0; i < num_entries; i++)
+    {
+      entry = cJSON_GetArrayItem(ltable, i);
+      items[i].v1 = cJSON_GetObjectItem(entry, "raw")->valuedouble;
+      items[i].v2 = cJSON_GetObjectItem(entry, "eng")->valuedouble;
+    }
+
+    lookup_table = malloc(sizeof(lookup_table_t));
+    lookup_table_init(lookup_table, items, num_entries);
+    free(items);
+  }
+  else
+  {
+    lookup_table = NULL;
+  }
+
+  if(cfg_mgr_update_lookup_table(chnl_num, lookup_table) == TRUE)
+  {
+    webapi_server_response_ok(nc);
+  }
+  else
+  {
+    webapi_server_error_other(nc, hm);
+  }
+
+out:
+  cJSON_Delete(req);
 }
 
 static void
@@ -373,12 +457,7 @@ webapi_get_alarm_status(struct mg_connection* nc, struct http_message* hm, struc
   }
 
   sprintf(data, "{ \"state\": \"%s\" }", alarm_get_string_state(status.state));
-
-  mg_printf(nc,
-      "HTTP/1.1 200 OK\r\n"
-      "Content-Type: text/json\r\n"
-      "Content-Length: %d\r\n\r\n%s",
-      (int)strlen(data), data);
+  webapi_server_json_response_ok(nc, data, strlen(data));
 }
 
 static void
@@ -397,11 +476,7 @@ webapi_get_config_base(struct mg_connection* nc, struct http_message* hm, struct
   }
   else
   {
-    mg_printf(nc,
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: text/json\r\n"
-        "Content-Length: %d\r\n\r\n%s",
-        len, json);
+    webapi_server_json_response_ok(nc, json, len);
   }
   cfg_mgr_unlock();
 }
