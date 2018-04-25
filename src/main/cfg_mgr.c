@@ -264,6 +264,7 @@ cfg_mgr_get_modbus_reg_codec(cJSON* node, modbus_reg_codec_t* codec)
 static inline cJSON*
 cfg_mgr_find_alarm(uint32_t alarm_num)
 {
+#if 0 // inefficient
   cJSON       *alarms,
               *alarm;
   int         num_alarms;
@@ -280,11 +281,29 @@ cfg_mgr_find_alarm(uint32_t alarm_num)
     }
   }
   return NULL;
+#else // performance optimized
+  cJSON       *alarms,
+              *current_child;
+
+  alarms        = cfg_mgr_get_node(_jroot, "alarms");
+  current_child = alarms->child;
+
+  while((current_child != NULL))
+  {
+    if((uint32_t)cfg_mgr_get_int(current_child, "alarm_num") == alarm_num)
+    {
+      return current_child;
+    }
+    current_child = current_child->next;
+  }
+  return NULL;
+#endif
 }
 
 static inline cJSON*
 cfg_mgr_find_channel(uint32_t chnl_num)
 {
+#if 0 // inefficient
   cJSON       *channels,
               *chnl;
   int         num_channels;
@@ -301,6 +320,23 @@ cfg_mgr_find_channel(uint32_t chnl_num)
     }
   }
   return NULL;
+#else // performance optimized
+  cJSON       *channels,
+              *current_child;
+
+  channels      = cfg_mgr_get_node(_jroot, "channels");
+  current_child = channels->child;
+
+  while((current_child != NULL))
+  {
+    if((uint32_t)cfg_mgr_get_int(current_child, "chnl_num") == chnl_num)
+    {
+      return current_child;
+    }
+    current_child = current_child->next;
+  }
+  return NULL;
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
