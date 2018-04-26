@@ -1,7 +1,14 @@
 # macron_base
 
-## current status
-Getting to milestone-1 trying to achieve the followings
+## current status : getting to milestone-2
+### Milestone-2
+Goals
+1. HMI Development
+2. HMI integration with Control Server
+3. Control Server Base Idea & Functionality Validation/Improvement
+4. Control app framework development
+
+### Milestone-1
 
 1. Generic channel bsaed control/monitoring server.
    * Channels should be loaded from channel configuration database and, should be up and running.
