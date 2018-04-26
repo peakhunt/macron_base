@@ -118,8 +118,16 @@ channel_manager_add_channel(channel_t* chnl)
 void
 channel_manager_init_channels(void)
 {
-  // FIXME
-  // initialize channels so that they all have default init value
+  channel_t*    chnl;
+
+  list_for_each_entry(chnl, &_channels, le)
+  {
+    // initialize all channel values to init value
+    chnl->eng_value = chnl->init_value;
+
+    // update raw value depending on channel direction
+    channel_update_raw_value(chnl);
+  }
 }
 
 uint32_t
@@ -153,7 +161,9 @@ channel_manager_set_raw_value(uint32_t chnl_num, uint32_t v)
     return;
   }
 
-  chnl->raw_value_queued = v;
+  chnl->raw_value_queued    = v;
+  chnl->raw_value_avail     = TRUE;
+
   channel_manager_chnl_put(chnl);
 }
 
@@ -217,10 +227,13 @@ channel_manager_update_input(void)
     pthread_mutex_lock(&_chnl_mgr_lock);
 
     TRACE(CHANNELM, "updating input for channel %d\n", chnl->chnl_num);
+    if(chnl->raw_value_avail == TRUE)
+    {
+      chnl->raw_value = chnl->raw_value_queued;
 
-    chnl->raw_value = chnl->raw_value_queued;
-
-    channel_update_eng_value(chnl);
+      channel_update_eng_value(chnl);
+      chnl->raw_value_avail = FALSE;
+    }
 
     eng_v = chnl->eng_value;
 
@@ -363,7 +376,7 @@ channel_manager_update_channel_config(uint32_t chnl_num, channel_runtime_config_
   chnl->min_val         = cfg->min_val;
   chnl->max_val         = cfg->max_val;
 
-  // FIXME update raw value depending on channel type
+  channel_update_raw_value(chnl);
 
   channel_manager_chnl_put(chnl);
 
