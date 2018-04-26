@@ -1,3 +1,2 @@
 1) IO driver: sensor fault handling 
 2) channel core: init/fail safety and sensor fault
-3) Web : ranged query on channel/alarm status
