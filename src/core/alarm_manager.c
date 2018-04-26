@@ -109,7 +109,7 @@ alarm_manager_update(void)
 {
 }
 
-void
+bool
 alarm_manager_ack_alarm(uint32_t alarm_num)
 {
   alarm_t*    alarm;
@@ -117,12 +117,13 @@ alarm_manager_ack_alarm(uint32_t alarm_num)
   alarm = alarm_manager_alarm_get(alarm_num);
   if(alarm == NULL)
   {
-    return;
+    return FALSE;
   }
 
   alarm_ack(alarm);
 
   alarm_manager_alarm_put(alarm);
+  return TRUE;
 }
 
 int

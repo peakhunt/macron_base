@@ -112,6 +112,22 @@ struct __api_cmd_handler_t
         ...
       ]
     }
+
+   POST /api/v1/alarm/ack
+    request
+    {
+      "alarm_num": xxx,
+    }
+
+    response
+    {
+      "alarm_num": xxx,
+      "state":    "inactive" or
+                  "pending" or
+                  "inactive_pending" or
+                  "active",
+      "occur_time": xxx
+    }
 */
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -469,6 +485,57 @@ out:
 }
 
 static void
+webapi_ack_alarm(struct mg_connection* nc, struct http_message* hm, struct mg_str* subcmd)
+{
+  cJSON*            req;
+  uint32_t          alarm_num;
+  const static json_util_field_t           _param_type1[] = 
+  {
+    { "alarm_num",    cJSON_Number                  },
+  };
+
+  req = webapi_parse_json_body(&hm->body, nc, hm);
+  if(req == NULL)
+  {
+    return;
+  }
+
+
+  if(json_util_simple_validate_message(req, _param_type1, NARRAY(_param_type1)))
+  {
+    alarm_num = (uint32_t)cJSON_GetObjectItem(req, "alarm_num")->valueint;
+
+    TRACE(WEBS_DRIVER, "alarm ack request for %d\n", alarm_num);
+
+    if(alarm_manager_ack_alarm(alarm_num) == TRUE)
+    {
+      alarm_status_t    status;
+      char              data[128];
+
+      alarm_manager_get_alarm_status(alarm_num, &status);
+      sprintf(data, "{ \"alarm_num\": %d, \"state\": \"%s\", \"occur_time\": %ld }",
+          alarm_num,
+          alarm_get_string_state(status.state),
+          status.occur_time);
+      webapi_server_json_response_ok(nc, data, strlen(data));
+    }
+    else
+    {
+      webapi_bad_request(nc, hm);
+      goto out;
+    }
+  }
+  else
+  {
+    webapi_bad_request(nc, hm);
+    goto out;
+  }
+
+out:
+  cJSON_Delete(req);
+}
+
+static void
 webapi_update_channel_lookup_table(struct mg_connection* nc, struct http_message* hm, struct mg_str* subcmd)
 {
   uint32_t                    chnl_num;
@@ -735,6 +802,11 @@ static api_cmd_handler_t  _top_level_post_handlers[] =
     .prefix   = MG_MK_STR("alarm/update/config/"),
     .handler  = webapi_update_alarm_config,
   },
+  {
+    .prefix   = MG_MK_STR("alarm/ack"),
+    .exact    = true,
+    .handler  = webapi_ack_alarm,
+  }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
