@@ -42,6 +42,13 @@ typedef struct
   evloop_timer_t                transaction_timer;
 
   modbus_master_driver_request_config_t*   request_schedule;
+
+  uint32_t      n_request;
+  uint32_t      n_response;
+  uint32_t      n_rsp_timeout;
+  uint32_t      min_transaction_time;
+  uint32_t      max_transaction_time;
+  uint32_t      avg_time;
 } modbus_master_driver_t;
 
 static void mb_master_driver_thread_init(evloop_thread_t* thrd);
@@ -254,6 +261,8 @@ modbus_master_driver_request(modbus_master_driver_t* master)
   uint16_t          reg_addr;
   uint16_t          num_regs;
 
+  master->n_request++;
+
   req = &master->request_schedule[master->current_request];
 
   slave_addr  = (uint8_t)req->slave_id;
@@ -303,6 +312,24 @@ modbus_driver_master_next(modbus_master_driver_t* master)
   double wait_time;
   double target_delay;
   unsigned long   time_took_for_prev_transacion = get_time_took_for_transaction_in_ms(master);
+
+  //
+  // not entire accurate but good enough
+  //
+  if(master->min_transaction_time == 0 ||
+     master->min_transaction_time > time_took_for_prev_transacion)
+  {
+    master->min_transaction_time = time_took_for_prev_transacion;
+  }
+
+  if(master->max_transaction_time == 0 ||
+     master->max_transaction_time < time_took_for_prev_transacion)
+  {
+    master->max_transaction_time = time_took_for_prev_transacion;
+  }
+
+  // not entire accurate but close enough
+  master->avg_time = (master->avg_time + time_took_for_prev_transacion)/2;
 
   master->current_request++;
 
@@ -358,6 +385,8 @@ modbus_master_transaction_timeout(evloop_timer_t* te, void* unused)
 {
   modbus_master_driver_t* master = container_of(te, modbus_master_driver_t, transaction_timer);
   modbus_master_driver_request_config_t*   req;
+
+  master->n_rsp_timeout++;
 
   req = &master->request_schedule[master->current_request];
 
@@ -424,6 +453,8 @@ __input_regs_cb(ModbusMasterCTX* ctx, uint8_t slave, uint16_t addr, uint16_t nre
 {
   modbus_master_driver_t* master = (modbus_master_driver_t*)ctx->priv;
 
+  master->n_response++;
+
   evloop_timer_stop(&master->transaction_timer);
 
   __handle_holding_input_read_response(master, modbus_reg_input, slave, addr, nreg, regs);
@@ -435,6 +466,8 @@ static void
 __holding_regs_cb(ModbusMasterCTX* ctx, uint8_t slave, uint16_t addr, uint16_t nreg, uint8_t* regs, MBRegisterMode mode)
 {
   modbus_master_driver_t* master = (modbus_master_driver_t*)ctx->priv;
+
+  master->n_response++;
 
   evloop_timer_stop(&master->transaction_timer);
 
@@ -451,6 +484,8 @@ __coil_cb(ModbusMasterCTX* ctx, uint8_t slave, uint16_t addr, uint16_t nreg, uin
 {
   modbus_master_driver_t* master = (modbus_master_driver_t*)ctx->priv;
 
+  master->n_response++;
+
   evloop_timer_stop(&master->transaction_timer);
 
   if(mode == MB_REG_READ)
@@ -465,6 +500,8 @@ static void
 __discrete_cb(ModbusMasterCTX* ctx, uint8_t slave, uint16_t addr, uint16_t nreg, uint8_t* regs)
 {
   modbus_master_driver_t* master = (modbus_master_driver_t*)ctx->priv;
+
+  master->n_response++;
 
   evloop_timer_stop(&master->transaction_timer);
 
@@ -486,7 +523,6 @@ __modbus_master_event_cb(ModbusMasterCTX* ctx, modbus_master_event_t event)
     TRACE(MBM_DRIVER, "xxxxxx connected callback xxxxxx\n");
     master->current_request = 0;
     modbus_master_driver_request(master);
-
     break;
 
   case modbus_master_event_disconnected:
@@ -578,6 +614,13 @@ alloc_init_modbus_master(modbus_master_driver_config_t* cfg)
   evloop_timer_init(&master->transaction_timer, modbus_master_transaction_timeout, NULL);
 
   list_add_tail(&master->le, &_modbus_masters);
+
+  master->n_request         = 0;
+  master->n_response        = 0;
+  master->n_rsp_timeout     = 0;
+
+  master->min_transaction_time  = 0;
+  master->max_transaction_time  = 0;
 
   return master;
 
@@ -728,6 +771,7 @@ modbus_master_driver_get_stat(void)
 {
   cJSON*                    ret;
   cJSON*                    jmaster_list;
+  cJSON*                    master_stat;
   modbus_master_driver_t*   master;
 
   evloop_thread_lock(&_mb_master_driver_thread);
@@ -741,15 +785,24 @@ modbus_master_driver_get_stat(void)
       ModbusTCPMaster*    tcp_master;
 
       tcp_master = container_of(master->ctx, ModbusTCPMaster, ctx);
-      cJSON_AddItemToArray(jmaster_list, modbus_tcp_master_get_stat(tcp_master));
+      master_stat = modbus_tcp_master_get_stat(tcp_master);
     }
     else
     {
       ModbusRTUMaster*    rtu_master;
 
       rtu_master = container_of(master->ctx, ModbusRTUMaster, ctx);
-      cJSON_AddItemToArray(jmaster_list, modbus_rtu_master_get_stat(rtu_master));
+      master_stat = modbus_rtu_master_get_stat(rtu_master);
     }
+
+    cJSON_AddNumberToObject(master_stat, "n_request", master->n_request);
+    cJSON_AddNumberToObject(master_stat, "n_response", master->n_response);
+    cJSON_AddNumberToObject(master_stat, "n_rsp_timeout", master->n_rsp_timeout);
+    cJSON_AddNumberToObject(master_stat, "min_transaction_time", master->min_transaction_time);
+    cJSON_AddNumberToObject(master_stat, "max_transaction_time", master->max_transaction_time);
+    cJSON_AddNumberToObject(master_stat, "avg_time", master->avg_time);
+    
+    cJSON_AddItemToArray(jmaster_list, master_stat);
   }
 
   cJSON_AddItemToObject(ret, "master_list", jmaster_list);

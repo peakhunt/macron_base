@@ -32,7 +32,6 @@ mb_master_fill_io_status_req(ModbusMasterCTX* ctx,
 void
 mb_master_ctx_init(ModbusMasterCTX* ctx)
 {
-  // FIXME
 }
 
 void

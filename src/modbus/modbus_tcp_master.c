@@ -22,7 +22,8 @@ modbus_tcp_master_start_reconnect(ModbusTCPMaster* master)
 
   tcp_auto_connector_init(&master->tcp_connector, &master->server_addr,
       MODBUS_TCP_MASTER_CONNECT_TIMEOUT,
-      MODBUS_TCP_MASTER_PROBATION_TIMEOUT);
+      MODBUS_TCP_MASTER_PROBATION_TIMEOUT, FALSE);
+
   tcp_auto_connector_start(&master->tcp_connector);
 }
 
@@ -80,6 +81,7 @@ modbus_tcp_master_stream_callback(stream_t* stream, stream_event_t evt)
   case stream_event_eof:
   case stream_event_err:
     TRACE(MB_TCP_MASTER, "got eof/err event %d\n", evt);
+    master->n_disconnect++;
     if(master->ctx.event_cb != NULL)
     {
       master->ctx.event_cb(&master->ctx, modbus_master_event_disconnected);
@@ -189,13 +191,14 @@ modbus_tcp_master_init(ModbusTCPMaster* master, struct sockaddr_in*  server_addr
   master->tcp_connector.cb = modbus_tcp_master_tcp_connector_callback;
   tcp_auto_connector_init(&master->tcp_connector, server_addr,
       MODBUS_TCP_MASTER_CONNECT_TIMEOUT,
-      MODBUS_TCP_MASTER_PROBATION_TIMEOUT);
+      MODBUS_TCP_MASTER_PROBATION_TIMEOUT, TRUE);
 }
 
 void
 modbus_tcp_master_start(ModbusTCPMaster* master)
 {
   master->tcp_state = ModbusTCPMasterState_Connecting;
+
   tcp_auto_connector_start(&master->tcp_connector);
 }
 
@@ -226,6 +229,10 @@ modbus_tcp_master_stop(ModbusTCPMaster* master)
   "server_ip":      "xxx.xxx.xxx.xxx",
   "server_port":    xxx,
   "connected":      true or false,
+  "n_conn_attempt": xxx,
+  "n_conn_success": xxx,
+  "n_conn_fail": xxx,
+  "n_disconnect": xxx
  }
  */
 cJSON*
@@ -241,6 +248,11 @@ modbus_tcp_master_get_stat(ModbusTCPMaster* master)
 
   connected = master->tcp_state == ModbusTCPMasterState_Connected ? TRUE : FALSE;
   cJSON_AddBoolToObject(jmaster, "connected", connected);
+
+  cJSON_AddNumberToObject(jmaster, "n_conn_attempt", master->tcp_connector.n_conn_attempt);
+  cJSON_AddNumberToObject(jmaster, "n_conn_success", master->tcp_connector.n_conn_success);
+  cJSON_AddNumberToObject(jmaster, "n_conn_fail", master->tcp_connector.n_conn_fail);
+  cJSON_AddNumberToObject(jmaster, "n_disconnect", master->n_disconnect);
 
   return jmaster;
 }

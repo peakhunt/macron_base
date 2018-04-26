@@ -152,13 +152,23 @@ cli_command_modbus(cli_intf_t* intf, int argc, const char** argv)
 
       if(strcmp(cJSON_GetObjectItem(master, "master_type")->valuestring, "tcp") == 0)
       {
-        cli_printf(intf, "server ip:   %s"CLI_EOL, cJSON_GetObjectItem(master, "server_ip")->valuestring);
-        cli_printf(intf, "server port: %d"CLI_EOL, cJSON_GetObjectItem(master, "server_port")->valueint);
-        cli_printf(intf, "connected:   %s"CLI_EOL, cJSON_GetObjectItem(master, "connected")->type == cJSON_True ? "yes" : "no");
+        cli_printf(intf, "server ip:      %s"CLI_EOL, cJSON_GetObjectItem(master, "server_ip")->valuestring);
+        cli_printf(intf, "server port:    %d"CLI_EOL, cJSON_GetObjectItem(master, "server_port")->valueint);
+        cli_printf(intf, "connected:      %s"CLI_EOL, cJSON_GetObjectItem(master, "connected")->type == cJSON_True ? "yes" : "no");
+        cli_printf(intf, "n_conn_attempt: %d"CLI_EOL, cJSON_GetObjectItem(master, "n_conn_attempt")->valueint);
+        cli_printf(intf, "n_conn_success: %d"CLI_EOL, cJSON_GetObjectItem(master, "n_conn_success")->valueint);
+        cli_printf(intf, "n_conn_fail:    %d"CLI_EOL, cJSON_GetObjectItem(master, "n_conn_fail")->valueint);
+        cli_printf(intf, "n_disconnect:   %d"CLI_EOL, cJSON_GetObjectItem(master, "n_disconnect")->valueint);
       }
       else
       {
       }
+      cli_printf(intf, "n_request:      %d"CLI_EOL, cJSON_GetObjectItem(master, "n_request")->valueint);
+      cli_printf(intf, "n_response:     %d"CLI_EOL, cJSON_GetObjectItem(master, "n_response")->valueint);
+      cli_printf(intf, "n_rsp_timeout:  %d"CLI_EOL, cJSON_GetObjectItem(master, "n_rsp_timeout")->valueint);
+      cli_printf(intf, "min time:       %dms"CLI_EOL, cJSON_GetObjectItem(master, "min_transaction_time")->valueint);
+      cli_printf(intf, "max time:       %dms"CLI_EOL, cJSON_GetObjectItem(master, "max_transaction_time")->valueint);
+      cli_printf(intf, "avg time:       %dms"CLI_EOL, cJSON_GetObjectItem(master, "avg_time")->valueint);
     }
     cJSON_Delete(ret);
   }

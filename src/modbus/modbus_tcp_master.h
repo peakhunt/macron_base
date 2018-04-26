@@ -30,6 +30,7 @@ typedef struct
   uint16_t                pid;
 
   mbap_reader_t           mbap_reader;
+  uint32_t                n_disconnect;
 } ModbusTCPMaster;
 
 extern void modbus_tcp_master_init(ModbusTCPMaster* master, struct sockaddr_in*  server_addr);
