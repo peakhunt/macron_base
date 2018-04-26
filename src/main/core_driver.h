@@ -29,6 +29,27 @@ typedef struct
   uint32_t            delay;
 } core_driver_alarm_config_t;
 
+typedef struct
+{
+  uint32_t            loop_interval;
+} core_driver_config_t;
+
+typedef struct
+{
+  uint32_t        input_scan_min;
+  uint32_t        input_scan_max;
+  uint32_t        input_scan_avg;
+
+  uint32_t        output_scan_min;
+  uint32_t        output_scan_max;
+  uint32_t        output_scan_avg;
+
+  uint32_t        app_min;
+  uint32_t        app_max;
+  uint32_t        app_avg;
+} core_driver_stat_t;
+
 extern void core_driver_init(void);
+extern void core_driver_get_stat(core_driver_stat_t* stat);
 
 #endif /* !__CORE_DRIVER_DEF_H__ */

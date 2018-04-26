@@ -46,6 +46,8 @@ extern const char* cfg_mgr_get_json_string_use_lock_before_call(int* len);
 
 extern void cfg_mgr_get_webserver_config(webserver_config_t* cfg);
 
+extern void cfg_mgr_get_core_driver_config(core_driver_config_t* cfg);
+
 extern void cfg_mgr_read_lock(void);
 extern void cfg_mgr_write_lock(void);
 extern void cfg_mgr_unlock(void);

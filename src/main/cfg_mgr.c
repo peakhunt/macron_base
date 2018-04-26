@@ -1033,6 +1033,20 @@ cfg_mgr_get_webserver_config(webserver_config_t* cfg)
   cfg_mgr_unlock();
 }
 
+void
+cfg_mgr_get_core_driver_config(core_driver_config_t* cfg)
+{
+  cJSON*      core;
+
+  cfg_mgr_read_lock();
+
+  core = cfg_mgr_get_node(_jroot, "core_config");
+
+  cfg->loop_interval  = cfg_mgr_get_int(core, "loop_interval");
+
+  cfg_mgr_unlock();
+}
+
 bool
 cfg_mgr_update_alarm_cfg(uint32_t alarm_num, alarm_runtime_config_t* cfg)
 {

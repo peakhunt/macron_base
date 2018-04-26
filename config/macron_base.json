@@ -7,6 +7,9 @@
 		"revision":	37,
 		"update_time":	"Wed Apr 25 11:38:45 2018\n"
 	},
+  "core_config": {
+    "loop_interval":  10
+  },
 	"cli":	{
 		"prompt":	"macron_bog> ",
 		"telnet":	{
@@ -1057,7 +1060,7 @@
 			"chnl_num":	1,
 			"chnl_dir":	"output",
 			"chnl_type":	"digital",
-			"init_val":	false,
+			"init_val":	true,
 			"failsafe_val":	false
 		}, {
 			"name":	"test channel #2",

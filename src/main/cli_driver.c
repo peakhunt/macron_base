@@ -12,6 +12,7 @@
 #include "channel_manager.h"
 #include "alarm_manager.h"
 #include "math_util.h"
+#include "core_driver.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -21,6 +22,7 @@
 static void cli_driver_thread_init(evloop_thread_t* thrd);
 static void cli_driver_thread_fini(evloop_thread_t* thrd);
 
+static void cli_command_core(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_modbus(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_channel(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_alarm(cli_intf_t* intf, int argc, const char** argv);
@@ -40,6 +42,11 @@ static completion_t     _go_signal;
 
 static cli_command_t    _app_commands[] =
 {
+  {
+    "core",
+    "core related commands",
+    cli_command_core,
+  },
   {
     "modbus",
     "modbus related commands",
@@ -62,6 +69,44 @@ static cli_command_t    _app_commands[] =
 // command implementation
 //
 ////////////////////////////////////////////////////////////////////////////////
+static void
+cli_command_core(cli_intf_t* intf, int argc, const char** argv)
+{
+  if(argc < 2)
+  {
+    goto command_error;
+  }
+
+  if(strcmp(argv[1], "status") == 0)
+  {
+    core_driver_stat_t    stat;
+
+    core_driver_get_stat(&stat);
+
+    cli_printf(intf, "input scan min:  %d ms"CLI_EOL, stat.input_scan_min);
+    cli_printf(intf, "input scan max:  %d ms"CLI_EOL, stat.input_scan_max);
+    cli_printf(intf, "input scan avg:  %d ms"CLI_EOL, stat.input_scan_avg);
+
+    cli_printf(intf, "output scan min: %d ms"CLI_EOL, stat.output_scan_min);
+    cli_printf(intf, "output scan max: %d ms"CLI_EOL, stat.output_scan_max);
+    cli_printf(intf, "output scan avg: %d ms"CLI_EOL, stat.output_scan_avg);
+
+    cli_printf(intf, "app min:         %d ms"CLI_EOL, stat.app_min);
+    cli_printf(intf, "app max:         %d ms"CLI_EOL, stat.app_max);
+    cli_printf(intf, "app avg:         %d ms"CLI_EOL, stat.app_avg);
+  }
+  else 
+  {
+    goto command_error;
+  }
+
+  return;
+
+command_error:
+  cli_printf(intf, "invalid argument!!!"CLI_EOL CLI_EOL);
+  cli_printf(intf, "%s status"CLI_EOL, argv[0]);
+}
+
 static void
 cli_command_modbus(cli_intf_t* intf, int argc, const char** argv)
 {

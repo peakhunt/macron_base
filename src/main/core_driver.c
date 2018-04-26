@@ -12,6 +12,10 @@
 static void app_core_thread_init(evloop_thread_t* thrd);
 static void app_core_thread_fini(evloop_thread_t* thrd);
 
+static double             _loop_interval;
+
+static core_driver_stat_t _stat;
+
 static evloop_timer_t     _update_timer;
 
 static evloop_thread_t    _app_core_thread = 
@@ -21,19 +25,48 @@ static evloop_thread_t    _app_core_thread =
 };
 
 static void
+app_core_run_application(void)
+{
+  //
+  // FIXME run control application
+  //
+}
+
+static void
 app_core_udpate(evloop_timer_t* t, void* arg)
 {
+  unsigned long   start,
+                  took;
+
   //static uint32_t   cnt = 0;
 
   //TRACE(CORE_DRIVER, "updating... %d\n", cnt++);
 
+  start = time_util_get_sys_clock_in_ms();
   channel_manager_update_input();
-  //
-  // FIXME run control application
-  //
-  channel_manager_update_output();
+  took = time_util_get_sys_clock_elapsed_in_ms(start);
 
-  evloop_timer_start(&_update_timer, 0.010, 0);
+  _stat.input_scan_min = MIN(_stat.input_scan_min, took);
+  _stat.input_scan_max = MAX(_stat.input_scan_max, took);
+  _stat.input_scan_avg = (_stat.input_scan_avg + took) / 2;
+
+  start = time_util_get_sys_clock_in_ms();
+  app_core_run_application();
+  took = time_util_get_sys_clock_elapsed_in_ms(start);
+
+  _stat.app_min = MIN(_stat.app_min, took);
+  _stat.app_max = MAX(_stat.app_max, took);
+  _stat.app_avg = (_stat.app_avg + took) / 2;
+
+  start = time_util_get_sys_clock_in_ms();
+  channel_manager_update_output();
+  took = time_util_get_sys_clock_elapsed_in_ms(start);
+
+  _stat.output_scan_min = MIN(_stat.output_scan_min, took);
+  _stat.output_scan_max = MAX(_stat.output_scan_max, took);
+  _stat.output_scan_avg = (_stat.output_scan_avg + took) / 2;
+
+  evloop_timer_start(&_update_timer, _loop_interval, 0);
 }
 
 static void
@@ -42,7 +75,7 @@ app_core_thread_init(evloop_thread_t* thrd)
   TRACE(CORE_DRIVER, "initializing app_core before thread loop\n");
 
   evloop_timer_init(&_update_timer, app_core_udpate, NULL);
-  evloop_timer_start(&_update_timer, 0.05, 0);
+  evloop_timer_start(&_update_timer, _loop_interval, 0);
 
   TRACE(CORE_DRIVER, "done initializing app_core\n");
 
@@ -155,7 +188,27 @@ __load_alarms(void)
 void
 core_driver_init(void)
 {
+  core_driver_config_t    cfg;
+
   TRACE(CORE_DRIVER, "starting up core driver\n");
+
+  cfg_mgr_get_core_driver_config(&cfg);
+  _loop_interval = cfg.loop_interval / 1000.0;
+
+
+  _stat.input_scan_min  = 0xffffffff;
+  _stat.input_scan_max  = 0;
+  _stat.input_scan_avg  = 0;
+
+  _stat.output_scan_min = 0xffffffff;
+  _stat.output_scan_max = 0;
+  _stat.output_scan_avg = 0;
+
+  _stat.app_min = 0xffffffff;
+  _stat.app_max = 0;
+  _stat.app_avg = 0;
+
+  TRACE(CORE_DRIVER, "core driver loop interval: %.3f sec\n", _loop_interval);
 
   evloop_thread_init(&_app_core_thread);
 
@@ -170,4 +223,14 @@ core_driver_init(void)
   evloop_thread_run(&_app_core_thread);
 
   app_init_complete_wait();
+}
+
+void
+core_driver_get_stat(core_driver_stat_t* stat)
+{
+  evloop_thread_lock(&_app_core_thread);
+
+  *stat = _stat;
+
+  evloop_thread_unlock(&_app_core_thread);
 }

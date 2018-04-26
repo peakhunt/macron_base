@@ -27,5 +27,8 @@ typedef uint8_t bool;
   b[0] = HI_BYTE(w);                  \
   b[1] = LO_BYTE(w);
 
+#define MIN(a,b)      (a < b ? a : b)
+#define MAX(a,b)      (a > b ? a : b)
+
 
 #endif /* !__COMMON_DEF_H__ */
