@@ -6,6 +6,7 @@
 typedef struct
 {
   alarm_state_t         state;
+  time_t                occur_time;
 } alarm_status_t;
 
 typedef struct

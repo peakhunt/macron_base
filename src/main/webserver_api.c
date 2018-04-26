@@ -57,10 +57,35 @@ struct __api_cmd_handler_t
         "state":    "inactive" or
                     "pending" or
                     "inactive_pending" or
-                    "active"
+                    "active",
+        "occur_time": xxx
       }
 
-  POST /api/v1/channel/update/config/<chnl_num>
+   GET /api/v1/alarm/status_ranged?start=xxx&end=xxx
+      {
+        "alarms": [
+           {
+              "alarm_num": xxx,
+              "state": "inacitve" or
+                       "pending" or
+                       "inactive_pending" or
+                       "active",
+              "occur_time": xxx
+           },
+           {
+              "alarm_num": xxx,
+              "state": "inacitve" or
+                       "pending" or
+                       "inactive_pending" or
+                       "active",
+              "occur_time": xxx
+           }
+           ...
+        ]
+      }
+
+
+   POST /api/v1/channel/update/config/<chnl_num>
     request
     {
       "init_val": true/false or number,
@@ -70,14 +95,14 @@ struct __api_cmd_handler_t
       "max_val": number
     }
 
-  POST /api/v1/alarm/update/config/<alarm_num>
+   POST /api/v1/alarm/update/config/<alarm_num>
     request
     {
       "set_point": true/false or number,
       "delay": number
     }
 
-  POST /api/v1/channel/update/lookup_table/<chnl_num>
+   POST /api/v1/channel/update/lookup_table/<chnl_num>
     request
     {
       "lookup_table": [
@@ -261,18 +286,17 @@ webapi_get_channel_status(struct mg_connection* nc, struct http_message* hm, str
 static void
 webapi_get_channel_status_ranged(struct mg_connection* nc, struct http_message* hm, struct mg_str* subcmd)
 {
-  char*   qstr;
-  uint32_t    start,end,
-              chnl_num;
-  int         ndx;
+  char*         qstr;
+  uint32_t      start,end,
+                chnl_num;
+  int           ndx;
   channel_status_t    status;
   bool comma_needed = false;
 
   qstr = mg_util_to_c_str_alloc(&hm->query_string);
   TRACE(WEBS_DRIVER, "channel status ranged request %s\n", qstr);
 
-  if(sscanf(qstr, "start=%d&end=%d", &start, &end) != 2 ||
-     end < start)
+  if(sscanf(qstr, "start=%d&end=%d", &start, &end) != 2 || end < start)
   {
     webapi_bad_request(nc,hm);
     goto out;
@@ -545,10 +569,69 @@ webapi_get_alarm_status(struct mg_connection* nc, struct http_message* hm, struc
     return;
   }
 
-  sprintf(data, "{ \"alarm_num\": %d, \"state\": \"%s\" }",
+  sprintf(data, "{ \"alarm_num\": %d, \"state\": \"%s\", \"occur_time\": %ld }",
       alarm_num,
-      alarm_get_string_state(status.state));
+      alarm_get_string_state(status.state),
+      status.occur_time);
   webapi_server_json_response_ok(nc, data, strlen(data));
+}
+
+static void
+webapi_get_alarm_status_ranged(struct mg_connection* nc, struct http_message* hm, struct mg_str* subcmd)
+{
+  char*         qstr;
+  uint32_t      start, end,
+                alarm_num;
+  int           ndx;
+  alarm_status_t    status;
+  bool comma_needed = false;
+
+  qstr = mg_util_to_c_str_alloc(&hm->query_string);
+  TRACE(WEBS_DRIVER, "alarm status ranged request %s\n", qstr);
+
+  if(sscanf(qstr, "start=%d&end=%d", &start, &end) != 2 || end < start)
+  {
+    webapi_bad_request(nc,hm);
+    goto out;
+  }
+
+  TRACE(WEBS_DRIVER, "alarm status ranged request %d, %d\n", start, end);
+  mg_printf(nc, "%s",
+      "HTTP/1.1 200 OK\r\n"
+      "Content-Type: text/json\r\n"
+      "Transfer-Encoding: chunked\r\n\r\n");
+  mg_printf_http_chunk(nc, "{\"alarms\": [");
+
+  ndx = cfg_mgr_get_alarm_index_equal_or_bigger(start);
+  while(ndx != -1)
+  {
+    alarm_num = cfg_mgr_get_alarm_from_index(ndx);
+    if(alarm_num > end)
+    {
+      break;
+    }
+
+    if(comma_needed)
+    {
+      mg_printf_http_chunk(nc, ",");
+    }
+    
+    alarm_manager_get_alarm_status(alarm_num, &status);
+
+    mg_printf_http_chunk(nc, "{ \"alarm_num\": %d, \"state\": \"%s\", \"occur_time\": %ld }",
+        alarm_num,
+        alarm_get_string_state(status.state),
+        status.occur_time);
+
+    comma_needed = true;
+    ndx = cfg_mgr_get_alarm_next(ndx);
+  }
+
+  mg_printf_http_chunk(nc, "]}");
+  mg_send_http_chunk(nc, "", 0);
+
+out:
+  free(qstr);
 }
 
 static void
@@ -602,6 +685,11 @@ static api_cmd_handler_t  _alarm_cmd_handlers[] =
   {
     .prefix   = MG_MK_STR("status/"),
     .handler  = webapi_get_alarm_status,
+  },
+  {
+    .prefix   = MG_MK_STR("status_ranged"),
+    .exact    = true,
+    .handler  = webapi_get_alarm_status_ranged,
   },
 };
 

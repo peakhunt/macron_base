@@ -136,7 +136,8 @@ alarm_manager_get_alarm_status(uint32_t alarm_num, alarm_status_t* status)
     return -1;
   }
 
-  status->state = alarm->state;
+  status->state       = alarm->state;
+  status->occur_time  = alarm->occur_time;
 
   alarm_manager_alarm_put(alarm);
 
