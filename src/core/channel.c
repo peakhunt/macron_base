@@ -28,6 +28,7 @@ channel_alloc(uint32_t chnl_num, channel_type_t chnl_type, channel_direction_t c
 
   chnl->raw_value         = 0;
   chnl->raw_value_queued  = 0;
+  chnl->raw_value_avail   = FALSE;
 
   chnl->lookup_table      = NULL;
 

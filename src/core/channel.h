@@ -47,6 +47,7 @@ typedef struct
 
   uint32_t            raw_value;
   uint32_t            raw_value_queued;     /* for input input buffer, for output output buffer */
+  bool                raw_value_avail;
   lookup_table_t*     lookup_table;
 
   publisher_t         chnl_update;
