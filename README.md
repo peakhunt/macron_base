@@ -34,7 +34,7 @@ Getting to milestone-1 trying to achieve the followings
    * JSON REST API support for updating channel/alarm configurations.
 
 7. Runtime configuration update
-   * atomic power fail-safe runtime update for core alarm/channel configuration data via CLI/HMI.
+   * atomic power-fail safe runtime update for core alarm/channel configuration data via CLI/HMI.
 
 8. JSON configuration file
    * Channels are configured on a project basis via JSON system configuration file.
