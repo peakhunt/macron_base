@@ -14,11 +14,13 @@ tcp_auto_connector_handle_tcp_connect_event(tcp_auto_connector_t* conn, tcp_conn
   switch(status)
   {
   case tcp_connector_success:
+    conn->n_conn_success++;
     conn->state = tcp_auto_connector_state_not_started;
     conn->cb(conn, tcp_connect_get_sd(&conn->tcp_connector));
     break;
 
   case tcp_connector_failure:
+    conn->n_conn_fail++;
     tcp_connector_deinit(&conn->tcp_connector);
 
     conn->state = tcp_auto_connector_state_reconnect_wait;
@@ -31,6 +33,7 @@ tcp_auto_connector_handle_tcp_connect_event(tcp_auto_connector_t* conn, tcp_conn
     break;
 
   case tcp_connector_timeout:
+    conn->n_conn_fail++;
     tcp_connector_deinit(&conn->tcp_connector);
     conn->cb(conn, -1);
     tcp_auto_connector_connect(conn);
@@ -42,6 +45,8 @@ static void
 tcp_auto_connector_connect(tcp_auto_connector_t* conn)
 {
   tcp_connector_status_t    ret;
+
+  conn->n_conn_attempt++;
 
   ret = tcp_connector_try_ipv4(&conn->tcp_connector, &conn->server_addr, conn->conn_tmr_value);
   tcp_auto_connector_handle_tcp_connect_event(conn, ret);
@@ -75,7 +80,7 @@ tcp_auto_connector_tcp_connector_callback(tcp_connector_t* tconn,
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void
-tcp_auto_connector_init(tcp_auto_connector_t* conn, struct sockaddr_in* server_addr, double conn_tmr, double reconn_wait_tmr)
+tcp_auto_connector_init(tcp_auto_connector_t* conn, struct sockaddr_in* server_addr, double conn_tmr, double reconn_wait_tmr, bool reset_stat)
 {
   memcpy(&conn->server_addr, server_addr, sizeof(struct sockaddr_in));
 
@@ -87,6 +92,13 @@ tcp_auto_connector_init(tcp_auto_connector_t* conn, struct sockaddr_in* server_a
   evloop_timer_init(&conn->reconn_wait_tmr, tcp_auto_connector_reconn_wait_timeout, NULL);
 
   conn->state = tcp_auto_connector_state_not_started;
+
+  if(reset_stat)
+  {
+    conn->n_conn_attempt  = 0;
+    conn->n_conn_success  = 0;
+    conn->n_conn_fail     = 0;
+  }
 }
 
 void

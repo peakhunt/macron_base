@@ -29,9 +29,13 @@ struct __tcp_auto_connector
   double                        reconn_wait_tmr_value;
 
   tcp_auto_connector_state_t    state;
+
+  uint32_t      n_conn_attempt;
+  uint32_t      n_conn_success;
+  uint32_t      n_conn_fail;
 };
 
-extern void tcp_auto_connector_init(tcp_auto_connector_t* conn, struct sockaddr_in* server_addr, double conn_tmr, double reconn_wait_tmr);
+extern void tcp_auto_connector_init(tcp_auto_connector_t* conn, struct sockaddr_in* server_addr, double conn_tmr, double reconn_wait_tmr, bool reset_stat);
 extern void tcp_auto_connector_start(tcp_auto_connector_t* conn);
 extern void tcp_auto_connector_stop(tcp_auto_connector_t* conn);
 
