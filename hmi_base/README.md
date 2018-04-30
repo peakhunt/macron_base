@@ -1,5 +1,11 @@
 # HMI based on vue.js/vuetify/electron
 
+## versions used
+1. Electron 1.8.6
+2. Node     8.2.1
+3. Vue.js   2.5.16
+1. Vuetify  1.0.0
+
 ## initial project setup
 
 1. if vue-cli is not already installed,

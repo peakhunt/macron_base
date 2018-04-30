@@ -56,12 +56,14 @@
     }
   },
   "dependencies": {
-    "vue": "^2.4.2",
     "axios": "^0.16.1",
+    "electron-storage": "^1.0.7",
+    "vue": "^2.4.2",
     "vue-electron": "^1.0.6",
     "vue-router": "^2.5.3",
+    "vuetify": "1.0.0",
     "vuex": "^2.3.1",
-    "vuetify": "1.0.0"
+    "webpack-material-design-icons": "^0.1.0"
   },
   "devDependencies": {
     "babel-core": "^6.25.0",

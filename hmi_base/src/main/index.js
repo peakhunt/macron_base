@@ -10,6 +10,8 @@ if (process.env.NODE_ENV !== 'development') {
   global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
+var appConfig = require('./app_config.js')
+
 let mainWindow
 const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080`
@@ -32,7 +34,11 @@ function createWindow () {
   })
 }
 
-app.on('ready', createWindow)
+function startUp () {
+  appConfig.load(app, createWindow)
+}
+
+app.on('ready', startUp)
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
