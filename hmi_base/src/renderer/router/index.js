@@ -16,6 +16,10 @@ export default new Router({
       component: require('@/components/InspireView').default
     },
     {
+      path: '/system-loading-view',
+      component: require('@/components/SystemLoadingView').default
+    },
+    {
       path: '*',
       redirect: '/'
     }

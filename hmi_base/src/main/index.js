@@ -19,13 +19,21 @@ const winURL = process.env.NODE_ENV === 'development'
 
 function createWindow () {
   /**
+   * set appConfig global
+   */
+  global.appConfig = appConfig.get()
+
+  /**
    * Initial window options
    */
   mainWindow = new BrowserWindow({
     height: 563,
     useContentSize: true,
     width: 1000,
-    title: appConfig.get().general.projectName
+    title: appConfig.get().general.projectName,
+    webPreferences: {
+      webSecurity: false
+    }
   })
 
   mainWindow.loadURL(winURL)

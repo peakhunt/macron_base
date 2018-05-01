@@ -23,6 +23,16 @@
               <v-list-tile-title v-text="item.title"></v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
+
+          <v-list-tile @click='exit()'>
+            <v-list-tile-action>
+              <v-icon>exit_to_app</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title>Exit</v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+
         </v-list>
       </v-navigation-drawer>
       <v-toolbar fixed app :clipped-left="clipped">
@@ -47,12 +57,6 @@
         </v-btn>
         <v-toolbar-title v-text="title"></v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn
-          icon
-          @click.native.stop="rightDrawer = !rightDrawer"
-        >
-          <v-icon>menu</v-icon>
-        </v-btn>
       </v-toolbar>
       <v-content>
         <v-container fluid fill-height>
@@ -61,33 +65,34 @@
           </v-slide-y-transition>
         </v-container>
       </v-content>
-      <v-navigation-drawer
-        temporary
-        fixed
-        :right="right"
-        v-model="rightDrawer"
-        app
-      >
-        <v-list>
-          <v-list-tile @click.native="right = !right">
-            <v-list-tile-action>
-              <v-icon light>compare_arrows</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-title>Switch drawer (click me)</v-list-tile-title>
-          </v-list-tile>
-        </v-list>
-      </v-navigation-drawer>
       <v-footer :fixed="fixed" app>
         <v-spacer></v-spacer>
-        <span>&copy; 2017</span>
+        <span>&copy; Scanjet Macron 2018</span>
       </v-footer>
     </v-app>
   </div>
 </template>
 
 <script>
+  import router from '@/router'
+  import global from '@/global'
+  import utils from '@/utils'
+
   export default {
     name: 'hmi_base',
+    methods: {
+      exit: function () {
+        utils.quit()
+      }
+    },
+    created () {
+      console.log('1:' + this.$route.path)
+      if (!this.$store.getters.isSysConfigLoaded) {
+        router.push('/system-loading-view')
+      } else {
+        router.push('/')
+      }
+    },
     data: () => ({
       clipped: false,
       drawer: true,
@@ -98,13 +103,11 @@
       ],
       miniVariant: false,
       right: true,
-      rightDrawer: false,
-      title: 'Vuetify.js'
+      title: global.config.general.projectName
     })
   }
 </script>
 
 <style>
-  /* @import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons'); */
   /* Global CSS */
 </style>
