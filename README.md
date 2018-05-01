@@ -2,6 +2,9 @@
 
 ## current status : reaching milestone-2
 ### Milestone-2
+
+![Current Status][captures/current.png]
+
 Goals
 1. HMI Development
 2. HMI integration with Control Server
