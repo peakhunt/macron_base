@@ -1,5 +1,6 @@
 const state = {
-  alarms: {}
+  alarms: {},
+  sortedList: []
 }
 
 const mutations = {
@@ -22,12 +23,22 @@ const mutations = {
       alarm.state = alarmState
       alarm.time = time
     }
+  },
+  BUILD_ALARM_LIST (state) {
+    state.sortedList = []
+    for (var alarmNum in state.alarms) {
+      state.sortedList[state.sortedList.length] = alarmNum
+    }
+    state.sortedList.sort()
   }
 }
 
 const getters = {
   alarm: (state) => (alarmNum) => {
     return state.alarms[alarmNum]
+  },
+  alarmList: (state) => {
+    return state.sortedList
   }
 }
 

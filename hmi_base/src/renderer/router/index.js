@@ -24,6 +24,10 @@ export default new Router({
       component: require('@/components/ChannelListView').default
     },
     {
+      path: '/alarm-list',
+      component: require('@/components/AlarmListView').default
+    },
+    {
       path: '*',
       redirect: '/'
     }

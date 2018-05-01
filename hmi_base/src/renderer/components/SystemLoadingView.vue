@@ -67,6 +67,8 @@
         alarms.forEach((value, key, map) => {
           self.$store.commit('ADD_ALARM', value)
         })
+
+        self.$store.commit('BUILD_ALARM_LIST')
       },
       populateStore: function (config) {
         this.populateChannelStore(config.channels)
