@@ -3,7 +3,7 @@
 ## current status : reaching milestone-2
 ### Milestone-2
 
-![Current Status][captures/current.png]
+![Current Status](captures/current.png)
 
 Goals
 1. HMI Development
