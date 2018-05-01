@@ -4,6 +4,7 @@
 ### Milestone-2
 
 ![Current Status](captures/current.png)
+![Channel List](captures/channel_list.png)
 
 Goals
 1. HMI Development
