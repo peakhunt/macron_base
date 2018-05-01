@@ -48,6 +48,30 @@
   export default {
     name: 'sysConfigLoadView',
     methods: {
+      populateChannelStore: function (channels) {
+        var self = this
+
+        self.$store.commit('CLEAR_CHANNELS')
+
+        channels.forEach((value, key, map) => {
+          self.$store.commit('ADD_CHANNEL', value)
+        })
+
+        self.$store.commit('BUILD_CHANNEL_LIST')
+      },
+      populateAlarmStore: function (alarms) {
+        var self = this
+
+        self.$store.commit('CLEAR_ALARMS')
+
+        alarms.forEach((value, key, map) => {
+          self.$store.commit('ADD_ALARM', value)
+        })
+      },
+      populateStore: function (config) {
+        this.populateChannelStore(config.channels)
+        this.populateAlarmStore(config.alarms)
+      },
       loadSysConfig: function () {
         var self = this
 
@@ -66,6 +90,7 @@
           self.status = 'got all system config. building system configuration'
 
           setTimeout(() => {
+            self.populateStore(data.data)
             self.dialog = false
             router.push('/')
           }, 2000)

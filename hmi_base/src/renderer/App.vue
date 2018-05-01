@@ -99,7 +99,8 @@
       fixed: false,
       items: [
         { icon: 'apps', title: 'Welcome', to: '/' },
-        { icon: 'bubble_chart', title: 'Inspire', to: '/inspire' }
+        { icon: 'bubble_chart', title: 'Inspire', to: '/inspire' },
+        { icon: 'apps', title: 'Channel List', to: '/channel-list' }
       ],
       miniVariant: false,
       right: true,

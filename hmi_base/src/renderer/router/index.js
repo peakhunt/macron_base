@@ -20,6 +20,10 @@ export default new Router({
       component: require('@/components/SystemLoadingView').default
     },
     {
+      path: '/channel-list',
+      component: require('@/components/ChannelListView').default
+    },
+    {
       path: '*',
       redirect: '/'
     }
