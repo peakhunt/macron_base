@@ -67,7 +67,7 @@
       </v-content>
       <v-footer :fixed="fixed" app>
         <v-spacer></v-spacer>
-        <span>&copy; Scanjet Macron 2018</span>
+        <span>&copy; Blah Blah Blah 2018</span>
       </v-footer>
     </v-app>
   </div>
