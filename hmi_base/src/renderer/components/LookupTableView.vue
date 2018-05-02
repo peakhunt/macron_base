@@ -1,23 +1,26 @@
 <template>
-  <v-container grid-list-md text-xs-center>
-    <v-layout row wrap justify-center id="wrapper">
+  <v-container>
+    <v-layout row wrap grid-list-md>
       <v-flex xs4>
-        <v-container grid-list-md text-xs-center>
-          <v-layout row wrap>
+        <v-layout column>
+          <div class="text-xs-center">
             <v-tooltip top>
-              <v-btn fab dark color="indigo" slot="activator" @click="on_click_add">
-                <v-icon dark>add</v-icon>
+              <v-btn dark color="indigo" slot="activator" @click="on_click_add">
+                Add
+                <v-icon>add</v-icon>
               </v-btn>
               <span>Add new lookup table entry</span>
             </v-tooltip>
 
             <v-tooltip top>
-              <v-btn  fab color="red" slot="activator" @click="on_click_commit" :disabled="table_changed == false">
-                <v-icon class="white--text">file_upload</v-icon>
+              <v-btn color="red" slot="activator" @click="on_click_commit" :disabled="table_changed == false"
+               :loading="updating_lookup_table">
+                Commit
+                <v-icon>cloud_upload</v-icon>
               </v-btn>
               <span>Commit changes</span>
             </v-tooltip>
-          </v-layout>
+          </div>
 
           <v-data-table
            disable-initial-sort
@@ -68,7 +71,7 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-        </v-container>
+        </v-layout>
       </v-flex>
 
       <v-flex xs8>
@@ -105,6 +108,7 @@
 
       return {
         table_changed: false,
+        updating_lookup_table: false,
         dialog: false,
         dialog_add_mode: true,
         dialog_raw: 0.0,
@@ -196,25 +200,30 @@
       on_click_commit: function () {
         var self = this
 
-        serverAPI.updateLookupTable(this.chnl_num, this.lookup_table, (err, data) => {
-          if (err) {
-            console.log('failed to update lookup table for ' + this.chnl_num)
-            console.log(err)
-            self.$notify({
-              title: 'Update Failed',
-              text: 'Failed updating Lookup Table!',
-              type: 'error'
-            })
-            return
-          }
+        self.updating_lookup_table = true
 
-          self.table_changed = false
-          self.$notify({
-            title: 'Update Success',
-            text: 'Lookup Table was successfully udpated!',
-            type: 'success'
-          })
-          console.log('lookup table update success for ' + this.chnl_num)
+        serverAPI.updateLookupTable(this.chnl_num, this.lookup_table, (err, data) => {
+          setTimeout(() => {
+            self.updating_lookup_table = false
+            if (err) {
+              console.log('failed to update lookup table for ' + this.chnl_num)
+              console.log(err)
+              self.$notify({
+                title: 'Update Failed',
+                text: 'Failed updating Lookup Table!',
+                type: 'error'
+              })
+              return
+            }
+
+            self.table_changed = false
+            self.$notify({
+              title: 'Update Success',
+              text: 'Lookup Table was successfully udpated!',
+              type: 'success'
+            })
+            console.log('lookup table update success for ' + this.chnl_num)
+          }, 1000)
         })
       },
       update_table_entry: function () {
