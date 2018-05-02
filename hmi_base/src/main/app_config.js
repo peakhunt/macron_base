@@ -4,6 +4,9 @@ var macronConfig
 function loadAppConfig (app, cb) {
   var configFile = 'macron_base/macron_base.json'
   var defaultData = {
+    schema: {
+      version: 1.0
+    },
     general: {
       projectName: 'blah blah blah blah project'
     },
@@ -11,6 +14,11 @@ function loadAppConfig (app, cb) {
       ipAddress: '192.168.227.211',
       webPort: 8000,
       modbusPort: 8080
+    },
+    poll_schedule: {
+      interval: 50,
+      num_channels: 512,
+      num_alarms: 512
     }
   }
 

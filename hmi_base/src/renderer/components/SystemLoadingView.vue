@@ -44,6 +44,7 @@
   import router from '@/router'
   import global from '@/global'
   import utils from '@/utils'
+  import {EventBus} from '@/event-bus'
 
   export default {
     name: 'sysConfigLoadView',
@@ -95,6 +96,7 @@
             self.populateStore(data.data)
             self.dialog = false
             router.push('/')
+            EventBus.$emit('systemConfigLoadComplete')
           }, 10)
         })
       },

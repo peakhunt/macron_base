@@ -40,7 +40,31 @@ function updateLookupTable (chnlNum, lookupTable, callback) {
     })
 }
 
+function getChannelStatus (startChnl, endChnl, callback) {
+  var url = getServerBaseUrl() + '/api/v1/channel/status_ranged?start=' + startChnl + '&end=' + endChnl
+
+  axios.get(url)
+    .then((response) => {
+      callback(null, response)
+    }, (err) => {
+      callback(err, null)
+    })
+}
+
+function getAlarmStatus (startAlarm, endAlarm, callback) {
+  var url = getServerBaseUrl() + '/api/v1/alarm/status_ranged?start=' + startAlarm + '&end=' + endAlarm
+
+  axios.get(url)
+    .then((response) => {
+      callback(null, response)
+    }, (err) => {
+      callback(err, null)
+    })
+}
+
 module.exports = {
   loadSystemConfig: loadSystemConfig,
-  updateLookupTable: updateLookupTable
+  updateLookupTable: updateLookupTable,
+  getChannelStatus: getChannelStatus,
+  getAlarmStatus: getAlarmStatus
 }

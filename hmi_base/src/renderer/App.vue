@@ -82,16 +82,27 @@
   import router from '@/router'
   import global from '@/global'
   import utils from '@/utils'
+  import {EventBus} from '@/event-bus'
+  import serverPoller from '@/server_poller'
 
   export default {
     name: 'hmi_base',
     methods: {
       exit: function () {
         utils.quit()
+      },
+      systemConfigLoadComplete: function () {
+        console.log('****** systemConfigLoadComplete ******')
+
+        console.log('initializing server poller')
+        serverPoller.initPoller(this.$store.getters.channelList, this.$store.getters.alarmList)
+        serverPoller.start(this)
       }
     },
     created () {
       console.log('1:' + this.$route.path)
+      EventBus.$on('systemConfigLoadComplete', this.systemConfigLoadComplete)
+
       if (!this.$store.getters.isSysConfigLoaded) {
         router.push('/system-loading-view')
       } else {
