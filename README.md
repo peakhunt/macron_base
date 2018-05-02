@@ -3,7 +3,8 @@
 ## current status : reaching milestone-2
 ### Milestone-2
 
-![Current Status](captures/current.png)
+![Loading](captures/loading.png)
+![Main DashBoard](captures/current.png)
 ![Channel List](captures/channel_list.png)
 ![Channel Detail](captures/channel_detail.png)
 
