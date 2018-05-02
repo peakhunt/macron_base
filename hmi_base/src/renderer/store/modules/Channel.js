@@ -12,6 +12,12 @@ const mutations = {
     copy.eng_value = 0
     copy.sensor_fault = false
 
+    if (chnl.lookup_table !== undefined) {
+      copy.lookup_table = []
+      for (var i = 0; i < chnl.lookup_table.length; i++) {
+        copy.lookup_table.push(Object.assign({}, chnl.lookup_table[i]))
+      }
+    }
     state.channels[copy.chnl_num] = copy
   },
   CLEAR_CHANNELS (state) {
@@ -28,10 +34,15 @@ const mutations = {
   },
   BUILD_CHANNEL_LIST (state) {
     state.sortedList = []
-    for (var chnlNum in state.channels) {
-      state.sortedList[state.sortedList.length] = chnlNum
-    }
-    state.sortedList.sort()
+    Object.keys(state.channels).forEach(function (chnlNum) {
+      var chnl = state.channels[chnlNum]
+
+      // this is much faster than push
+      state.sortedList[state.sortedList.length] = chnl.chnl_num
+    })
+    state.sortedList.sort((a, b) => {
+      return a - b
+    })
   }
 }
 

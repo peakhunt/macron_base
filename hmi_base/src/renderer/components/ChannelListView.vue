@@ -15,6 +15,7 @@
         </v-card-title>
 
         <v-data-table
+         disable-initial-sort
          :headers="headers"
          :items="items"
          :item-key="itemKey"
@@ -29,7 +30,7 @@
             </v-tooltip>
           </template>
           <template slot="items" slot-scope="props">
-            <tr>
+            <tr v-on:click="channel_select(props.item.chnl_num)">
               <td width="100px" class="text-xs-left">{{props.item.chnl_num}}</td>
               <td width="100px" class="text-xs-left">{{props.item.chnl_dir}}</td>
               <td width="100px" class="text-xs-left">{{props.item.chnl_type}}</td>
@@ -46,8 +47,15 @@
 </template>
 
 <script>
+  import router from '@/router'
+
   export default {
     name: 'channelListView',
+    methods: {
+      channel_select (chnlNum) {
+        router.push('/channel/' + chnlNum)
+      }
+    },
     created () {
       var chnlList
 

@@ -4,12 +4,12 @@
 		"last_update":	"Mar/30/2018"
 	},
 	"update_info":	{
-		"revision":	37,
-		"update_time":	"Wed Apr 25 11:38:45 2018\n"
+		"revision":	50,
+		"update_time":	"Wed May  2 13:25:51 2018\n"
 	},
-  "core_config": {
-    "loop_interval":  10
-  },
+	"core_config":	{
+		"loop_interval":	10
+	},
 	"cli":	{
 		"prompt":	"macron_bog> ",
 		"telnet":	{
@@ -1090,17 +1090,35 @@
 					"raw":	0,
 					"eng":	0
 				}, {
-					"raw":	10,
+					"raw":	1,
+					"eng":	1
+				}, {
+					"raw":	2,
+					"eng":	2
+				}, {
+					"raw":	3,
+					"eng":	3
+				}, {
+					"raw":	4,
+					"eng":	4
+				}, {
+					"raw":	5,
 					"eng":	5
 				}, {
-					"raw":	15,
-					"eng":	7.5
+					"raw":	6,
+					"eng":	4
 				}, {
-					"raw":	20,
-					"eng":	10
+					"raw":	7,
+					"eng":	3
 				}, {
-					"raw":	25,
-					"eng":	12.5
+					"raw":	8,
+					"eng":	2
+				}, {
+					"raw":	9,
+					"eng":	1
+				}, {
+					"raw":	10,
+					"eng":	0
 				}]
 		}, {
 			"name":	"test channel #5",

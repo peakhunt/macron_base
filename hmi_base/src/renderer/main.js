@@ -7,9 +7,14 @@ import App from './App'
 import router from './router'
 import store from './store'
 
+import Notifications from 'vue-notification'
+import velocity from 'velocity-animate'
+
 import 'material-design-icons/iconfont/material-icons.css'
 
 Vue.use(Vuetify)
+Vue.use(Notifications, { velocity })
+
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios
 Vue.config.productionTip = false

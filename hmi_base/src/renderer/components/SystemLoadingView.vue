@@ -95,7 +95,7 @@
             self.populateStore(data.data)
             self.dialog = false
             router.push('/')
-          }, 2000)
+          }, 10)
         })
       },
       retry: function () {
@@ -103,7 +103,7 @@
 
         self.show_fail_dialog = false
         self.dialog = true
-        setTimeout(() => { self.loadSysConfig() }, 2000)
+        self.loadSysConfig()
       },
       exit: function () {
         utils.quit()
@@ -115,7 +115,7 @@
       self.server_ip = global.config.server.ipAddress
       self.server_port = global.config.server.webPort
 
-      setTimeout(() => { self.loadSysConfig() }, 2000)
+      setTimeout(() => { self.loadSysConfig() }, 1000)
     },
     data () {
       return {

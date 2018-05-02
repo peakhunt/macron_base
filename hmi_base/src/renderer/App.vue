@@ -63,6 +63,11 @@
           <v-slide-y-transition mode="out-in">
             <router-view></router-view>
           </v-slide-y-transition>
+          <notifications
+           animation-type="velocity"
+           position="bottom center"
+           :speed="600"
+           />
         </v-container>
       </v-content>
       <v-footer :fixed="fixed" app>

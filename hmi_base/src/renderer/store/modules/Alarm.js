@@ -26,10 +26,15 @@ const mutations = {
   },
   BUILD_ALARM_LIST (state) {
     state.sortedList = []
-    for (var alarmNum in state.alarms) {
-      state.sortedList[state.sortedList.length] = alarmNum
-    }
-    state.sortedList.sort()
+    Object.keys(state.alarms).forEach(function (alarmNum) {
+      var alarm = state.alarms[alarmNum]
+
+      // this is much faster than push
+      state.sortedList[state.sortedList.length] = alarm.alarm_num
+    })
+    state.sortedList.sort((a, b) => {
+      return a - b
+    })
   }
 }
 
