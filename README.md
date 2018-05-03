@@ -7,6 +7,8 @@
 ![Main DashBoard](captures/current.png)
 ![Channel List](captures/channel_list.png)
 ![Channel Detail](captures/channel_detail.png)
+![Alarm List](captures/alarm_list.png)
+![Alarm Detail](captures/alarm_detail.png)
 
 Goals
 1. HMI Development

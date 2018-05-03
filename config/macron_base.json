@@ -4,8 +4,8 @@
 		"last_update":	"Mar/30/2018"
 	},
 	"update_info":	{
-		"revision":	50,
-		"update_time":	"Wed May  2 13:25:51 2018\n"
+		"revision":	60,
+		"update_time":	"Thu May  3 10:07:15 2018\n"
 	},
 	"core_config":	{
 		"loop_interval":	10
@@ -1061,7 +1061,7 @@
 			"chnl_dir":	"output",
 			"chnl_type":	"digital",
 			"init_val":	true,
-			"failsafe_val":	false
+			"failsafe_val":	true
 		}, {
 			"name":	"test channel #2",
 			"chnl_num":	2,
@@ -1103,22 +1103,22 @@
 					"eng":	4
 				}, {
 					"raw":	5,
-					"eng":	5
+					"eng":	5.8
 				}, {
 					"raw":	6,
-					"eng":	4
+					"eng":	9.7
 				}, {
 					"raw":	7,
-					"eng":	3
+					"eng":	8.8
 				}, {
 					"raw":	8,
-					"eng":	2
+					"eng":	15.6
 				}, {
 					"raw":	9,
-					"eng":	1
+					"eng":	14.4
 				}, {
 					"raw":	10,
-					"eng":	0
+					"eng":	13
 				}]
 		}, {
 			"name":	"test channel #5",

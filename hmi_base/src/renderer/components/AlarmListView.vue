@@ -29,7 +29,7 @@
             </v-tooltip>
           </template>
           <template slot="items" slot-scope="props">
-            <tr>
+            <tr v-on:click="alarm_select(props.item.alarm_num)">
               <td width="80px" class="text-xs-left">{{props.item.alarm_num}}</td>
               <td width="80px" class="text-xs-left">{{props.item.chnl_num}}</td>
               <td width="80px" class="text-xs-left">{{props.item.delay}}</td>
@@ -47,8 +47,15 @@
 </template>
 
 <script>
+  import router from '@/router'
+
   export default {
     name: 'alarmListView',
+    methods: {
+      alarm_select (alarmNum) {
+        router.push('/alarm/' + alarmNum)
+      }
+    },
     created () {
       var alarmList
 
