@@ -1,7 +1,7 @@
 <template>
-  <v-container grid-list-md text-xs-center>
-    <v-layout row wrap justify-center id="wrapper">
-      <v-flex xs12 class="text-xs-center centered">
+  <v-container fluid grid-list-lg mt-0>
+    <v-layout row wrap>
+      <v-flex xs12>
         <v-toolbar color="primary">
           <v-btn icon color="white" @click="go_back()">
             <v-icon>arrow_back</v-icon>
@@ -10,7 +10,7 @@
         </v-toolbar>
       </v-flex>
 
-      <v-flex xs12 class="text-xs-center centered">
+      <v-flex xs12>
         <v-card>
           <v-card-title primary-title>Channel Info</v-card-title>
           <v-data-table
@@ -56,7 +56,7 @@
         </v-card>
       </v-flex>
 
-      <v-flex xs12 class="text-xs-center centered" v-if="show_lookup_table">
+      <v-flex xs12 v-if="show_lookup_table">
         <v-card>
           <v-card-title primary-title>Lookup Table</v-card-title>
           <lookup-table-view :chnl_num="channel_number"></lookup-table-view>
