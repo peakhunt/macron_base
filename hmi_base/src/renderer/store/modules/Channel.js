@@ -1,3 +1,5 @@
+// import Vue from 'vue'
+
 const state = {
   channels: {},
   sortedList: []
@@ -8,8 +10,8 @@ const mutations = {
     var copy
 
     copy = Object.assign({}, chnl)
-    copy.raw_value = 0
-    copy.eng_value = 0
+    copy.raw_val = 0
+    copy.eng_val = 0
     copy.sensor_fault = false
 
     if (chnl.lookup_table !== undefined) {
@@ -18,18 +20,22 @@ const mutations = {
         copy.lookup_table.push(Object.assign({}, chnl.lookup_table[i]))
       }
     }
-    state.channels[copy.chnl_num] = copy
+
+    var chnlNum = copy.chnl_num
+
+    state.channels[chnlNum] = copy
   },
   CLEAR_CHANNELS (state) {
     state.channels = {}
   },
-  SET_CHNNEL_VALUE (state, chnlNum, eng, raw, fault) {
-    var chnl = state.channels[chnlNum]
+  SET_CHANNEL_VALUE (state, chnlStatus) {
+    var chnl = state.channels[chnlStatus.chnl_num]
 
     if (chnl !== undefined) {
-      chnl.raw_value = raw
-      chnl.eng_value = eng
-      chnl.sensor_fault = fault
+      chnl.raw_val = chnlStatus.raw_val
+      chnl.eng_val = chnlStatus.eng_val
+    } else {
+      console.log('vuex no channel:' + chnlStatus.chnl_num)
     }
   },
   BUILD_CHANNEL_LIST (state) {

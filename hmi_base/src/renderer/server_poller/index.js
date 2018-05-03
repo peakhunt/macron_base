@@ -62,6 +62,18 @@ function initPoller (chnlList, alarmList) {
   alarmPollNdx = 0
 }
 
+function updateChannelStatus (vueInstance, chnlStatus) {
+  for (var ndx = 0; ndx < chnlStatus.length; ndx++) {
+    vueInstance.$store.commit('SET_CHANNEL_VALUE', chnlStatus[ndx])
+  }
+}
+
+function updateAlarmStatus (vueInstance, alarmStatus) {
+  for (var ndx = 0; ndx < alarmStatus.length; ndx++) {
+    vueInstance.$store.commit('SET_ALARM_VALUE', alarmStatus[ndx])
+  }
+}
+
 function pollNext (vueInstance) {
   var chnlPoll, alarmPoll
 
@@ -72,14 +84,14 @@ function pollNext (vueInstance) {
     if (err) {
       console.log('get channel status error: ' + chnlPoll.start + ',' + chnlPoll.end)
     } else {
-      console.log('get channel status success: ' + chnlPoll.start + ',' + chnlPoll.end)
+      updateChannelStatus(vueInstance, data.data.channels)
     }
 
     serverAPI.getAlarmStatus(alarmPoll.start, alarmPoll.end, (err, data) => {
       if (err) {
         console.log('get alarm status error: ' + alarmPoll.start + ',' + alarmPoll.end)
       } else {
-        console.log('get alarm status success: ' + alarmPoll.start + ',' + alarmPoll.end)
+        updateAlarmStatus(vueInstance, data.data.alarms)
       }
 
       _timeoutHandle = setTimeout(() => { pollNext(vueInstance) }, interval)

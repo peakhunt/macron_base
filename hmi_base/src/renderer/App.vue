@@ -104,6 +104,7 @@
       EventBus.$on('systemConfigLoadComplete', this.systemConfigLoadComplete)
 
       if (!this.$store.getters.isSysConfigLoaded) {
+        serverPoller.stop(this)
         router.push('/system-loading-view')
       } else {
         router.push('/')

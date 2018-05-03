@@ -16,12 +16,12 @@ const mutations = {
   CLEAR_ALARMS (state) {
     state.alarms = {}
   },
-  SET_ALARM_VALUE (state, alarmNum, alarmState, time) {
-    var alarm = state.alarms[alarmNum]
+  SET_ALARM_VALUE (state, alarmStatus) {
+    var alarm = state.alarms[alarmStatus.alarm_num]
 
     if (alarm !== undefined) {
-      alarm.state = alarmState
-      alarm.time = time
+      alarm.state = alarmStatus.state
+      alarm.time = alarmStatus.occur_time
     }
   },
   BUILD_ALARM_LIST (state) {

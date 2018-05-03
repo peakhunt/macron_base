@@ -97,10 +97,10 @@
         return this.$store.getters.channel(this.chnlNum).name
       },
       channel_value () {
-        return this.$store.getters.channel(this.chnlNum).eng_value
+        return this.$store.getters.channel(this.chnlNum).eng_val
       },
       channel_raw_value () {
-        return this.$store.getters.channel(this.chnlNum).raw_value
+        return this.$store.getters.channel(this.chnlNum).raw_val
       },
       show_lookup_table () {
         if (this.channel_type === 'analog') {

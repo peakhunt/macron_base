@@ -37,7 +37,7 @@
               <td width="150px" class="text-xs-left">{{props.item.init_val}}</td>
               <td width="150px" class="text-xs-left">{{props.item.failsafe_val}}</td>
               <td class="text-xs-left">{{props.item.name}}</td>
-              <td width="150px" class="text-xs-left">{{props.item.eng_value}}</td>
+              <td width="150px" class="text-xs-left">{{props.item.eng_val}}</td>
             </tr>
           </template>
         </v-data-table>

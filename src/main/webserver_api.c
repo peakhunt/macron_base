@@ -30,7 +30,7 @@ struct __api_cmd_handler_t
    GET /api/v1/channel/status/<channel_num>
        {
           "chnl_num": number,
-          "eng_value": xxx or true or false,
+          "eng_val": xxx or true or false,
           "raw_val": xxx
        }
 
@@ -39,12 +39,12 @@ struct __api_cmd_handler_t
         "channels": [
            {
               "chnl_num": number,
-              "eng_value": xxx or true or false,
+              "eng_val": xxx or true or false,
               "raw_val": xxx
            },
            {
               "chnl_num": number,
-              "eng_value": xxx or true or false,
+              "eng_val": xxx or true or false,
               "raw_val": xxx
            },
            ...
@@ -281,16 +281,16 @@ webapi_get_channel_status(struct mg_connection* nc, struct http_message* hm, str
     return;
   }
 
-  if(status.chnl_type == channel_type_digital)
+  if(status.chnl_type == channel_type_analog)
   {
-    sprintf(data, "{ \"chnl_num\": %d, \"eng_value\": %.2f, \"raw_val\": %d }",
+    sprintf(data, "{ \"chnl_num\": %d, \"eng_val\": %.2f, \"raw_val\": %d }",
         chnl_num,
         status.eng_val.f,
         status.raw_val);
   }
   else
   {
-    sprintf(data, "{ \"chnl_num\": %d, \"eng_value\": %s, \"raw_val\": %d }",
+    sprintf(data, "{ \"chnl_num\": %d, \"eng_val\": %s, \"raw_val\": %d }",
         chnl_num,
         status.eng_val.b ? "true" : "false",
         status.raw_val);
@@ -341,16 +341,16 @@ webapi_get_channel_status_ranged(struct mg_connection* nc, struct http_message* 
 
     channel_manager_get_channel_stat(chnl_num, &status);
 
-    if(status.chnl_type == channel_type_digital)
+    if(status.chnl_type == channel_type_analog)
     {
-      mg_printf_http_chunk(nc, "{\"chnl_num\": %d, \"eng_value\": %.2f, \"raw_val\": %d }",
+      mg_printf_http_chunk(nc, "{\"chnl_num\": %d, \"eng_val\": %.2f, \"raw_val\": %d }",
           chnl_num,
           status.eng_val.f,
           status.raw_val);
     }
     else
     {
-      mg_printf_http_chunk(nc, "{ \"chnl_num\": %d, \"eng_value\": %s, \"raw_val\": %d }",
+      mg_printf_http_chunk(nc, "{ \"chnl_num\": %d, \"eng_val\": %s, \"raw_val\": %d }",
           chnl_num,
           status.eng_val.b ? "true" : "false",
           status.raw_val);
