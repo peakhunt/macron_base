@@ -251,7 +251,7 @@ channel_manager_update_output(void)
   TRACE(CHANNELM, "updating output\n");
   list_for_each_entry(chnl, &_out_channels, le_by_dir)
   {
-    pthread_mutex_unlock(&_chnl_mgr_lock);
+    pthread_mutex_lock(&_chnl_mgr_lock);
     TRACE(CHANNELM, "updating output for channel %d\n", chnl->chnl_num);
 
     chnl->raw_value_queued = chnl->raw_value;
