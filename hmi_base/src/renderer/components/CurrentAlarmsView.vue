@@ -21,7 +21,7 @@
          hide-actions
         >
           <template slot="items" slot-scope="props">
-            <alarm-status-view v-bind:alarm-obj="props.item" inline-template>
+            <alarm-status-view v-bind:alarm-obj="props.item" v-bind:blinking-state="blinkingState" inline-template>
               <tr v-on:dblclick="alarm_ack()" class="set-height noselect" v-bind:class="alarm_state_class">
                 <td width="30px" class="text-xs-left">{{alarm_number}}</td>
                 <td width="200px" class="text-xs-left">{{alarm_time}}</td>
@@ -43,6 +43,17 @@
     components: {
       AlarmStatusView
     },
+    methods: {
+      blink () {
+        this.blinkingState = !this.blinkingState
+      }
+    },
+    created () {
+      this.$options.interval = setInterval(this.blink, 250)
+    },
+    beforeDestroy () {
+      clearInterval(this.$options.interval)
+    },
     data () {
       return {
         headers: [
@@ -53,7 +64,8 @@
         ],
         selected: [2],
         items: this.$store.getters.currentAlarms,
-        search: ''
+        search: '',
+        blinkingState: false
       }
     }
   }

@@ -45,7 +45,11 @@
 
           case 'pending':
           case 'inactive_pending':
-            state = 'blinking'
+            if (this.blinkingState === true) {
+              state = 'blinking-on'
+            } else {
+              state = 'blinking-off'
+            }
             break
 
           case 'active':
@@ -54,7 +58,7 @@
         return this.alarm_severity + '-' + state
       }
     },
-    props: ['alarmObj'],
+    props: ['alarmObj', 'blinkingState'],
     data () {
       return {
         alarm_state_names: ['Inactive', 'Active Pending', 'Inactive Pending', 'Active']
@@ -82,50 +86,14 @@
   height: 2.5em;
 }
 
-@keyframes blinking-critical {
-  0% red--text {
-    background-color: red;
-  }
-  50% {
-    background-color: white;
-  }
-  100% {
-    background-color: white;
-  }
-}
-
-@keyframes blinking-major {
-  0% {
-    background-color: orange;
-  }
-  50% {
-    background-color: white;
-  }
-  100% {
-    background-color: white;
-  }
-}
-
-@keyframes blinking-minor {
-  0% {
-    background-color: yellow;
-  }
-  50% {
-    background-color: white;
-  }
-  100% {
-    background-color: white;
-  }
-}
-
-.critical-blinking {
+.critical-blinking-off {
   background-color: red;
   color: black;
-  animation-name: blinking-critical;
-  animation-iteration-count: infinite;
-  animation-fill-mode: alternate;
-  animation-duration: 1s;
-  animation-timing-function: steps(1);
+}
+
+.critical-blinking-on {
+  background-color: white;
+  color: black;
 }
 
 .critical-ack {
@@ -133,27 +101,24 @@
   color: black;
 }
 
-.major-blinking {
+.major-blinking-off {
   background-color: orange;
-  animation-name: blinking-major;
-  animation-iteration-count: infinite;
-  animation-fill-mode: alternate;
-  animation-duration: 1s;
-  animation-timing-function: steps(1);
+}
+
+.major-blinking-on {
+  background-color: white;
 }
 
 .major-ack {
   background-color: orange;
-  animation-name: blinking-major;
 }
 
-.minor-blinking {
+.minor-blinking-off {
   background-color: yellow;
-  animation-name: blinking-minor;
-  animation-iteration-count: infinite;
-  animation-fill-mode: alternate;
-  animation-duration: 1s;
-  animation-timing-function: steps(1);
+}
+
+.minor-blinking-on {
+  background-color: white;
 }
 
 .minor-ack {
