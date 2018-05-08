@@ -62,9 +62,27 @@ function getAlarmStatus (startAlarm, endAlarm, callback) {
     })
 }
 
+function ackAlarm (alarmNum, callback) {
+  var url = getServerBaseUrl() + '/api/v1/alarm/ack'
+
+  axios.post(url,
+    {
+      alarm_num: alarmNum
+    },
+    {
+      headers: { 'Content-Type': 'application/json' }
+    })
+    .then((response) => {
+      callback(null, response)
+    }, (err) => {
+      callback(err, null)
+    })
+}
+
 module.exports = {
   loadSystemConfig: loadSystemConfig,
   updateLookupTable: updateLookupTable,
   getChannelStatus: getChannelStatus,
-  getAlarmStatus: getAlarmStatus
+  getAlarmStatus: getAlarmStatus,
+  ackAlarm: ackAlarm
 }

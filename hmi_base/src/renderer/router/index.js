@@ -36,6 +36,10 @@ export default new Router({
       component: require('@/components/AlarmView').default
     },
     {
+      path: '/current-alarms',
+      component: require('@/components/CurrentAlarmsView').default
+    },
+    {
       path: '*',
       redirect: '/'
     }

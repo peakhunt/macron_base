@@ -118,7 +118,8 @@
         { icon: 'apps', title: 'Welcome', to: '/' },
         { icon: 'bubble_chart', title: 'Inspire', to: '/inspire' },
         { icon: 'apps', title: 'Channel List', to: '/channel-list' },
-        { icon: 'apps', title: 'Alarm List', to: '/alarm-list' }
+        { icon: 'apps', title: 'Alarm List', to: '/alarm-list' },
+        { icon: 'apps', title: 'Current Alarms', to: '/current-alarms' }
       ],
       miniVariant: false,
       right: true,
