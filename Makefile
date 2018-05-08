@@ -132,7 +132,7 @@ MIGRATION = config_migration
 #######################################
 # compile & link flags
 #######################################
-CFLAGS += $(C_DEFS) $(C_INCLUDES)
+CFLAGS += -g $(C_DEFS) $(C_INCLUDES)
 
 # Generate dependency information
 CFLAGS += -MMD -MF .dep/$(*F).d
