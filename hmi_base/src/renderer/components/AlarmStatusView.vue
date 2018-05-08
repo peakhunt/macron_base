@@ -14,6 +14,7 @@
 
 <script>
   import serverAPI from '@/server_api'
+  import dateFormat from 'dateformat'
 
   export default {
     name: 'alarmStatusView',
@@ -34,7 +35,9 @@
         return this.alarmObj.name
       },
       alarm_time () {
-        return this.alarmObj.time
+        // return this.alarmObj.time
+        var d = new Date(this.alarmObj.time * 1000)
+        return dateFormat(d, 'yyyy-mm-dd HH:MM:ss')
       },
       alarm_state_class () {
         var state

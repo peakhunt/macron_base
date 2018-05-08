@@ -49,6 +49,7 @@
       }
     },
     created () {
+      // FIXME switch to vue-timers npm module
       this.$options.interval = setInterval(this.blink, 250)
     },
     beforeDestroy () {

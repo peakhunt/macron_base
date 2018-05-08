@@ -1,4 +1,4 @@
-import Vue from 'vue'
+// import Vue from 'vue'
 
 var currentAlarmHash = {
 }
@@ -24,6 +24,7 @@ const mutations = {
   },
   SET_ALARM_VALUE (state, alarmStatus) {
     var alarm = state.alarms[alarmStatus.alarm_num]
+    var n
 
     if (alarm !== undefined) {
       alarm.state = alarmStatus.state
@@ -31,7 +32,7 @@ const mutations = {
 
       if (alarm.state === 'inactive') {
         if (currentAlarmHash[alarm.alarm_num] !== undefined) {
-          var n = state.current_alarms_list.indexOf(alarm)
+          n = state.current_alarms_list.indexOf(alarm)
 
           delete currentAlarmHash[alarm.alarm_num]
           state.current_alarms_list.splice(n, 1)
@@ -39,7 +40,14 @@ const mutations = {
       } else {
         if (currentAlarmHash[alarm.alarm_num] === undefined) {
           currentAlarmHash[alarm.alarm_num] = alarm
-          Vue.set(state.current_alarms_list, state.current_alarms_list.length, alarm)
+
+          for (n = 0; n < state.current_alarms_list.length; n++) {
+            if (alarm.time > state.current_alarms_list[n].time) {
+              break
+            }
+          }
+          state.current_alarms_list.splice(n, 0, alarm)
+          // Vue.set(state.current_alarms_list, state.current_alarms_list.length, alarm)
         }
       }
     }
