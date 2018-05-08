@@ -1,0 +1,247 @@
+{
+	"schema":	{
+		"version":	1,
+		"last_update":	"Mar/30/2018"
+	},
+	"update_info":	{
+		"revision":	62,
+		"update_time":	"Thu May  3 15:48:44 2018\n"
+	},
+	"core_config":	{
+		"loop_interval":	10
+	},
+	"cli":	{
+		"prompt":	"macron_bog> ",
+		"telnet":	{
+			"enabled":	true,
+			"port":	9090
+		},
+		"serial":	{
+			"enabled":	false,
+			"serial_port":	"/dev/ttyUSB0",
+			"baud":	115200,
+			"data_bit":	8,
+			"stop_bit":	1,
+			"parity":	"none"
+		}
+	},
+	"web":	{
+		"http_address":	"8000",
+		"doc_root":	"./"
+	},
+	"modbus_slave_list":	[{
+    "protocol":	"tcp",
+    "address":	15,
+    "param":	{
+      "port":	8080
+    },
+    "reg_map":	[{
+        "slave":	0,
+        "reg":	"coil",
+        "address":	1,
+        "channel":	1
+      }, {
+        "slave":	0,
+        "reg":	"coil",
+        "address":	2,
+        "channel":	2
+      }, {
+        "slave":	0,
+        "reg":	"coil",
+        "address":	3,
+        "channel":	3
+      }, {
+        "slave":	0,
+        "reg":	"coil",
+        "address":	4,
+        "channel":	4
+      }, {
+        "slave":	0,
+        "reg":	"coil",
+        "address":	5,
+        "channel":	5
+      }, {
+        "slave":	0,
+        "reg":	"coil",
+        "address":	6,
+        "channel":	6
+      }, {
+        "slave":	0,
+        "reg":	"coil",
+        "address":	7,
+        "channel":	7
+      }, {
+        "slave":	0,
+        "reg":	"coil",
+        "address":	8,
+        "channel":	8
+      }, {
+        "slave":	0,
+        "reg":	"coil",
+        "address":	9,
+        "channel":	9
+      }, {
+        "slave":	0,
+        "reg":	"coil",
+        "address":	10,
+        "channel":	10
+      }
+    ]
+  ],
+  "channels": [ {
+      "name":	"test channel #1",
+      "chnl_num":	1,
+      "chnl_dir":	"input",
+      "chnl_type":	"digital",
+      "init_val":	false,
+      "failsafe_val":	false,
+      "lookup_table":	[]
+    }, {
+      "name":	"test channel #2",
+      "chnl_num":	2,
+      "chnl_dir":	"input",
+      "chnl_type":	"digital",
+      "init_val":	false,
+      "failsafe_val":	false,
+      "lookup_table":	[]
+    }, {
+      "name":	"test channel #3",
+      "chnl_num":	3,
+      "chnl_dir":	"input",
+      "chnl_type":	"digital",
+      "init_val":	false,
+      "failsafe_val":	false,
+      "lookup_table":	[]
+    }, {
+      "name":	"test channel #4",
+      "chnl_num":	4,
+      "chnl_dir":	"input",
+      "chnl_type":	"digital",
+      "init_val":	false,
+      "failsafe_val":	false,
+      "lookup_table":	[]
+    }, {
+      "name":	"test channel #5",
+      "chnl_num":	5,
+      "chnl_dir":	"input",
+      "chnl_type":	"digital",
+      "init_val":	false,
+      "failsafe_val":	false,
+      "lookup_table":	[]
+    }, {
+      "name":	"test channel #6",
+      "chnl_num":	6,
+      "chnl_dir":	"input",
+      "chnl_type":	"digital",
+      "init_val":	false,
+      "failsafe_val":	false,
+      "lookup_table":	[]
+    }, {
+      "name":	"test channel #8",
+      "chnl_num":	1,
+      "chnl_dir":	"input",
+      "chnl_type":	"digital",
+      "init_val":	false,
+      "failsafe_val":	false,
+      "lookup_table":	[]
+    }, {
+      "name":	"test channel #9",
+      "chnl_num":	9,
+      "chnl_dir":	"input",
+      "chnl_type":	"digital",
+      "init_val":	false,
+      "failsafe_val":	false,
+      "lookup_table":	[]
+    }, {
+      "name":	"test channel #10",
+      "chnl_num":	10,
+      "chnl_dir":	"input",
+      "chnl_type":	"digital",
+      "init_val":	false,
+      "failsafe_val":	false,
+      "lookup_table":	[]
+    }
+  ],
+	"alarms":	[{
+			"name":	"test alarm #1",
+			"alarm_num":	1,
+			"chnl_num":	1,
+			"trigger_type":	"digital",
+			"severity":	"critical",
+			"set_point":	"on",
+			"delay":	0
+    }, {
+			"name":	"test alarm #2",
+			"alarm_num":	2,
+			"chnl_num":	2,
+			"trigger_type":	"digital",
+			"severity":	"critical",
+			"set_point":	"on",
+			"delay":	0
+    }, {
+			"name":	"test alarm #3",
+			"alarm_num":	3,
+			"chnl_num":	3,
+			"trigger_type":	"digital",
+			"severity":	"critical",
+			"set_point":	"on",
+			"delay":	0
+    }, {
+			"name":	"test alarm #4",
+			"alarm_num":	4,
+			"chnl_num":	4,
+			"trigger_type":	"digital",
+			"severity":	"major",
+			"set_point":	"on",
+			"delay":	0
+    }, {
+			"name":	"test alarm #5",
+			"alarm_num":	5,
+			"chnl_num":	5,
+			"trigger_type":	"digital",
+			"severity":	"major",
+			"set_point":	"on",
+			"delay":	0
+    }, {
+			"name":	"test alarm #6",
+			"alarm_num":	6,
+			"chnl_num":	6,
+			"trigger_type":	"digital",
+			"severity":	"major",
+			"set_point":	"on",
+			"delay":	0
+    }, {
+			"name":	"test alarm #7",
+			"alarm_num":	7,
+			"chnl_num":	7,
+			"trigger_type":	"digital",
+			"severity":	"minor",
+			"set_point":	"on",
+			"delay":	0
+    }, {
+			"name":	"test alarm #8",
+			"alarm_num":	8,
+			"chnl_num":	8,
+			"trigger_type":	"digital",
+			"severity":	"minor",
+			"set_point":	"on",
+			"delay":	0
+    }, {
+			"name":	"test alarm #9",
+			"alarm_num":	9,
+			"chnl_num":	9,
+			"trigger_type":	"digital",
+			"severity":	"minor",
+			"set_point":	"on",
+			"delay":	0
+    }, {
+			"name":	"test alarm #10",
+			"alarm_num":	10,
+			"chnl_num":	10,
+			"trigger_type":	"digital",
+			"severity":	"minor",
+			"set_point":	"on",
+			"delay":	0
+    }
+  ]
+}
