@@ -3,7 +3,7 @@
     <v-flex xs12 class="text-xs-center centered">
       <v-card>
         <v-card-title>
-          Alarm List
+          <h2>Alarm List </h2>
           <v-spacer></v-spacer>
           <v-text-field
            append-icon="search"

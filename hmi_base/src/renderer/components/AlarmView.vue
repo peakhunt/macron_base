@@ -12,7 +12,7 @@
 
       <v-flex xs12>
         <v-card>
-          <v-card-title primary-title>Alarm Info</v-card-title>
+          <v-card-title primary-title><h2>Alarm Info</h2></v-card-title>
           <v-data-table
            :headers="headers"
            :items="items"
@@ -48,18 +48,15 @@
                 <td class="text-xs-left">{{delay}}</td>
               </tr>
               <tr>
+                <td width="250px" class="text-xs-left">Occur Time</td>
+                <td class="text-xs-left">{{occur_time}}</td>
+              </tr>
+              <tr>
                 <td width="250px" class="text-xs-left">Current State</td>
                 <td class="text-xs-left">{{current_state}}</td>
               </tr>
             </template>
           </v-data-table>
-        </v-card>
-      </v-flex>
-
-      <v-flex xs12 v-if="show_lookup_table">
-        <v-card>
-          <v-card-title primary-title>Lookup Table</v-card-title>
-          <lookup-table-view :chnl_num="channel_number"></lookup-table-view>
         </v-card>
       </v-flex>
     </v-layout>
@@ -68,6 +65,7 @@
 
 <script>
   import router from '@/router'
+  import dateFormat from 'dateformat'
 
   export default {
     name: 'AlarmView',
@@ -97,6 +95,16 @@
       },
       delay () {
         return this.$store.getters.alarm(this.alarmNum).delay
+      },
+      occur_time () {
+        var t = this.$store.getters.alarm(this.alarmNum).time
+
+        if (t !== 0) {
+          var d = new Date(t * 1000)
+
+          return dateFormat(d, 'yyyy-mm-dd HH:MM:ss')
+        }
+        return '-'
       },
       current_state () {
         return this.$store.getters.alarm(this.alarmNum).state

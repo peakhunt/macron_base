@@ -12,7 +12,7 @@
 
       <v-flex xs12>
         <v-card>
-          <v-card-title primary-title>Channel Info</v-card-title>
+          <v-card-title primary-title><h2>Channel Info</h2></v-card-title>
           <v-data-table
            :headers="headers"
            :items="items"
