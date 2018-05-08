@@ -9,6 +9,7 @@
 ![Channel Detail](captures/channel_detail.png)
 ![Alarm List](captures/alarm_list.png)
 ![Alarm Detail](captures/alarm_detail.png)
+![Current Alarms](captures/current_alarms.png)
 
 Goals
 1. HMI Development
