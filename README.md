@@ -7,8 +7,11 @@
 ![Main DashBoard](captures/current.png)
 ![Channel List](captures/channel_list.png)
 ![Channel Detail](captures/channel_detail.png)
+![Channel Config Update1](captures/channel_config_update1.png)
+![Channel Config Update2](captures/channel_config_update2.png)
 ![Alarm List](captures/alarm_list.png)
 ![Alarm Detail](captures/alarm_detail.png)
+![Alarm Config Update](captures/alarm_config_update.png)
 ![Current Alarms](captures/current_alarms.png)
 
 Goals
