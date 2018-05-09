@@ -94,6 +94,7 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
+
         </v-card>
       </v-flex>
 
@@ -164,7 +165,7 @@
               text: 'Channel was successfully udpated!',
               type: 'success'
             })
-            console.log('lookup table update success for ' + self.chnlNum)
+            console.log('channel update success for ' + self.chnlNum)
           }, 1000)
         })
       }

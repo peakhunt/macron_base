@@ -12,7 +12,13 @@
 
       <v-flex xs12>
         <v-card>
-          <v-card-title primary-title><h2>Alarm Info</h2></v-card-title>
+          <v-card-title primary-title>
+            <h2>Alarm Info</h2>
+            <v-btn v-if="alarmModified" color="red" slot="activator" @click="on_commit_channel_change" :loading="updating_alarm">
+              Commit
+              <v-icon>cloud_upload</v-icon>
+            </v-btn>
+          </v-card-title>
           <v-data-table
            :headers="headers"
            :items="items"
@@ -39,11 +45,11 @@
                 <td width="250px" class="text-xs-left">Severity</td>
                 <td class="text-xs-left">{{severity}}</td>
               </tr>
-              <tr>
+              <tr @click="edit_alarm()">
                 <td width="250px" class="text-xs-left">Set Point</td>
                 <td class="text-xs-left">{{set_point}}</td>
               </tr>
-              <tr>
+              <tr @click="edit_alarm()">
                 <td width="250px" class="text-xs-left">Delay</td>
                 <td class="text-xs-left">{{delay}}</td>
               </tr>
@@ -57,6 +63,29 @@
               </tr>
             </template>
           </v-data-table>
+
+          <v-dialog v-model="showModDialog" persistent max-width="500px">
+            <v-card>
+              <v-card-title>
+                <span class="headline">Modify Alarm Configuration</span>
+              </v-card-title>
+              <v-card-text>
+                <v-container>
+                  <v-switch v-if="channel_type === 'digital'" :label="`Set Point: ${modSetPoint.toString()}`" v-model="modSetPoint"></v-switch>
+                  <v-text-field v-if="channel_type === 'analog'" label="Set Point" v-model.number="modSetPoint" required></v-text-field>
+                  <v-text-field label="Delay" v-model.number="modDelay" required></v-text-field>
+                </v-container>
+              </v-card-text>
+
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" flat @click.native="showModDialog = false">Dismiss</v-btn>
+                <v-btn color="blue darken-1" flat @click="modify_alarm">Modify</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+          </v-dialog>
+
         </v-card>
       </v-flex>
     </v-layout>
@@ -66,12 +95,57 @@
 <script>
   import router from '@/router'
   import dateFormat from 'dateformat'
+  import serverAPI from '@/server_api'
 
   export default {
     name: 'AlarmView',
     methods: {
       go_back: function () {
         router.push('/alarm-list')
+      },
+      edit_alarm: function () {
+        if (this.alarmModified === false) {
+          this.modSetPoint = this.set_point
+          this.modDelay = this.delay
+        }
+        this.showModDialog = true
+      },
+      modify_alarm: function () {
+        this.alarmModified = true
+        this.showModDialog = false
+      },
+      on_commit_channel_change: function () {
+        var req = {}
+        var self = this
+
+        req.set_point = self.modSetPoint
+        req.delay = self.modDelay
+
+        self.updating_alarm = true
+
+        serverAPI.updateAlarmConfig(self.alarmNum, req, (err, data) => {
+          setTimeout(() => {
+            self.updating_alarm = false
+            if (err) {
+              console.log('failed to update alarm config for ' + self.alarmNum)
+              console.log(err)
+              self.$notify({
+                title: 'Update Failed',
+                text: 'Failed updating alarm configuration!',
+                type: 'error'
+              })
+              return
+            }
+
+            self.alarmModified = false
+            self.$notify({
+              title: 'Update Success',
+              text: 'Alarm was successfully udpated!',
+              type: 'success'
+            })
+            console.log('alarm update success for ' + self.chnlNum)
+          }, 1000)
+        })
       }
     },
     computed: {
@@ -84,6 +158,10 @@
       channel_number () {
         return this.$store.getters.alarm(this.alarmNum).chnl_num
       },
+      channel_type () {
+        var chnlNum = this.$store.getters.alarm(this.alarmNum).chnl_num
+        return this.$store.getters.channel(chnlNum).chnl_type
+      },
       trigger_type () {
         return this.$store.getters.alarm(this.alarmNum).trigger_type
       },
@@ -91,9 +169,15 @@
         return this.$store.getters.alarm(this.alarmNum).severity
       },
       set_point () {
+        if (this.alarmModified) {
+          return this.modSetPoint
+        }
         return this.$store.getters.alarm(this.alarmNum).set_point
       },
       delay () {
+        if (this.alarmModified) {
+          return this.modDelay
+        }
         return this.$store.getters.alarm(this.alarmNum).delay
       },
       occur_time () {
@@ -117,7 +201,12 @@
           { align: 'left' },
           { align: 'left' }
         ],
-        alarmNum: this.$route.params.alarmNum
+        alarmNum: this.$route.params.alarmNum,
+        showModDialog: false,
+        modSetPoint: false,
+        modDelay: 0,
+        alarmModified: false,
+        updating_alarm: false
       }
     }
   }

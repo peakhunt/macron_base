@@ -94,11 +94,27 @@ function updateChannelConfig (chnlNum, config, callback) {
     })
 }
 
+function updateAlarmConfig (alarmNum, config, callback) {
+  var url = getServerBaseUrl() + '/api/v1/alarm/update/config/' + alarmNum
+
+  axios.post(url,
+    config,
+    {
+      headers: { 'Content-Type': 'application/json' }
+    })
+    .then((response) => {
+      callback(null, response)
+    }, (err) => {
+      callback(err, null)
+    })
+}
+
 module.exports = {
   loadSystemConfig: loadSystemConfig,
   updateLookupTable: updateLookupTable,
   getChannelStatus: getChannelStatus,
   getAlarmStatus: getAlarmStatus,
   ackAlarm: ackAlarm,
-  updateChannelConfig: updateChannelConfig
+  updateChannelConfig: updateChannelConfig,
+  updateAlarmConfig: updateAlarmConfig
 }

@@ -4,8 +4,8 @@
 		"last_update":	"Mar/30/2018"
 	},
 	"update_info":	{
-		"revision":	62,
-		"update_time":	"Thu May  3 15:48:44 2018\n"
+		"revision":	68,
+		"update_time":	"Wed May  9 11:44:34 2018\n"
 	},
 	"core_config":	{
 		"loop_interval":	10
@@ -30,155 +30,183 @@
 		"doc_root":	"./"
 	},
 	"modbus_slave_list":	[{
-    "protocol":	"tcp",
-    "address":	15,
-    "param":	{
-      "port":	8080
-    },
-    "reg_map":	[{
-        "slave":	0,
-        "reg":	"coil",
-        "address":	1,
-        "channel":	1
-      }, {
-        "slave":	0,
-        "reg":	"coil",
-        "address":	2,
-        "channel":	2
-      }, {
-        "slave":	0,
-        "reg":	"coil",
-        "address":	3,
-        "channel":	3
-      }, {
-        "slave":	0,
-        "reg":	"coil",
-        "address":	4,
-        "channel":	4
-      }, {
-        "slave":	0,
-        "reg":	"coil",
-        "address":	5,
-        "channel":	5
-      }, {
-        "slave":	0,
-        "reg":	"coil",
-        "address":	6,
-        "channel":	6
-      }, {
-        "slave":	0,
-        "reg":	"coil",
-        "address":	7,
-        "channel":	7
-      }, {
-        "slave":	0,
-        "reg":	"coil",
-        "address":	8,
-        "channel":	8
-      }, {
-        "slave":	0,
-        "reg":	"coil",
-        "address":	9,
-        "channel":	9
-      }, {
-        "slave":	0,
-        "reg":	"coil",
-        "address":	10,
-        "channel":	10
-      }
-    ]
-  ],
-  "channels": [ {
-      "name":	"test channel #1",
-      "chnl_num":	1,
-      "chnl_dir":	"input",
-      "chnl_type":	"digital",
-      "init_val":	false,
-      "failsafe_val":	false,
-      "lookup_table":	[]
-    }, {
-      "name":	"test channel #2",
-      "chnl_num":	2,
-      "chnl_dir":	"input",
-      "chnl_type":	"digital",
-      "init_val":	false,
-      "failsafe_val":	false,
-      "lookup_table":	[]
-    }, {
-      "name":	"test channel #3",
-      "chnl_num":	3,
-      "chnl_dir":	"input",
-      "chnl_type":	"digital",
-      "init_val":	false,
-      "failsafe_val":	false,
-      "lookup_table":	[]
-    }, {
-      "name":	"test channel #4",
-      "chnl_num":	4,
-      "chnl_dir":	"input",
-      "chnl_type":	"digital",
-      "init_val":	false,
-      "failsafe_val":	false,
-      "lookup_table":	[]
-    }, {
-      "name":	"test channel #5",
-      "chnl_num":	5,
-      "chnl_dir":	"input",
-      "chnl_type":	"digital",
-      "init_val":	false,
-      "failsafe_val":	false,
-      "lookup_table":	[]
-    }, {
-      "name":	"test channel #6",
-      "chnl_num":	6,
-      "chnl_dir":	"input",
-      "chnl_type":	"digital",
-      "init_val":	false,
-      "failsafe_val":	false,
-      "lookup_table":	[]
-    }, {
-      "name":	"test channel #8",
-      "chnl_num":	1,
-      "chnl_dir":	"input",
-      "chnl_type":	"digital",
-      "init_val":	false,
-      "failsafe_val":	false,
-      "lookup_table":	[]
-    }, {
-      "name":	"test channel #9",
-      "chnl_num":	9,
-      "chnl_dir":	"input",
-      "chnl_type":	"digital",
-      "init_val":	false,
-      "failsafe_val":	false,
-      "lookup_table":	[]
-    }, {
-      "name":	"test channel #10",
-      "chnl_num":	10,
-      "chnl_dir":	"input",
-      "chnl_type":	"digital",
-      "init_val":	false,
-      "failsafe_val":	false,
-      "lookup_table":	[]
-    }
-  ],
+			"protocol":	"tcp",
+			"address":	15,
+			"param":	{
+				"port":	8080
+			},
+			"reg_map":	[{
+					"slave":	0,
+					"reg":	"coil",
+					"address":	1,
+					"channel":	1
+				}, {
+					"slave":	0,
+					"reg":	"coil",
+					"address":	2,
+					"channel":	2
+				}, {
+					"slave":	0,
+					"reg":	"coil",
+					"address":	3,
+					"channel":	3
+				}, {
+					"slave":	0,
+					"reg":	"coil",
+					"address":	4,
+					"channel":	4
+				}, {
+					"slave":	0,
+					"reg":	"coil",
+					"address":	5,
+					"channel":	5
+				}, {
+					"slave":	0,
+					"reg":	"coil",
+					"address":	6,
+					"channel":	6
+				}, {
+					"slave":	0,
+					"reg":	"coil",
+					"address":	7,
+					"channel":	7
+				}, {
+					"slave":	0,
+					"reg":	"coil",
+					"address":	8,
+					"channel":	8
+				}, {
+					"slave":	0,
+					"reg":	"coil",
+					"address":	9,
+					"channel":	9
+				}, {
+					"slave":	0,
+					"reg":	"coil",
+					"address":	10,
+					"channel":	10
+				}, {
+					"slave":	0,
+					"reg":	"hold",
+					"address":	1,
+					"channel":	11
+				}]
+		}],
+	"modbus_master_list":	[],
+	"channels":	[{
+			"name":	"test channel #1",
+			"chnl_num":	1,
+			"chnl_dir":	"input",
+			"chnl_type":	"digital",
+			"lookup_table":	[],
+			"init_val":	true,
+			"failsafe_val":	true
+		}, {
+			"name":	"test channel #2",
+			"chnl_num":	2,
+			"chnl_dir":	"input",
+			"chnl_type":	"digital",
+			"init_val":	false,
+			"failsafe_val":	false,
+			"lookup_table":	[]
+		}, {
+			"name":	"test channel #3",
+			"chnl_num":	3,
+			"chnl_dir":	"input",
+			"chnl_type":	"digital",
+			"init_val":	false,
+			"failsafe_val":	false,
+			"lookup_table":	[]
+		}, {
+			"name":	"test channel #4",
+			"chnl_num":	4,
+			"chnl_dir":	"input",
+			"chnl_type":	"digital",
+			"init_val":	false,
+			"failsafe_val":	false,
+			"lookup_table":	[]
+		}, {
+			"name":	"test channel #5",
+			"chnl_num":	5,
+			"chnl_dir":	"input",
+			"chnl_type":	"digital",
+			"init_val":	false,
+			"failsafe_val":	false,
+			"lookup_table":	[]
+		}, {
+			"name":	"test channel #6",
+			"chnl_num":	6,
+			"chnl_dir":	"input",
+			"chnl_type":	"digital",
+			"init_val":	false,
+			"failsafe_val":	false,
+			"lookup_table":	[]
+		}, {
+			"name":	"test channel #7",
+			"chnl_num":	7,
+			"chnl_dir":	"input",
+			"chnl_type":	"digital",
+			"init_val":	false,
+			"failsafe_val":	false,
+			"lookup_table":	[]
+		}, {
+			"name":	"test channel #8",
+			"chnl_num":	8,
+			"chnl_dir":	"input",
+			"chnl_type":	"digital",
+			"init_val":	false,
+			"failsafe_val":	false,
+			"lookup_table":	[]
+		}, {
+			"name":	"test channel #9",
+			"chnl_num":	9,
+			"chnl_dir":	"input",
+			"chnl_type":	"digital",
+			"init_val":	false,
+			"failsafe_val":	false,
+			"lookup_table":	[]
+		}, {
+			"name":	"test channel #10",
+			"chnl_num":	10,
+			"chnl_dir":	"input",
+			"chnl_type":	"digital",
+			"init_val":	false,
+			"failsafe_val":	false,
+			"lookup_table":	[]
+		}, {
+			"name":	"test analog channel #11",
+			"chnl_num":	11,
+			"chnl_dir":	"input",
+			"chnl_type":	"analog",
+			"lookup_table":	[{
+					"raw":	0,
+					"eng":	0
+				}, {
+					"raw":	10,
+					"eng":	10
+				}],
+			"init_val":	0,
+			"failsafe_val":	2,
+			"min_val":	3,
+			"max_val":	30
+		}],
 	"alarms":	[{
 			"name":	"test alarm #1",
 			"alarm_num":	1,
 			"chnl_num":	1,
 			"trigger_type":	"digital",
 			"severity":	"critical",
-			"set_point":	"on",
-			"delay":	0
-    }, {
+			"set_point":	"off",
+			"delay":	50
+		}, {
 			"name":	"test alarm #2",
 			"alarm_num":	2,
 			"chnl_num":	2,
 			"trigger_type":	"digital",
 			"severity":	"critical",
-			"set_point":	"on",
-			"delay":	0
-    }, {
+			"set_point":	"off",
+			"delay":	1000
+		}, {
 			"name":	"test alarm #3",
 			"alarm_num":	3,
 			"chnl_num":	3,
@@ -186,7 +214,7 @@
 			"severity":	"critical",
 			"set_point":	"on",
 			"delay":	0
-    }, {
+		}, {
 			"name":	"test alarm #4",
 			"alarm_num":	4,
 			"chnl_num":	4,
@@ -194,7 +222,7 @@
 			"severity":	"major",
 			"set_point":	"on",
 			"delay":	0
-    }, {
+		}, {
 			"name":	"test alarm #5",
 			"alarm_num":	5,
 			"chnl_num":	5,
@@ -202,7 +230,7 @@
 			"severity":	"major",
 			"set_point":	"on",
 			"delay":	0
-    }, {
+		}, {
 			"name":	"test alarm #6",
 			"alarm_num":	6,
 			"chnl_num":	6,
@@ -210,7 +238,7 @@
 			"severity":	"major",
 			"set_point":	"on",
 			"delay":	0
-    }, {
+		}, {
 			"name":	"test alarm #7",
 			"alarm_num":	7,
 			"chnl_num":	7,
@@ -218,7 +246,7 @@
 			"severity":	"minor",
 			"set_point":	"on",
 			"delay":	0
-    }, {
+		}, {
 			"name":	"test alarm #8",
 			"alarm_num":	8,
 			"chnl_num":	8,
@@ -226,7 +254,7 @@
 			"severity":	"minor",
 			"set_point":	"on",
 			"delay":	0
-    }, {
+		}, {
 			"name":	"test alarm #9",
 			"alarm_num":	9,
 			"chnl_num":	9,
@@ -234,7 +262,7 @@
 			"severity":	"minor",
 			"set_point":	"on",
 			"delay":	0
-    }, {
+		}, {
 			"name":	"test alarm #10",
 			"alarm_num":	10,
 			"chnl_num":	10,
@@ -242,6 +270,21 @@
 			"severity":	"minor",
 			"set_point":	"on",
 			"delay":	0
-    }
-  ]
+		}, {
+			"name":	"test alarm #11 low",
+			"alarm_num":	11,
+			"chnl_num":	11,
+			"trigger_type":	"low",
+			"severity":	"minor",
+			"set_point":	1,
+			"delay":	1000
+		}, {
+			"name":	"test alarm #12 high",
+			"alarm_num":	12,
+			"chnl_num":	11,
+			"trigger_type":	"high",
+			"severity":	"minor",
+			"set_point":	20,
+			"delay":	1000
+		}]
 }
