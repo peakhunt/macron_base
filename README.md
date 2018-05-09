@@ -1,7 +1,41 @@
 # macron_base
 
-## current status : reaching milestone-2
-### Milestone-2
+## current status : trying to  milestone-3
+
+### Milestone-3
+Goals
+1. event logger
+2. alarm logger
+3. signal logger & realtime/offline tracing with line chart
+4. common widgets for visual HMI development
+5. Control app framework development
+
+### Milestone-2 (Reached on May/9/2018)
+1. HMI Development for base system functionalities
+   * Channel List
+   * Channel Detail
+   * Channel Configuration Update
+   * Alarm List
+   * Alarm Detail
+   * Alarm Configuration Update
+   * Current Alarms
+   * HMI configuration with JSON file
+
+2. HMI integration with Control Server
+   * JSON based API for channel status query
+   * JSON based API for alarm status query
+   * System Project Configuration Loader API 
+   * Alarm ACK API
+   * JSON based API for channel configuration update
+   * JSON based API for alarm configuration update
+   * JSON based API for lookup table update
+   * Automatic Channel Polling Scheduler based on configuration
+   * Automatic Alarm Polling Scheduler based on configuration
+
+3. Control Server Base Idea & Functionality Validation/Improvement
+   * channel status polling verified
+   * alarm status polling verified
+   * configuration update verified
 
 ![Loading](captures/loading.png)
 ![Main DashBoard](captures/current.png)
@@ -13,12 +47,6 @@
 ![Alarm Detail](captures/alarm_detail.png)
 ![Alarm Config Update](captures/alarm_config_update.png)
 ![Current Alarms](captures/current_alarms.png)
-
-Goals
-1. HMI Development
-2. HMI integration with Control Server
-3. Control Server Base Idea & Functionality Validation/Improvement
-4. Control app framework development
 
 ### Milestone-1 (Reached on April/26/2018)
 
