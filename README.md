@@ -1,6 +1,6 @@
 # macron_base
 
-## current status : trying to  milestone-3
+## current status : trying to reach milestone-3
 
 ### Milestone-3
 Goals
