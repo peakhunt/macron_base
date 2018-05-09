@@ -40,6 +40,10 @@ export default new Router({
       component: require('@/components/CurrentAlarmsView').default
     },
     {
+      path: '/signal-trace',
+      component: require('@/components/SignalTraceView').default
+    },
+    {
       path: '*',
       redirect: '/'
     }
