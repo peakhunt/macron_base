@@ -54,7 +54,13 @@
     data () {
       var configOptions = {
         responsive: true,
+        animation: false,
         maintainAspectRatio: false,
+        elements: {
+          point: {
+            radius: 0
+          }
+        },
         scales: {
           xAxes: [
             {
@@ -91,8 +97,8 @@
             {
               label: 'Sample Data',
               fill: false,
-              backgroundColor: '#f87979',
-              pointRadius: 1.5,
+              borderColor: '#f87979',
+              pointRadius: 0,
               data: [],
               showLine: true
             }
