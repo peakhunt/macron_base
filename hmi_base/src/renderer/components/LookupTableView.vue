@@ -202,11 +202,11 @@
 
         self.updating_lookup_table = true
 
-        serverAPI.updateLookupTable(this.chnl_num, this.lookup_table, (err, data) => {
+        serverAPI.updateLookupTable(self.chnl_num, self.lookup_table, (err, data) => {
           setTimeout(() => {
             self.updating_lookup_table = false
             if (err) {
-              console.log('failed to update lookup table for ' + this.chnl_num)
+              console.log('failed to update lookup table for ' + self.chnl_num)
               console.log(err)
               self.$notify({
                 title: 'Update Failed',
@@ -222,7 +222,7 @@
               text: 'Lookup Table was successfully udpated!',
               type: 'success'
             })
-            console.log('lookup table update success for ' + this.chnl_num)
+            console.log('lookup table update success for ' + self.chnl_num)
           }, 1000)
         })
       },

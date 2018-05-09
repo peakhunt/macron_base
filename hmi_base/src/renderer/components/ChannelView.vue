@@ -12,7 +12,13 @@
 
       <v-flex xs12>
         <v-card>
-          <v-card-title primary-title><h2>Channel Info</h2></v-card-title>
+          <v-card-title primary-title>
+            <h2>Channel Info</h2>
+            <v-btn v-if="chnlModified" color="red" slot="activator" @click="on_commit_channel_change" :loading="updating_channel">
+              Commit
+              <v-icon>cloud_upload</v-icon>
+            </v-btn>
+          </v-card-title>
           <v-data-table
            :headers="headers"
            :items="items"
@@ -35,16 +41,24 @@
                 <td width="250px" class="text-xs-left">Channel Type</td>
                 <td class="text-xs-left">{{channel_type}}</td>
               </tr>
-              <tr>
+              <tr @click="edit_channel()">
                 <td width="250px" class="text-xs-left">Init Value</td>
                 <td class="text-xs-left">{{channel_init}}</td>
               </tr>
-              <tr>
+              <tr @click="edit_channel()">
                 <td width="250px" class="text-xs-left">FailSafe Value</td>
                 <td class="text-xs-left">{{channel_failsafe}}</td>
               </tr>
+              <tr v-if="channel_type === 'analog'" @click="edit_channel()">
+                <td width="250px" class="text-xs-left">Min Value</td>
+                <td class="text-xs-left">{{channel_min}}</td>
+              </tr>
+              <tr v-if="channel_type === 'analog'" @click="edit_channel()">
+                <td width="250px" class="text-xs-left">Max Value</td>
+                <td class="text-xs-left">{{channel_max}}</td>
+              </tr>
               <tr>
-                <td width="250px" class="text-xs-left">Value</td>
+                <td width="250px" class="text-xs-left">Eng. Value</td>
                 <td class="text-xs-left">{{channel_value}}</td>
               </tr>
               <tr>
@@ -53,6 +67,33 @@
               </tr>
             </template>
           </v-data-table>
+
+          <v-dialog v-model="showModDialog" persistent max-width="500px">
+            <v-card>
+              <v-card-title>
+                <span class="headline">Modify Channel Configuration</span>
+              </v-card-title>
+              <v-card-text>
+                <v-container fluid v-if="channel_type === 'digital'">
+                  <v-switch :label="`Init Value: ${modInitValue.toString()}`" v-model="modInitValue"></v-switch>
+                  <v-switch :label="`FailSafe Value: ${modFailSafeValue.toString()}`" v-model="modFailSafeValue"></v-switch>
+                </v-container>
+
+                <v-container fluid v-if="channel_type === 'analog'">
+                  <v-text-field label="Init Value" v-model.number="modInitValue" required></v-text-field>
+                  <v-text-field label="FailSafe Value" v-model.number="modFailSafeValue" required></v-text-field>
+                  <v-text-field label="Min Value" v-model.number="modMinValue" required></v-text-field>
+                  <v-text-field label="Max Value" v-model.number="modMaxValue" required></v-text-field>
+                </v-container>
+              </v-card-text>
+
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" flat @click.native="showModDialog = false">Dismiss</v-btn>
+                <v-btn color="blue darken-1" flat @click="modify_channel">Modify</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-card>
       </v-flex>
 
@@ -69,12 +110,63 @@
 <script>
   import router from '@/router'
   import LookupTableView from '@/components/LookupTableView'
+  import serverAPI from '@/server_api'
 
   export default {
     name: 'ChannelVuew',
     methods: {
       go_back: function () {
         router.push('/channel-list')
+      },
+      edit_channel: function () {
+        if (this.chnlModified === false) {
+          this.modInitValue = this.channel_init
+          this.modFailSafeValue = this.channel_failsafe
+          this.modMinValue = this.channel_min
+          this.modMaxValue = this.channel_max
+        }
+        this.showModDialog = true
+      },
+      modify_channel: function () {
+        this.chnlModified = true
+        this.showModDialog = false
+      },
+      on_commit_channel_change: function () {
+        var req = {}
+        var self = this
+
+        req.init_val = self.modInitValue
+        req.failsafe_val = self.modFailSafeValue
+
+        if (self.channel_type === 'analog') {
+          req.min_val = self.modMinValue
+          req.max_val = self.modMaxValue
+        }
+
+        self.updating_channel = true
+        serverAPI.updateChannelConfig(self.chnlNum, req, (err, data) => {
+          setTimeout(() => {
+            self.updating_channel = false
+            if (err) {
+              console.log('failed to update channel config for ' + self.chnlNum)
+              console.log(err)
+              self.$notify({
+                title: 'Update Failed',
+                text: 'Failed updating channel configuration!',
+                type: 'error'
+              })
+              return
+            }
+
+            self.chnlModified = false
+            self.$notify({
+              title: 'Update Success',
+              text: 'Channel was successfully udpated!',
+              type: 'success'
+            })
+            console.log('lookup table update success for ' + self.chnlNum)
+          }, 1000)
+        })
       }
     },
     computed: {
@@ -88,10 +180,28 @@
         return this.$store.getters.channel(this.chnlNum).chnl_type
       },
       channel_init () {
+        if (this.chnlModified === true) {
+          return this.modInitValue
+        }
         return this.$store.getters.channel(this.chnlNum).init_val
       },
       channel_failsafe () {
+        if (this.chnlModified === true) {
+          return this.modFailSafeValue
+        }
         return this.$store.getters.channel(this.chnlNum).failsafe_val
+      },
+      channel_min () {
+        if (this.chnlModified === true) {
+          return this.modMinValue
+        }
+        return this.$store.getters.channel(this.chnlNum).min_val
+      },
+      channel_max () {
+        if (this.chnlModified === true) {
+          return this.modMaxValue
+        }
+        return this.$store.getters.channel(this.chnlNum).max_val
       },
       channel_name () {
         return this.$store.getters.channel(this.chnlNum).name
@@ -117,7 +227,14 @@
           { align: 'left' },
           { align: 'left' }
         ],
-        chnlNum: this.$route.params.chnlNum
+        chnlNum: this.$route.params.chnlNum,
+        chnlModified: false,
+        modInitValue: false,
+        modFailSafeValue: false,
+        modMinValue: 0,
+        modMaxValue: 0,
+        showModDialog: false,
+        updating_channel: false
       }
     }
   }
