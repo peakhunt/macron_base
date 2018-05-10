@@ -40,16 +40,16 @@ Goals
    * alarm status polling verified
    * configuration update verified
 
-![Loading](captures/loading.png)
-![Main DashBoard](captures/current.png)
-![Channel List](captures/channel_list.png)
-![Channel Detail](captures/channel_detail.png)
-![Channel Config Update1](captures/channel_config_update1.png)
-![Channel Config Update2](captures/channel_config_update2.png)
-![Alarm List](captures/alarm_list.png)
-![Alarm Detail](captures/alarm_detail.png)
-![Alarm Config Update](captures/alarm_config_update.png)
-![Current Alarms](captures/current_alarms.png)
+![Loading](captures/loading.png "main configuration loading")
+![Main DashBoard](captures/current.png "dash board placeholder for visual HMI")
+![Channel List](captures/channel_list.png "channel list")
+![Channel Detail](captures/channel_detail.png "channel detail")
+![Channel Config Update1](captures/channel_config_update1.png "channel configuration update")
+![Channel Config Update2](captures/channel_config_update2.png "channel configuration update")
+![Alarm List](captures/alarm_list.png "alarm list")
+![Alarm Detail](captures/alarm_detail.png "alarm detail")
+![Alarm Config Update](captures/alarm_config_update.png "alarm configuration update")
+![Current Alarms](captures/current_alarms.png "current active alarms")
 
 ### Milestone-1 (Reached on April/26/2018)
 
