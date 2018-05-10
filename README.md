@@ -10,8 +10,8 @@ Goals
 4. common widgets for visual HMI development
 5. Control app framework development
 
-![Signal Trace Realtime](captures/signal_trace_realtime.png)
-![Signal Trace Channel Select](captures/signal_trace_channel_select.png)
+![Signal Trace Realtime](captures/signal_trace_realtime.png "realtime signal trace")
+![Signal Trace Channel Select](captures/signal_trace_channel_select.png "trace channel select dialog")
 
 ### Milestone-2 (Reached on May/9/2018)
 1. HMI Development for base system functionalities
