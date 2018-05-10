@@ -13,7 +13,6 @@
 
 <script>
   import LineChart from '@/components/LineChart'
-  import Vue from 'vue'
   import dateFormat from 'dateformat'
 
   export default {
@@ -31,8 +30,8 @@
         var v = 0.0572 * Math.cos(4.667 * rad) + 0.0218 * Math.cos(12.22 * rad)
         this.count += 1
 
-        Vue.set(this.data.labels, this.data.labels.length, d)
-        Vue.set(this.data.datasets[0].data, this.data.datasets[0].data.length, v)
+        this.data.labels[this.data.labels.length] = d
+        this.data.datasets[0].data[this.data.datasets[0].data.length] = v
 
         if (this.data.labels.length > this.maxPoints) {
           this.data.labels.splice(0, 1)
@@ -42,7 +41,12 @@
           this.data.datasets[0].data.splice(0, 1)
         }
 
-        this.$refs['lineGraph'].refresh()
+        this.accumlationCnt += 1
+
+        if (this.accumlationCnt >= 5) {
+          this.$refs['lineGraph'].refresh()
+          this.accumlationCnt = 0
+        }
       }
     },
     created () {
@@ -90,6 +94,7 @@
       return {
         maxPoints: 200 * 2,
         count: 0,
+        accumlationCnt: 0,
         channels: [],
         data: {
           labels: [],
