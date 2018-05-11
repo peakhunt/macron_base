@@ -53,6 +53,14 @@
   export default {
     name: 'ChannelSelectDialog',
     props: ['showDialog', 'currentChannels'],
+    watch: {
+      showDialog: function (newVal) {
+        if (newVal === true) {
+          this.channelNum = ''
+          this.selectedChannels = [...this.currentChannels]
+        }
+      }
+    },
     methods: {
       addChannel: function () {
         var n = parseInt(this.channelNum)
