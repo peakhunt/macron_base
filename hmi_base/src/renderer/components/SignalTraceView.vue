@@ -29,7 +29,7 @@
               <span>Query Signal Log</span>
             </v-tooltip>
           </v-card-title>
-          <line-chart class="graph-div" :chartData="data" :options="options" ref="lineGraph"></line-chart>
+          <line-chart id="wrapper" :chartData="data" :options="options" ref="lineGraph"></line-chart>
           <channel-select-dialog :showDialog="showChannelSelectDialog" :currentChannels="channels"
            @dismiss="showChannelSelectDialog = false"
            @select="onChannelSelectionModified"
@@ -197,7 +197,8 @@
 </script>
 
 <style scoped>
-.graph-div {
-  height: 700px;
+#wrapper {
+  height: 75vh;
 }
+
 </style>
