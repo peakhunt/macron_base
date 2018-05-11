@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid grid-list-md mt-0>
+  <v-container fluid grid-list-md mt-0 fill-height>
     <v-layout row wrap>
       <v-flex xs12>
         <v-card>
@@ -28,12 +28,36 @@
               </v-btn>
               <span>Query Signal Log</span>
             </v-tooltip>
+
+            <v-tooltip bottom>
+              <v-btn color="green" slot="activator" :disabled="realtimePlaying === true" @click="showSettingsDialog = true">
+                <v-icon>settings</v-icon>
+              </v-btn>
+              <span>Plot Settings</span>
+            </v-tooltip>
           </v-card-title>
+
+          <v-layout row wrap align-center>
+            <v-btn flat icon color="indigo" :disabled="realtimePlaying === true">
+              <v-icon>arrow_back</v-icon>
+            </v-btn>
+
+            <v-spacer></v-spacer>
+
+            <v-btn flat icon color="indigo" :disabled="realtimePlaying === true">
+              <v-icon>arrow_forward</v-icon>
+            </v-btn>
+          </v-layout>
+
           <line-chart id="wrapper" :chartData="data" :options="options" ref="lineGraph"></line-chart>
           <channel-select-dialog :showDialog="showChannelSelectDialog" :currentChannels="channels"
            @dismiss="showChannelSelectDialog = false"
            @select="onChannelSelectionModified"
-           ></channel-select-dialog>
+          ></channel-select-dialog>
+          <plot-settings-dialog :showDialog="showSettingsDialog" :plotCfg="plotCfg"
+           @dismiss="showSettingsDialog = false"
+           @change="onSettingsModified"
+          ></plot-settings-dialog>
         </v-card>
       </v-flex>
     </v-layout>
@@ -45,10 +69,11 @@
   import dateFormat from 'dateformat'
   import utils from '@/utils'
   import ChannelSelectDialog from '@/components/ChannelSelectDialog'
+  import PlotSettingsDialog from '@/components/PlotSettingsDialog'
 
   export default {
     name: 'signalTraceView',
-    components: { LineChart, ChannelSelectDialog },
+    components: { LineChart, ChannelSelectDialog, PlotSettingsDialog },
     methods: {
       start_stop_realtime_play () {
         if (this.realtimePlaying === true) {
@@ -59,7 +84,7 @@
         } else {
           // start
           this.realtimePlaying = true
-          this.$options.interval = setInterval(this.update, 20)
+          this.$options.interval = setInterval(this.update, this.plotCfg.samplingInterval)
 
           // clear data
           this.data.labels = []
@@ -73,7 +98,7 @@
 
         console.log('onChannelSelectionModified:' + data)
 
-        self.channel = data
+        self.channels = [...data]
         self.data.datasets = []
         data.forEach(function (chnlNum) {
           self.add_channel(chnlNum)
@@ -81,7 +106,14 @@
         self.showChannelSelectDialog = false
         self.$refs['lineGraph'].refresh()
       },
-
+      onSettingsModified: function (setting) {
+        console.log('changing settings:' + setting)
+        this.plotCfg.maxSamplesVisible = setting.maxSamplesVisible
+        this.plotCfg.maxSamplesToKeep = setting.maxSamplesToKeep
+        this.plotCfg.samplingInterval = setting.samplingInterval
+        this.plotCfg.samplesToUpdate = setting.samplesToUpdate
+        this.showSettingsDialog = false
+      },
       add_channel (chnlNum) {
         var n = chnlNum
 
@@ -117,18 +149,18 @@
           var r2 = (Math.random() - 0.5) * 5
 
           element.data[element.data.length] = v * r2 + r
-          if (element.data.length > self.maxPoints) {
+          if (element.data.length > self.plotCfg.maxSamplesVisible) {
             element.data.splice(0, 1)
           }
         })
 
-        if (this.data.labels.length > this.maxPoints) {
+        if (this.data.labels.length > this.plotCfg.maxSamplesVisible) {
           this.data.labels.splice(0, 1)
         }
 
         this.accumlationCnt += 1
 
-        if (this.accumlationCnt >= 5) {
+        if (this.accumlationCnt >= this.plotCfg.samplesToUpdate) {
           this.$refs['lineGraph'].refresh()
           this.accumlationCnt = 0
         }
@@ -181,7 +213,13 @@
       return {
         showChannelSelectDialog: false,
         realtimePlaying: false,
-        maxPoints: 180,
+        plotCfg: {
+          maxSamplesVisible: 180,
+          maxSamplesToKeep: 180 * 10,
+          samplingInterval: 20,
+          samplesToUpdate: 10
+        },
+        showSettingsDialog: false,
         count: 0,
         accumlationCnt: 0,
         channels: [],
@@ -198,7 +236,7 @@
 
 <style scoped>
 #wrapper {
-  height: 75vh;
+  height: 70vh;
 }
 
 </style>
