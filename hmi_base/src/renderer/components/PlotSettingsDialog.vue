@@ -63,8 +63,8 @@
               return 'Value should be less than Max Samples'
             }
 
-            if (value < 180) {
-              return 'Value should be bigger than 180'
+            if (value < 60) {
+              return 'Value should be bigger than 60'
             }
             return true
           },
