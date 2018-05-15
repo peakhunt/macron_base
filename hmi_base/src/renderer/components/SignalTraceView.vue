@@ -70,30 +70,33 @@
         }
 
         if (deltaX !== undefined) {
-          this.shift(deltaX)
+          this.shift_visible(deltaX)
         }
+      },
+      clear_data () {
+        this.data.labels = []
+        this.data.labels_accumulated = []
+        this.visibleStart = 0
+
+        this.data.datasets.forEach(function (element) {
+          element.data = []
+          element.data_accumulated = []
+        })
       },
       start_stop_realtime_play () {
         if (this.realtimePlaying === true) {
           // stop
           this.realtimePlaying = false
-          clearInterval(this.$options.interval)
+          clearInterval(this.$options.interval_timer)
           this.$options.interval_timer = null
           this.$refs['lineGraph'].refresh()
         } else {
           // start
           this.realtimePlaying = true
-          this.$options.interval = setInterval(this.update, this.plotCfg.samplingInterval)
+          this.$options.interval_timer = setInterval(this.update, this.plotCfg.samplingInterval)
 
           // clear data
-          this.data.labels = []
-          this.data.labels_accumulated = []
-          this.visibleStart = 0
-
-          this.data.datasets.forEach(function (element) {
-            element.data = []
-            element.data_accumulated = []
-          })
+          this.clear_data()
         }
       },
       onChannelSelectionModified: function (data) {
@@ -135,41 +138,18 @@
       show_channel_select_dialog () {
         this.showChannelSelectDialog = true
       },
-      update () {
+      get_data_simul (graphNdx) {
         // var v = this.$store.getters.channel(11)
-        var d = new Date()
-
-        d = dateFormat(d, 'yyyy-mm-dd HH:MM:ss')
-
         var rad = Math.PI * this.count / 180
-
         var v = 0.0572 * Math.cos(4.667 * rad) + 0.0218 * Math.cos(12.22 * rad)
-        this.count += 1
+        var r = Math.random()
+        var r2 = (Math.random() - 0.5) * 5
 
-        this.data.labels[this.data.labels.length] = d
-        this.data.labels_accumulated[this.data.labels_accumulated.length] = d
-
-        var self = this
-
-        this.data.datasets.forEach(function (element) {
-          var r = Math.random()
-          var r2 = (Math.random() - 0.5) * 5
-
-          element.data[element.data.length] = v * r2 + r
-          if (element.data.length > self.plotCfg.maxSamplesVisible) {
-            element.data.splice(0, 1)
-          }
-
-          element.data_accumulated[element.data_accumulated.length] = v * r2 + r
-          if (element.data_accumulated.length > self.plotCfg.maxSamplesToKeep) {
-            element.data_accumulated.splice(0, 1)
-          }
-        })
-
-        if (this.data.labels.length > this.plotCfg.maxSamplesVisible) {
-          this.data.labels.splice(0, 1)
-          this.visibleStart += 1
-        }
+        return v * r2 * r
+      },
+      push_label (label) {
+        this.data.labels[this.data.labels.length] = label
+        this.data.labels_accumulated[this.data.labels_accumulated.length] = label
 
         if (this.data.labels_accumulated.length > this.plotCfg.maxSamplesToKeep) {
           this.data.labels_accumulated.splice(0, 1)
@@ -179,6 +159,39 @@
         if (this.visibleStart < 0) {
           this.visibleStart = 0
         }
+      },
+      push_data (dataGetter) {
+        var self = this
+
+        this.data.datasets.forEach(function (element) {
+          var ndx = self.data.datasets.indexOf(element)
+          var v = dataGetter.call(self, ndx)
+
+          element.data[element.data.length] = v
+          if (element.data.length > self.plotCfg.maxSamplesVisible) {
+            element.data.splice(0, 1)
+          }
+
+          element.data_accumulated[element.data_accumulated.length] = v
+          if (element.data_accumulated.length > self.plotCfg.maxSamplesToKeep) {
+            element.data_accumulated.splice(0, 1)
+          }
+        })
+
+        if (this.data.labels.length > this.plotCfg.maxSamplesVisible) {
+          this.data.labels.splice(0, 1)
+          this.visibleStart += 1
+        }
+      },
+      update () {
+        var d = new Date()
+
+        d = dateFormat(d, 'yyyy-mm-dd HH:MM:ss')
+
+        this.count += 1
+
+        this.push_label(d)
+        this.push_data(this.get_data_simul)
 
         this.accumlationCnt += 1
 
@@ -211,7 +224,7 @@
         })
         this.$refs['lineGraph'].refresh()
       },
-      shift (delta) {
+      shift_visible (delta) {
         this.visibleStart += delta
         this.adjust_offset_ndx_and_reload()
       },
@@ -235,7 +248,7 @@
     },
     beforeDestroy () {
       if (this.$options.interval_timer != null) {
-        clearInterval(this.$options.interval)
+        clearInterval(this.$options.interval_timer)
       }
     },
     data () {
