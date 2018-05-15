@@ -37,19 +37,8 @@
             </v-tooltip>
           </v-card-title>
 
-          <v-layout row wrap align-center>
-            <v-btn flat icon color="indigo" :disabled="realtimePlaying === true">
-              <v-icon>arrow_back</v-icon>
-            </v-btn>
-
-            <v-spacer></v-spacer>
-
-            <v-btn flat icon color="indigo" :disabled="realtimePlaying === true">
-              <v-icon>arrow_forward</v-icon>
-            </v-btn>
-          </v-layout>
-
-          <line-chart id="wrapper" :chartData="data" :options="options" ref="lineGraph"></line-chart>
+          <line-chart id="wrapper" :chartData="data" :options="options" ref="lineGraph"
+           v-dragged="onDragged"></line-chart>
           <channel-select-dialog :showDialog="showChannelSelectDialog" :currentChannels="channels"
            @dismiss="showChannelSelectDialog = false"
            @select="onChannelSelectionModified"
@@ -75,12 +64,22 @@
     name: 'signalTraceView',
     components: { LineChart, ChannelSelectDialog, PlotSettingsDialog },
     methods: {
+      onDragged ({ el, deltaX, deltaY, offsetX, offsetY, clientX, clientY, first, last }) {
+        if (this.realtimePlaying === true) {
+          return
+        }
+
+        if (deltaX !== undefined) {
+          this.shift(deltaX)
+        }
+      },
       start_stop_realtime_play () {
         if (this.realtimePlaying === true) {
           // stop
           this.realtimePlaying = false
           clearInterval(this.$options.interval)
           this.$options.interval_timer = null
+          this.$refs['lineGraph'].refresh()
         } else {
           // start
           this.realtimePlaying = true
@@ -88,8 +87,12 @@
 
           // clear data
           this.data.labels = []
+          this.data.labels_accumulated = []
+          this.visibleStart = 0
+
           this.data.datasets.forEach(function (element) {
             element.data = []
+            element.data_accumulated = []
           })
         }
       },
@@ -113,6 +116,8 @@
         this.plotCfg.samplingInterval = setting.samplingInterval
         this.plotCfg.samplesToUpdate = setting.samplesToUpdate
         this.showSettingsDialog = false
+
+        this.adjust_offset_ndx_and_reload()
       },
       add_channel (chnlNum) {
         var n = chnlNum
@@ -123,6 +128,7 @@
           borderColor: utils.getColor(n),
           pointRadius: 1.5,
           data: [],
+          data_accumulated: [],
           showLine: true
         })
       },
@@ -141,6 +147,7 @@
         this.count += 1
 
         this.data.labels[this.data.labels.length] = d
+        this.data.labels_accumulated[this.data.labels_accumulated.length] = d
 
         var self = this
 
@@ -152,10 +159,25 @@
           if (element.data.length > self.plotCfg.maxSamplesVisible) {
             element.data.splice(0, 1)
           }
+
+          element.data_accumulated[element.data_accumulated.length] = v * r2 + r
+          if (element.data_accumulated.length > self.plotCfg.maxSamplesToKeep) {
+            element.data_accumulated.splice(0, 1)
+          }
         })
 
         if (this.data.labels.length > this.plotCfg.maxSamplesVisible) {
           this.data.labels.splice(0, 1)
+          this.visibleStart += 1
+        }
+
+        if (this.data.labels_accumulated.length > this.plotCfg.maxSamplesToKeep) {
+          this.data.labels_accumulated.splice(0, 1)
+        }
+
+        this.visibleStart = this.data.labels_accumulated.length - this.plotCfg.maxSamplesVisible
+        if (this.visibleStart < 0) {
+          this.visibleStart = 0
         }
 
         this.accumlationCnt += 1
@@ -164,6 +186,48 @@
           this.$refs['lineGraph'].refresh()
           this.accumlationCnt = 0
         }
+      },
+      reload_visible_data () {
+        var i
+        var self = this
+        var numSamples
+
+        this.data.labels = []
+
+        numSamples = Math.min(this.plotCfg.maxSamplesVisible, this.data.labels_accumulated.length)
+
+        console.log('reloading visible: ' + numSamples + ', from: ' + this.visibleStart)
+
+        for (i = 0; i < numSamples; i++) {
+          this.data.labels[i] = this.data.labels_accumulated[this.visibleStart + i]
+        }
+
+        this.data.datasets.forEach(function (element) {
+          element.data[i] = []
+
+          for (i = 0; i < numSamples; i++) {
+            element.data[i] = element.data_accumulated[self.visibleStart + i]
+          }
+        })
+        this.$refs['lineGraph'].refresh()
+      },
+      shift (delta) {
+        this.visibleStart += delta
+        this.adjust_offset_ndx_and_reload()
+      },
+      adjust_offset_ndx_and_reload () {
+        if (this.visibleStart >= this.data.labels_accumulated.length - this.plotCfg.maxSamplesVisible) {
+          this.visibleStart = this.data.labels_accumulated.length - this.plotCfg.maxSamplesVisible
+        }
+
+        if (this.visibleStart < 0) {
+          this.visibleStart = 0
+        }
+
+        console.log('visibleStart:' + this.visibleStart + ', total data:' + this.data.labels_accumulated.length +
+            ', max visible:' + this.plotCfg.maxSamplesVisible)
+
+        this.reload_visible_data()
       }
     },
     created () {
@@ -181,7 +245,7 @@
         maintainAspectRatio: false,
         elements: {
           point: {
-            radius: 1.5
+            radius: 0.5
           }
         },
         scales: {
@@ -225,10 +289,12 @@
         channels: [],
         data: {
           labels: [],
+          labels_accumulated: [],
           datasets: [
           ]
         },
-        options: configOptions
+        options: configOptions,
+        visibleStart: 0
       }
     }
   }

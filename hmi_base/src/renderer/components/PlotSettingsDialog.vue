@@ -55,16 +55,16 @@
         valid: true,
         settingsRules: {
           maxSamplesVisible: (value) => {
-            if (value > 2000) {
-              return 'Value should be less than 2000'
+            if (value > 3600) {
+              return 'Value should be less than 3600'
             }
 
             if (value > this.maxSamplesToKeep) {
               return 'Value should be less than Max Samples'
             }
 
-            if (value < 60) {
-              return 'Value should be bigger than 60'
+            if (value < 30) {
+              return 'Value should be bigger than 30'
             }
             return true
           },
@@ -73,8 +73,8 @@
               return 'Value should be bigger than Number of Visible Samples'
             }
 
-            if (value > 5000) {
-              return 'Value should be less than 5000'
+            if (value > 36000) {
+              return 'Value should be less than 36000'
             }
 
             return true
