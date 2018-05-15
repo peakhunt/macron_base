@@ -60,6 +60,7 @@
     "chart.js": "^2.7.2",
     "dateformat": "^3.0.3",
     "electron-storage": "^1.0.7",
+    "v-dragged": "0.0.5",
     "velocity": "^0.7.2",
     "vue": "^2.5.16",
     "vue-chartjs": "^3.3.1",
