@@ -13,10 +13,12 @@ import velocity from 'velocity-animate'
 import 'material-design-icons/iconfont/material-icons.css'
 
 import VDragged from 'v-dragged'
+import vuewheel from 'vuewheel'
 
 Vue.use(Vuetify)
 Vue.use(Notifications, { velocity })
 Vue.use(VDragged)
+Vue.use(vuewheel)
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios
