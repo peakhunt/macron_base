@@ -12,6 +12,7 @@ Goals
 
 ![Signal Trace Realtime](captures/signal_trace_realtime.png "realtime signal trace")
 ![Signal Trace Channel Select](captures/signal_trace_channel_select.png "trace channel select dialog")
+![Signal Trace Settings](captures/signal_trace_settings.png "signal trace settings")
 
 ### Milestone-2 (Reached on May/9/2018)
 1. HMI Development for base system functionalities
