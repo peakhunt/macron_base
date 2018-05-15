@@ -38,7 +38,7 @@
           </v-card-title>
 
           <line-chart id="wrapper" :chartData="data" :options="options" ref="lineGraph"
-           v-dragged="onDragged"></line-chart>
+           v-dragged="onDragged" v-wheel="onWheel"></line-chart>
           <channel-select-dialog :showDialog="showChannelSelectDialog" :currentChannels="channels"
            @dismiss="showChannelSelectDialog = false"
            @select="onChannelSelectionModified"
@@ -72,6 +72,15 @@
         if (deltaX !== undefined) {
           this.shift_visible(deltaX)
         }
+      },
+      onWheel (e) {
+        if (this.realtimePlaying === true) {
+          return
+        }
+        var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)))
+
+        this.shift_visible(delta * 10)
+        e.preventDefault()
       },
       clear_data () {
         this.data.labels = []
