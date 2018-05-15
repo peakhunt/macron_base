@@ -147,20 +147,21 @@
 
         return v * r2 * r
       },
-      push_label (label) {
+      push_label_and_data (label, dataGetter) {
         this.data.labels[this.data.labels.length] = label
         this.data.labels_accumulated[this.data.labels_accumulated.length] = label
+
+        if (this.data.labels.length > this.plotCfg.maxSamplesVisible) {
+          this.data.labels.splice(0, 1)
+          if (this.data.labels_accumulated.length <= this.plotCfg.maxSamplesToKeep) {
+            this.visibleStart += 1
+          }
+        }
 
         if (this.data.labels_accumulated.length > this.plotCfg.maxSamplesToKeep) {
           this.data.labels_accumulated.splice(0, 1)
         }
 
-        this.visibleStart = this.data.labels_accumulated.length - this.plotCfg.maxSamplesVisible
-        if (this.visibleStart < 0) {
-          this.visibleStart = 0
-        }
-      },
-      push_data (dataGetter) {
         var self = this
 
         this.data.datasets.forEach(function (element) {
@@ -177,11 +178,6 @@
             element.data_accumulated.splice(0, 1)
           }
         })
-
-        if (this.data.labels.length > this.plotCfg.maxSamplesVisible) {
-          this.data.labels.splice(0, 1)
-          this.visibleStart += 1
-        }
       },
       update () {
         var d = new Date()
@@ -190,8 +186,7 @@
 
         this.count += 1
 
-        this.push_label(d)
-        this.push_data(this.get_data_simul)
+        this.push_label_and_data(d, this.get_data_simul)
 
         this.accumlationCnt += 1
 
@@ -204,6 +199,7 @@
         var i
         var self = this
         var numSamples
+        var ndx
 
         this.data.labels = []
 
@@ -215,12 +211,14 @@
           this.data.labels[i] = this.data.labels_accumulated[this.visibleStart + i]
         }
 
+        ndx = 0
         this.data.datasets.forEach(function (element) {
-          element.data[i] = []
+          element.data[ndx] = []
 
           for (i = 0; i < numSamples; i++) {
             element.data[i] = element.data_accumulated[self.visibleStart + i]
           }
+          ndx += 1
         })
         this.$refs['lineGraph'].refresh()
       },
