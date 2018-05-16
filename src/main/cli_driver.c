@@ -586,10 +586,11 @@ cli_command_signal_trace(cli_intf_t* intf, int argc, const char** argv)
 
   if(argc < 2) goto command_error;
 
-  chnl_num = atoi(argv[2]);
 
   if(strcmp(argv[1], "set") == 0)
   {
+    chnl_num = atoi(argv[2]);
+
     if(argc != 3) goto command_error;
 
     cli_printf(intf, "setting channel trace for %d"CLI_EOL, chnl_num);
@@ -597,6 +598,8 @@ cli_command_signal_trace(cli_intf_t* intf, int argc, const char** argv)
   }
   else if(strcmp(argv[1], "clear") == 0)
   {
+    chnl_num = atoi(argv[2]);
+
     if(argc != 3) goto command_error;
 
     cli_printf(intf, "clearing channel trace for %d"CLI_EOL, chnl_num);
