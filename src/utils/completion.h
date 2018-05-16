@@ -15,6 +15,12 @@ completion_init(completion_t* c)
 }
 
 static inline void
+completion_deinit(completion_t* c)
+{
+  sem_destroy(&c->wait);
+}
+
+static inline void
 completion_wait(completion_t* c)
 {
   sem_wait(&c->wait);

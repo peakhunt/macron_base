@@ -4,6 +4,7 @@
 #include "bhash.h"
 #include "channel_manager.h"
 #include "trace.h"
+#include "logger.h"
 
 #define CHANNEL_MANAGER_NUM_BUCKETS     1024
 
@@ -237,6 +238,18 @@ channel_manager_update_input(void)
 
     eng_v = chnl->eng_value;
 
+    if(chnl->trace)
+    {
+      if(chnl->chnl_type == channel_type_analog)
+      {
+        logger_signal_log(chnl->chnl_num, chnl->eng_value.f);
+      }
+      else
+      {
+        logger_signal_log(chnl->chnl_num, chnl->eng_value.b);
+      }
+    }
+
     pthread_mutex_unlock(&_chnl_mgr_lock);
 
     publisher_exec_notify(&chnl->chnl_update, (void*)&eng_v);
@@ -255,6 +268,18 @@ channel_manager_update_output(void)
     TRACE(CHANNELM, "updating output for channel %d\n", chnl->chnl_num);
 
     chnl->raw_value_queued = chnl->raw_value;
+
+    if(chnl->trace)
+    {
+      if(chnl->chnl_type == channel_type_analog)
+      {
+        logger_signal_log(chnl->chnl_num, chnl->eng_value.f);
+      }
+      else
+      {
+        logger_signal_log(chnl->chnl_num, chnl->eng_value.b);
+      }
+    }
 
     // XXX review later
     //publisher_exec_notify(&chnl->chnl_update, chnl);
@@ -381,4 +406,40 @@ channel_manager_update_channel_config(uint32_t chnl_num, channel_runtime_config_
   channel_manager_chnl_put(chnl);
 
   return TRUE;
+}
+
+void
+channel_manager_set_channel_trace(uint32_t chnl_num)
+{
+  channel_t* chnl;
+
+  chnl = channel_manager_chnl_get(chnl_num);
+  if(chnl == NULL)
+  {
+    return;
+  }
+
+  chnl->trace = TRUE;
+
+  channel_manager_chnl_put(chnl);
+
+  return;
+}
+
+void
+channel_manager_clear_channel_trace(uint32_t chnl_num)
+{
+  channel_t* chnl;
+
+  chnl = channel_manager_chnl_get(chnl_num);
+  if(chnl == NULL)
+  {
+    return;
+  }
+
+  chnl->trace = FALSE;
+
+  channel_manager_chnl_put(chnl);
+
+  return;
 }

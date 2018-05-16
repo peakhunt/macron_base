@@ -51,6 +51,7 @@ typedef struct
   lookup_table_t*     lookup_table;
 
   publisher_t         chnl_update;
+  bool                trace;
 } channel_t;
 
 extern channel_t* channel_alloc(uint32_t chnl_num, channel_type_t chnl_type, channel_direction_t chnl_dir);

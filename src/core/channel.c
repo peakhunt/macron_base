@@ -31,6 +31,7 @@ channel_alloc(uint32_t chnl_num, channel_type_t chnl_type, channel_direction_t c
   chnl->raw_value_avail   = FALSE;
 
   chnl->lookup_table      = NULL;
+  chnl->trace             = FALSE;
 
   publisher_init(&chnl->chnl_update);
 

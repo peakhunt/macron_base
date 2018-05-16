@@ -10,9 +10,10 @@
 #include "time_util.h"
 #include "trace.h"
 #include "app_init_completion.h"
+#include "completion.h"
+#include "channel_manager.h"
 #include "logger.h"
-
-#define LOGGER_DB     "db/logging_db.sq3"
+#include "logger_sql3_common.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -38,13 +39,10 @@ struct __logger_request_t
   union
   {
     logger_alarm_event_t    event;
-    struct
-    {
-      double f;
-      bool b;
-    } chnl_v;
+    double                  v;
   };
   logger_request_handler    handler;
+  void*                     arg;
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,10 +78,8 @@ static pthread_mutex_t        _req_buffer_lock;
 static void
 logger_db_init(void)
 {
-  int ret;
-
-  ret = sqlite3_open_v2(LOGGER_DB, &_logger_db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_NOMUTEX, NULL);
-  if(ret != SQLITE_OK)
+  _logger_db = logger_db_open(LOGGER_DB);
+  if(_logger_db == NULL)
   {
     TRACE(LOGGER, "failed to open logger db %s\n", LOGGER_DB);
     exit(-1);
@@ -146,76 +142,59 @@ logger_req_buffer_pool_put(logger_request_t* lr)
 static void
 logger_chnl_log_req_handler(logger_request_t* lr)
 {
-  const static char*    sql_cmd_buffer = 
-    "insert into channel_log (ch_num, time_stamp, eng_val_f, eng_val_b) values (?1,?2,?3,?4)";
-  sqlite3_stmt*         stmt;
-  const char*           sql_error;
-  int                   ret;
-
-  sqlite3_exec(_logger_db, "BEGIN TRANSACTION", NULL, NULL, NULL);
-  ret = sqlite3_prepare_v2(_logger_db, sql_cmd_buffer, strlen(sql_cmd_buffer), &stmt, &sql_error);
-  if(ret != SQLITE_OK)
+  if(logger_db_insert_chnl(_logger_db, lr->chnl, lr->timestamp, lr->v) == FALSE)
   {
-    TRACE(LOGGER, "sqlite3_prepare_v2 failed for channel log\n");
+    TRACE(LOGGER, "logger_db_insert_chnl failed for channel log: %s\n", sqlite3_errmsg(_logger_db));
     return;
   }
-
-  sqlite3_bind_int(stmt, 1, lr->chnl);
-  sqlite3_bind_int(stmt, 2, lr->timestamp);
-  sqlite3_bind_double(stmt, 3, lr->chnl_v.f);
-  sqlite3_bind_int(stmt, 4, lr->chnl_v.b);
-
-  if(sqlite3_step(stmt) != SQLITE_DONE)
-  {
-    TRACE(LOGGER, "sqlite3_step failed for channel log\n");
-    return;
-  }
-
-  if(sqlite3_finalize(stmt) != SQLITE_OK)
-  {
-    TRACE(LOGGER, "sqlite3_finalize failed for channel log\n");
-    return;
-  }
-
-  sqlite3_exec(_logger_db, "END TRANSACTION", NULL, NULL, NULL);
 }
 
 static void
 logger_alarm_log_req_handler(logger_request_t* lr)
 {
-  const static char*    sql_cmd_buffer = 
-    "insert into alarm_log (alarm, time_stamp, event) values (?1, ?2, ?3)";
-  sqlite3_stmt*         stmt;
-  const char*           sql_error;
-  int                   ret;
-
   TRACE(LOGGER, "alarm logging: %d, %lu, %d\n", lr->alarm, lr->timestamp, lr->event);
 
-  sqlite3_exec(_logger_db, "BEGIN TRANSACTION", NULL, NULL, NULL);
-  ret = sqlite3_prepare_v2(_logger_db, sql_cmd_buffer, strlen(sql_cmd_buffer), &stmt, &sql_error);
-  if(ret != SQLITE_OK)
+  if(logger_db_insert_alarm(_logger_db, lr->alarm, lr->timestamp, lr->event) == FALSE)
   {
-    TRACE(LOGGER, "sqlite3_prepare_v2 failed for alarm log:\n", sqlite3_errmsg(_logger_db));
+    TRACE(LOGGER, "logger_db_insert_alarm failed: %s\n", sqlite3_errmsg(_logger_db));
     return;
   }
+}
 
-  sqlite3_bind_int(stmt, 1, lr->alarm);
-  sqlite3_bind_int(stmt, 2, lr->timestamp);
-  sqlite3_bind_int(stmt, 3, lr->event);
+static void
+logger_signal_trace_set_req_handler(logger_request_t* lr)
+{
+  completion_t*         c = (completion_t*)lr->arg;
 
-  if(sqlite3_step(stmt) != SQLITE_DONE)
+  TRACE(LOGGER, "channel trace set: %d\n", lr->chnl);
+  if(logger_db_insert_trace_channel(_logger_db, lr->chnl, time_util_get_current_time_in_ms()) == TRUE)
   {
-    TRACE(LOGGER, "sqlite3_step failed for alarm log: %s\n", sqlite3_errmsg(_logger_db));
-    return;
+    channel_manager_set_channel_trace(lr->chnl);
+  }
+  else
+  {
+    TRACE(LOGGER, "logger_db_insert_trace_channel failed for channel trace set: %s\n", sqlite3_errmsg(_logger_db));
+  }
+  completion_signal(c);
+}
+
+static void
+logger_signal_trace_clear_req_handler(logger_request_t* lr)
+{
+  completion_t*   c = (completion_t*)lr->arg;
+
+  TRACE(LOGGER, "channel trace clear: %d\n", lr->chnl);
+
+  // step 1. update core channel manager
+  channel_manager_clear_channel_trace(lr->chnl);
+
+  // step 3. delete existing logs
+  if(logger_db_delete_trace_channel_and_data(_logger_db, lr->chnl) == FALSE)
+  {
+    TRACE(LOGGER, "logger_db_delete_trace_channel_and_data failed for channel trace clear: %s\n", sqlite3_errmsg(_logger_db));
   }
 
-  if(sqlite3_finalize(stmt) != SQLITE_OK)
-  {
-    TRACE(LOGGER, "sqlite3_finalize failed for alarm log: %s\n", sqlite3_errmsg(_logger_db));
-    return;
-  }
-
-  sqlite3_exec(_logger_db, "END TRANSACTION", NULL, NULL, NULL);
+  completion_signal(c);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -283,7 +262,7 @@ logger_init(void)
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void
-logger_signal_log(uint32_t chnl, double f, bool b)
+logger_signal_log(uint32_t chnl, double v)
 {
   logger_request_t*   lr;
 
@@ -296,8 +275,7 @@ logger_signal_log(uint32_t chnl, double f, bool b)
 
   lr->timestamp   = time_util_get_current_time_in_ms();
   lr->chnl        = chnl;
-  lr->chnl_v.f    = f;
-  lr->chnl_v.b    = b;
+  lr->v           = v;
   lr->handler     = logger_chnl_log_req_handler;
 
   thread_queue_add(&_req_q, &lr->le);
@@ -323,4 +301,56 @@ logger_alarm_log(uint32_t alarm, logger_alarm_event_t evt)
 
   thread_queue_add(&_req_q, &lr->le);
   ev_async_send(_logger_thread.ev_loop, &_req_q_noti);
+}
+
+void
+logger_signal_trace_set(uint32_t chnl)
+{
+  logger_request_t*   lr;
+  completion_t        c;
+
+  lr = logger_req_buffer_pool_get();
+  if(lr == NULL)
+  {
+    TRACE(LOGGER, "failed to get logger request for signal trace set\n");
+    return;
+  }
+
+  completion_init(&c);
+
+  lr->chnl    = chnl;
+  lr->arg     = &c;
+  lr->handler = logger_signal_trace_set_req_handler;
+
+  thread_queue_add(&_req_q, &lr->le);
+  ev_async_send(_logger_thread.ev_loop, &_req_q_noti);
+
+  completion_wait(&c);
+  completion_deinit(&c);
+}
+
+void
+logger_signal_trace_clear(uint32_t chnl)
+{
+  logger_request_t*   lr;
+  completion_t        c;
+
+  lr = logger_req_buffer_pool_get();
+  if(lr == NULL)
+  {
+    TRACE(LOGGER, "failed to get logger request for signal trace set\n");
+    return;
+  }
+
+  completion_init(&c);
+
+  lr->chnl    = chnl;
+  lr->arg     = &c;
+  lr->handler = logger_signal_trace_clear_req_handler;
+
+  thread_queue_add(&_req_q, &lr->le);
+  ev_async_send(_logger_thread.ev_loop, &_req_q_noti);
+
+  completion_wait(&c);
+  completion_deinit(&c);
 }

@@ -76,6 +76,7 @@ src/main/modbus_master_driver.c                     \
 src/main/webserver_driver.c                         \
 src/main/webserver_api.c                            \
 src/main/cfg_mgr.c                                  \
+src/main/logger_sql3_common.c                       \
 src/main/logger.c
 
 TEST_C_SOURCE =                                     \

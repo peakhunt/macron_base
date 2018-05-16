@@ -43,4 +43,7 @@ extern int channel_manager_get_channel_stat(uint32_t chnl_num, channel_status_t*
 
 extern bool channel_manager_update_channel_config(uint32_t chnl_num, channel_runtime_config_t* cfg);
 
+extern void channel_manager_set_channel_trace(uint32_t chnl_num);
+extern void channel_manager_clear_channel_trace(uint32_t chnl_num);
+
 #endif /* !__CHANNEL_MANAGER_DEF_H__ */

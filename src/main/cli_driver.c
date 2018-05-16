@@ -13,6 +13,8 @@
 #include "alarm_manager.h"
 #include "math_util.h"
 #include "core_driver.h"
+#include "logger.h"
+#include "logger_sql3_common.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -26,6 +28,7 @@ static void cli_command_core(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_modbus(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_channel(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_alarm(cli_intf_t* intf, int argc, const char** argv);
+static void cli_command_signal_trace(cli_intf_t* intf, int argc, const char** argv);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -62,6 +65,11 @@ static cli_command_t    _app_commands[] =
     "alarm related commands",
     cli_command_alarm,
   },
+  {
+    "signal_trace",
+    "channel signal tracing related commands",
+    cli_command_signal_trace,
+  }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -559,6 +567,74 @@ command_error:
   cli_printf(intf, "%s ack alarm-num"CLI_EOL, argv[0]);
   cli_printf(intf, "%s config_dig alarm-num [on|off] delay"CLI_EOL, argv[0]);
   cli_printf(intf, "%s config_ana alarm-num set_point delay"CLI_EOL, argv[0]);
+}
+
+static int
+__get_all_trace_channels_cb(void* data, int argc, char** argv, char** azColName)
+{
+  cli_intf_t* intf = (cli_intf_t*)data;
+
+  cli_printf(intf, "CH - %s"CLI_EOL, argv[0]);
+
+  return 0;
+}
+
+static void
+cli_command_signal_trace(cli_intf_t* intf, int argc, const char** argv)
+{
+  uint32_t            chnl_num;
+
+  if(argc < 2) goto command_error;
+
+  chnl_num = atoi(argv[2]);
+
+  if(strcmp(argv[1], "set") == 0)
+  {
+    if(argc != 3) goto command_error;
+
+    cli_printf(intf, "setting channel trace for %d"CLI_EOL, chnl_num);
+    logger_signal_trace_set(chnl_num);
+  }
+  else if(strcmp(argv[1], "clear") == 0)
+  {
+    if(argc != 3) goto command_error;
+
+    cli_printf(intf, "clearing channel trace for %d"CLI_EOL, chnl_num);
+    logger_signal_trace_clear(chnl_num);
+  }
+  else if(strcmp(argv[1], "show") == 0)
+  {
+    sqlite3* db;
+
+    db = logger_db_open(LOGGER_DB);
+
+    if(db == NULL)
+    {
+      cli_printf(intf, "failed to open logger db"CLI_EOL);
+      return ;
+    }
+
+    if(logger_db_get_all_trace_channels(db, __get_all_trace_channels_cb, intf) == FALSE)
+    {
+      cli_printf(intf, "failed to retrive trace channels"CLI_EOL);
+    }
+    else
+    {
+      cli_printf(intf, CLI_EOL);
+    }
+    logger_db_close(db);
+  }
+  else
+  {
+    goto command_error;
+  }
+
+  return;
+
+command_error:
+  cli_printf(intf, "invalid argument!!!"CLI_EOL CLI_EOL);
+  cli_printf(intf, "%s set chnl-num"CLI_EOL, argv[0]);
+  cli_printf(intf, "%s clear chnl-num"CLI_EOL, argv[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
