@@ -11,6 +11,8 @@ logger_db_open(const char* path)
   {
     return NULL;
   }
+  
+  sqlite3_busy_timeout(sq3, 5000);    // to deal with "database is locked"
   return sq3;
 }
 

@@ -619,7 +619,7 @@ cli_command_signal_trace(cli_intf_t* intf, int argc, const char** argv)
 
     if(logger_db_get_all_trace_channels(db, __get_all_trace_channels_cb, intf) == FALSE)
     {
-      cli_printf(intf, "failed to retrive trace channels"CLI_EOL);
+      cli_printf(intf, "failed to retrive trace channels: %s"CLI_EOL, sqlite3_errmsg(db));
     }
     else
     {
