@@ -142,6 +142,12 @@ logger_req_buffer_pool_put(logger_request_t* lr)
 static void
 logger_chnl_log_req_handler(logger_request_t* lr)
 {
+  if(logger_db_check_if_channel_traced(_logger_db, lr->chnl) == FALSE)
+  {
+    // may happen, especially during clearing due to queued requests
+    return;
+  }
+
   if(logger_db_insert_chnl(_logger_db, lr->chnl, lr->timestamp, lr->v) == FALSE)
   {
     TRACE(LOGGER, "logger_db_insert_chnl failed for channel log: %s\n", sqlite3_errmsg(_logger_db));

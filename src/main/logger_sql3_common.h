@@ -17,5 +17,6 @@ extern bool logger_db_insert_alarm(sqlite3* db, uint32_t alarm, unsigned long ti
 extern bool logger_db_insert_trace_channel(sqlite3* db, uint32_t chnl, unsigned long timestamp);
 extern bool logger_db_delete_trace_channel_and_data(sqlite3* db, uint32_t chnl);
 extern bool logger_db_get_all_trace_channels(sqlite3* db, sqlite3_callback cb, void* cb_data);
+extern bool logger_db_check_if_channel_traced(sqlite3* db, uint32_t chnl);
 
 #endif /* !__LOGGER_SQL3_COMMON_DEF_H__ */

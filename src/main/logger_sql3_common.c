@@ -190,3 +190,33 @@ logger_db_get_all_trace_channels(sqlite3* db, sqlite3_callback cb, void* cb_data
   }
   return TRUE;
 }
+
+bool
+logger_db_check_if_channel_traced(sqlite3* db, uint32_t chnl)
+{
+  const static char*    sql_cmd_buffer = 
+    "select * from channel_trace where chnl_num = ?1";
+  sqlite3_stmt*         stmt;
+  const char*           sql_error;
+  int                   ret;
+
+  ret = sqlite3_prepare_v2(db, sql_cmd_buffer, strlen(sql_cmd_buffer), &stmt, &sql_error);
+  if(ret != SQLITE_OK)
+  {
+    return FALSE;
+  }
+
+  sqlite3_bind_int(stmt, 1, chnl);
+
+  // gotta be exactly one row
+  if(sqlite3_step(stmt) != SQLITE_ROW)
+  {
+    return FALSE;
+  }
+
+  if(sqlite3_finalize(stmt) != SQLITE_OK)
+  {
+    return FALSE;
+  }
+  return TRUE;
+}
