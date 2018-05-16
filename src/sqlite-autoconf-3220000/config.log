@@ -403,7 +403,7 @@ configure:12938: $? = 0
 configure:12938: result: yes
 configure:12938: checking for fullfsync
 configure:12938: gcc -o conftest -g -O2   conftest.c  >&5
-/tmp/ccLLFqPS.o: In function `main':
+/tmp/cc0f1qXe.o: In function `main':
 /home/hkim/macron_base/src/sqlite-autoconf-3220000/conftest.c:59: undefined reference to `fullfsync'
 collect2: error: ld returned 1 exit status
 configure:12938: $? = 1
@@ -788,7 +788,7 @@ configure:13159: checking for readline/readline.h
 configure:13159: result: no
 configure:13309: checking for library containing pthread_create
 configure:13340: gcc -o conftest -g -O2   conftest.c  >&5
-/tmp/ccqiARTc.o: In function `main':
+/tmp/ccSgjbox.o: In function `main':
 /home/hkim/macron_base/src/sqlite-autoconf-3220000/conftest.c:40: undefined reference to `pthread_create'
 collect2: error: ld returned 1 exit status
 configure:13340: $? = 1
@@ -845,7 +845,7 @@ configure:13396: $? = 0
 configure:13413: result: none required
 configure:13436: checking for library containing dlopen
 configure:13467: gcc -o conftest -g -O2   conftest.c -lpthread  >&5
-/tmp/ccguc2Wl.o: In function `main':
+/tmp/cc9DsQOB.o: In function `main':
 /home/hkim/macron_base/src/sqlite-autoconf-3220000/conftest.c:40: undefined reference to `dlopen'
 collect2: error: ld returned 1 exit status
 configure:13467: $? = 1
@@ -914,7 +914,7 @@ configure:13637: checking for zlib.h
 configure:13637: result: yes
 configure:13643: checking for library containing deflate
 configure:13674: gcc -o conftest -g -O2   conftest.c -ldl -lpthread  >&5
-/tmp/ccU3z2Fl.o: In function `main':
+/tmp/cccAXzmL.o: In function `main':
 /home/hkim/macron_base/src/sqlite-autoconf-3220000/conftest.c:42: undefined reference to `deflate'
 collect2: error: ld returned 1 exit status
 configure:13674: $? = 1

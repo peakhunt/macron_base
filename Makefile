@@ -75,7 +75,8 @@ src/main/modbus_slave_driver.c                      \
 src/main/modbus_master_driver.c                     \
 src/main/webserver_driver.c                         \
 src/main/webserver_api.c                            \
-src/main/cfg_mgr.c
+src/main/cfg_mgr.c                                  \
+src/main/logger.c
 
 TEST_C_SOURCE =                                     \
 test/cmd_option_test.c                              \
@@ -93,6 +94,11 @@ test/test_main.c
 LIBEV_DIR=src/libev/install_dir
 
 #######################################
+#  sqlite3
+########################################
+SQLITE3_DIR=src/sqlite-autoconf-3220000/sql3_install
+
+#######################################
 C_DEFS  = -DTRACE_ENABLED
 
 #######################################
@@ -104,10 +110,11 @@ C_INCLUDES =                              \
 -Isrc/core                                \
 -Isrc/main                                \
 -Isrc/mongoose                            \
--I$(LIBEV_DIR)/include
+-I$(LIBEV_DIR)/include                    \
+-I$(SQLITE3_DIR)/include
 
-LIBS = -lev -lpthread -lm
-LIBDIR = -L$(LIBEV_DIR)/lib
+LIBS = -lev -lsqlite3 -ldl -lpthread -lm
+LIBDIR = -L$(LIBEV_DIR)/lib -L$(SQLITE3_DIR)/lib
 
 #######################################
 # for verbose output

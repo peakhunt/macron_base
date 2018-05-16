@@ -23,4 +23,16 @@ time_util_get_sys_clock_elapsed_in_ms(unsigned long start)
   return now - start;
 }
 
+static inline unsigned long
+time_util_get_current_time_in_ms(void)
+{
+  struct timespec now;
+  unsigned long   ret;
+
+  clock_gettime(CLOCK_REALTIME, &now);
+
+  ret = now.tv_sec * 1000.0 +  now.tv_nsec / 1000000.0;
+  return ret;
+}
+
 #endif /* !__TIME_UTIL_DEF_H__ */

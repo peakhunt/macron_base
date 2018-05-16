@@ -3,6 +3,7 @@
 #include "alarm.h"
 #include "time_util.h"
 #include "trace.h"
+#include "logger.h"
 
 typedef enum
 {
@@ -44,6 +45,8 @@ handle_alarm_event(alarm_t* alarm, alarm_event_t event)
     {
       alarm_move_state(alarm, alarm_state_active_pending);
       alarm_mark_occur_time(alarm);
+
+      logger_alarm_log(alarm->alarm_num, logger_alarm_event_occur);
     }
     break;
 
@@ -51,10 +54,14 @@ handle_alarm_event(alarm_t* alarm, alarm_event_t event)
     if(event == alarm_event_ack)
     {
       alarm_move_state(alarm, alarm_state_active);
+
+      logger_alarm_log(alarm->alarm_num, logger_alarm_event_ack);
     }
     else if(event == alarm_event_clear)
     {
       alarm_move_state(alarm, alarm_state_inactive_pending);
+
+      logger_alarm_log(alarm->alarm_num, logger_alarm_event_clear);
     }
     break;
 
@@ -62,10 +69,14 @@ handle_alarm_event(alarm_t* alarm, alarm_event_t event)
     if(event == alarm_event_ack)
     {
       alarm_move_state(alarm, alarm_state_inactive);
+
+      logger_alarm_log(alarm->alarm_num, logger_alarm_event_ack);
     }
     else if(event == alarm_event_occur)
     {
       alarm_move_state(alarm, alarm_state_active_pending);
+
+      logger_alarm_log(alarm->alarm_num, logger_alarm_event_occur);
     }
     break;
 
@@ -73,6 +84,8 @@ handle_alarm_event(alarm_t* alarm, alarm_event_t event)
     if(event == alarm_event_clear)
     {
       alarm_move_state(alarm, alarm_state_inactive);
+
+      logger_alarm_log(alarm->alarm_num, logger_alarm_event_clear);
     }
     break;
   }

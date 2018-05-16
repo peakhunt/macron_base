@@ -11,6 +11,7 @@
 #include "modbus_master_driver.h"
 #include "core_driver.h"
 #include "webserver_driver.h"
+#include "logger.h"
 #include "completion.h"
 
 static void main_thread_init(evloop_thread_t* thrd);
@@ -40,6 +41,7 @@ static uint32_t   _initial_trace_setup[] =
   TRACE_COMP(CLI_DRIVER),
   //TRACE_COMP(MB_TCP_MASTER),
   //TRACE_COMP(MB_MASTER),
+  TRACE_COMP(LOGGER),
 };
 
 static evloop_thread_t      _main_thread = 
@@ -68,6 +70,8 @@ main_thread_init(evloop_thread_t* thrd)
   core_driver_init();
   modbus_slave_driver_init();
   modbus_master_driver_init();
+
+  logger_init();
 
   cli_driver_init();
   webserver_driver_init();
