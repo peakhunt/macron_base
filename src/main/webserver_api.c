@@ -273,7 +273,7 @@ webapi_get_channel_status(struct mg_connection* nc, struct http_message* hm, str
 
   chnl_num = (uint32_t)mg_util_get_int(subcmd);
 
-  TRACE(WEBS_DRIVER, "channel status request for %d\n", chnl_num);
+  TRACE(WEBS_REQUEST, "channel status request for %d\n", chnl_num);
 
   if(channel_manager_get_channel_stat(chnl_num, &status) == -1)
   {
@@ -310,7 +310,7 @@ webapi_get_channel_status_ranged(struct mg_connection* nc, struct http_message* 
   bool comma_needed = false;
 
   qstr = mg_util_to_c_str_alloc(&hm->query_string);
-  TRACE(WEBS_DRIVER, "channel status ranged request %s\n", qstr);
+  TRACE(WEBS_REQUEST, "channel status ranged request %s\n", qstr);
 
   if(sscanf(qstr, "start=%d&end=%d", &start, &end) != 2 || end < start)
   {
@@ -318,7 +318,7 @@ webapi_get_channel_status_ranged(struct mg_connection* nc, struct http_message* 
     goto out;
   }
 
-  TRACE(WEBS_DRIVER, "channel status ranged request %d, %d\n", start, end);
+  TRACE(WEBS_REQUEST, "channel status ranged request %d, %d\n", start, end);
   mg_printf(nc, "%s",
       "HTTP/1.1 200 OK\r\n"
       "Content-Type: text/json\r\n"
@@ -388,7 +388,7 @@ webapi_update_channel_config(struct mg_connection* nc, struct http_message* hm, 
 
   chnl_num = (uint32_t)mg_util_get_int(subcmd);
 
-  TRACE(WEBS_DRIVER, "channel config update request for %d\n", chnl_num);
+  TRACE(WEBS_REQUEST, "channel config update request for %d\n", chnl_num);
 
   req = webapi_parse_json_body(&hm->body, nc, hm);
   if(req == NULL)
@@ -447,7 +447,7 @@ webapi_update_alarm_config(struct mg_connection* nc, struct http_message* hm, st
 
   alarm_num = (uint32_t)mg_util_get_int(subcmd);
 
-  TRACE(WEBS_DRIVER, "alarm config update request for %d\n", alarm_num);
+  TRACE(WEBS_REQUEST, "alarm config update request for %d\n", alarm_num);
 
   req = webapi_parse_json_body(&hm->body, nc, hm);
   if(req == NULL)
@@ -505,7 +505,7 @@ webapi_ack_alarm(struct mg_connection* nc, struct http_message* hm, struct mg_st
   {
     alarm_num = (uint32_t)cJSON_GetObjectItem(req, "alarm_num")->valueint;
 
-    TRACE(WEBS_DRIVER, "alarm ack request for %d\n", alarm_num);
+    TRACE(WEBS_REQUEST, "alarm ack request for %d\n", alarm_num);
 
     if(alarm_manager_ack_alarm(alarm_num) == TRUE)
     {
@@ -559,7 +559,7 @@ webapi_update_channel_lookup_table(struct mg_connection* nc, struct http_message
 
   chnl_num = (uint32_t)mg_util_get_int(subcmd);
 
-  TRACE(WEBS_DRIVER, "lookup table update request for %d\n", chnl_num);
+  TRACE(WEBS_REQUEST, "lookup table update request for %d\n", chnl_num);
 
   req = webapi_parse_json_body(&hm->body, nc, hm);
   if(req == NULL)
@@ -628,7 +628,7 @@ webapi_get_alarm_status(struct mg_connection* nc, struct http_message* hm, struc
 
   alarm_num = (uint32_t)mg_util_get_int(subcmd);
 
-  TRACE(WEBS_DRIVER, "alarm status request for %d\n", alarm_num);
+  TRACE(WEBS_REQUEST, "alarm status request for %d\n", alarm_num);
 
   if(alarm_manager_get_alarm_status(alarm_num, &status) == -1)
   {
@@ -654,7 +654,7 @@ webapi_get_alarm_status_ranged(struct mg_connection* nc, struct http_message* hm
   bool comma_needed = false;
 
   qstr = mg_util_to_c_str_alloc(&hm->query_string);
-  TRACE(WEBS_DRIVER, "alarm status ranged request %s\n", qstr);
+  TRACE(WEBS_REQUEST, "alarm status ranged request %s\n", qstr);
 
   if(sscanf(qstr, "start=%d&end=%d", &start, &end) != 2 || end < start)
   {
@@ -662,7 +662,7 @@ webapi_get_alarm_status_ranged(struct mg_connection* nc, struct http_message* hm
     goto out;
   }
 
-  TRACE(WEBS_DRIVER, "alarm status ranged request %d, %d\n", start, end);
+  TRACE(WEBS_REQUEST, "alarm status ranged request %d, %d\n", start, end);
   mg_printf(nc, "%s",
       "HTTP/1.1 200 OK\r\n"
       "Content-Type: text/json\r\n"
@@ -847,7 +847,7 @@ webserver_api_handler(struct mg_connection* nc, struct http_message* hm)
     webapi_not_found(nc, hm);
   }
 
-  TRACE(WEBS_DRIVER, "done handling api request. took %ld ms\n",
+  TRACE(WEBS_REQUEST, "done handling api request. took %ld ms\n",
       time_util_get_sys_clock_elapsed_in_ms(start));
 
   return true;
