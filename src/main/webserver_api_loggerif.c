@@ -24,6 +24,7 @@ typedef struct
   struct mg_connection*     nc;
   struct http_message*      hm;
   bool                      first;
+  uint32_t                  count;
 } get_channel_log_ctx_t;
 
 
@@ -99,6 +100,8 @@ get_channel_log_callback(void* data, int argc, char** argv, char** azColName)
 
   mg_printf_http_chunk(nc, "{\"ch\": %s, \"data\": %s, \"timestamp\": %s }",
       argv[0],argv[1],argv[2]);
+  ctx->count++;
+
   return 0;
 }
 
@@ -117,7 +120,8 @@ webapi_get_channel_log(struct mg_connection* nc, struct http_message* hm)
   {
     .nc = nc,
     .hm = hm,
-    .first = true
+    .first = true,
+    .count = 0,
   };
 
   qstr = mg_util_to_c_str_alloc(&hm->query_string);
@@ -158,6 +162,8 @@ webapi_get_channel_log(struct mg_connection* nc, struct http_message* hm)
   {
     mg_printf_http_chunk(nc, "]}");
     mg_send_http_chunk(nc, "", 0);
+
+    TRACE(WEBL_REQUEST, "channe log returned %u data\n", ctx.count);
   }
   else
   {
