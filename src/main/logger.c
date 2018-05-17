@@ -45,6 +45,13 @@ struct __logger_request_t
   void*                     arg;
 };
 
+typedef struct
+{
+  completion_t      c;
+  uint32_t*         chnls;
+  uint32_t          n_chnls;
+} trace_set_arg_t;
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // private prototypes
@@ -168,39 +175,23 @@ logger_alarm_log_req_handler(logger_request_t* lr)
 }
 
 static void
-logger_signal_trace_set_req_handler(logger_request_t* lr)
+logger_signal_trace_set_chnls_handler(logger_request_t* lr)
 {
-  completion_t*         c = (completion_t*)lr->arg;
+  trace_set_arg_t*    arg   = (trace_set_arg_t*)lr->arg;
+  unsigned long timestamp   = time_util_get_current_time_in_ms();
 
-  TRACE(LOGGER, "channel trace set: %d\n", lr->chnl);
-  if(logger_db_insert_trace_channel(_logger_db, lr->chnl, time_util_get_current_time_in_ms()) == TRUE)
+  TRACE(LOGGER, "channel trace set chnls\n");
+
+  if(logger_db_set_trace_channels(_logger_db, arg->chnls, arg->n_chnls, timestamp) == FALSE)
   {
-    channel_manager_set_channel_trace(lr->chnl);
+    TRACE(LOGGER, "logger_db_set_trace_channels failed: %s\n", sqlite3_errmsg(_logger_db));
   }
   else
   {
-    TRACE(LOGGER, "logger_db_insert_trace_channel failed for channel trace set: %s\n", sqlite3_errmsg(_logger_db));
-  }
-  completion_signal(c);
-}
-
-static void
-logger_signal_trace_clear_req_handler(logger_request_t* lr)
-{
-  completion_t*   c = (completion_t*)lr->arg;
-
-  TRACE(LOGGER, "channel trace clear: %d\n", lr->chnl);
-
-  // step 1. update core channel manager
-  channel_manager_clear_channel_trace(lr->chnl);
-
-  // step 3. delete existing logs
-  if(logger_db_delete_trace_channel_and_data(_logger_db, lr->chnl) == FALSE)
-  {
-    TRACE(LOGGER, "logger_db_delete_trace_channel_and_data failed for channel trace clear: %s\n", sqlite3_errmsg(_logger_db));
+    channel_manager_set_trace_channels(arg->chnls, arg->n_chnls);
   }
 
-  completion_signal(c);
+  completion_signal(&arg->c);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -268,7 +259,7 @@ logger_init(void)
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void
-logger_signal_log(uint32_t chnl, double v)
+logger_signal_log(uint32_t chnl, double v, unsigned long timestamp)
 {
   logger_request_t*   lr;
 
@@ -279,7 +270,7 @@ logger_signal_log(uint32_t chnl, double v)
     return;
   }
 
-  lr->timestamp   = time_util_get_current_time_in_ms();
+  lr->timestamp   = timestamp;
   lr->chnl        = chnl;
   lr->v           = v;
   lr->handler     = logger_chnl_log_req_handler;
@@ -310,53 +301,29 @@ logger_alarm_log(uint32_t alarm, logger_alarm_event_t evt)
 }
 
 void
-logger_signal_trace_set(uint32_t chnl)
+logger_signal_trace_set_chnls(uint32_t* chnls, uint32_t num_chnls)
 {
   logger_request_t*   lr;
-  completion_t        c;
+  trace_set_arg_t     arg;
 
   lr = logger_req_buffer_pool_get();
   if(lr == NULL)
   {
-    TRACE(LOGGER, "failed to get logger request for signal trace set\n");
+    TRACE(LOGGER, "failed to get logger request for signal trace chnls set\n");
     return;
   }
 
-  completion_init(&c);
+  completion_init(&arg.c);
 
-  lr->chnl    = chnl;
-  lr->arg     = &c;
-  lr->handler = logger_signal_trace_set_req_handler;
+  arg.chnls     = chnls;
+  arg.n_chnls   = num_chnls;
+
+  lr->arg       = &arg;
+  lr->handler   = logger_signal_trace_set_chnls_handler;
 
   thread_queue_add(&_req_q, &lr->le);
   ev_async_send(_logger_thread.ev_loop, &_req_q_noti);
 
-  completion_wait(&c);
-  completion_deinit(&c);
-}
-
-void
-logger_signal_trace_clear(uint32_t chnl)
-{
-  logger_request_t*   lr;
-  completion_t        c;
-
-  lr = logger_req_buffer_pool_get();
-  if(lr == NULL)
-  {
-    TRACE(LOGGER, "failed to get logger request for signal trace set\n");
-    return;
-  }
-
-  completion_init(&c);
-
-  lr->chnl    = chnl;
-  lr->arg     = &c;
-  lr->handler = logger_signal_trace_clear_req_handler;
-
-  thread_queue_add(&_req_q, &lr->le);
-  ev_async_send(_logger_thread.ev_loop, &_req_q_noti);
-
-  completion_wait(&c);
-  completion_deinit(&c);
+  completion_wait(&arg.c);
+  completion_deinit(&arg.c);
 }

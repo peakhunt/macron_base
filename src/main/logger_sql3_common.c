@@ -93,83 +93,52 @@ logger_db_insert_alarm(sqlite3* db, uint32_t alarm, unsigned long timestamp, log
 }
 
 bool
-logger_db_insert_trace_channel(sqlite3* db, uint32_t chnl, unsigned long timestamp)
+logger_db_set_trace_channels(sqlite3* db, uint32_t* chnls, uint32_t n_chnls, unsigned long timestamp)
 {
-  const static char*    sql_cmd_buffer = 
+  const static char*    sql_cmd_buffer_delete = 
+    "delete from channel_trace";
+  const static char*    sql_cmd_buffer_insert = 
     "insert into channel_trace (chnl_num, time_started) values (?1, ?2)";
+  const static char*    sql_cmd_buffer_clear =
+    "delete from channel_log where not exists (select * from channel_trace where channel_trace.chnl_num = channel_log.ch_num);";
   sqlite3_stmt*         stmt;
   const char*           sql_error;
   int                   ret;
 
   sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, NULL);
-  ret = sqlite3_prepare_v2(db, sql_cmd_buffer, strlen(sql_cmd_buffer), &stmt, &sql_error);
+  // step 1. clear channels
+  ret = sqlite3_exec(db, sql_cmd_buffer_delete, NULL, NULL, NULL);
   if(ret != SQLITE_OK)
   {
     return FALSE;
   }
 
-  sqlite3_bind_int(stmt, 1, chnl);
-  sqlite3_bind_int(stmt, 2, timestamp);
-
-  if(sqlite3_step(stmt) != SQLITE_DONE)
+  // step 2. add all new channels
+  for(uint32_t n = 0; n < n_chnls; n++)
   {
-    return FALSE;
+    ret = sqlite3_prepare_v2(db, sql_cmd_buffer_insert, strlen(sql_cmd_buffer_insert), &stmt, &sql_error);
+    if(ret != SQLITE_OK)
+    {
+      return FALSE;
+    }
+
+    sqlite3_bind_int(stmt, 1, chnls[n]);
+    sqlite3_bind_int(stmt, 2, timestamp);
+
+    if(sqlite3_step(stmt) != SQLITE_DONE)
+    {
+      return FALSE;
+    }
+
+    if(sqlite3_finalize(stmt) != SQLITE_OK)
+    {
+      return FALSE;
+    }
   }
 
-  if(sqlite3_finalize(stmt) != SQLITE_OK)
-  {
-    return FALSE;
-  }
-
-  sqlite3_exec(db, "END TRANSACTION", NULL, NULL, NULL);
-  return TRUE;
-}
-
-bool
-logger_db_delete_trace_channel_and_data(sqlite3* db, uint32_t chnl)
-{
-  const static char*    sql_cmd_buffer = 
-    "delete from channel_trace where chnl_num = ?1";
-  const static char*    sql_cmd_buffer_chnl_log = 
-    "delete from channel_log where ch_num = ?1";
-  sqlite3_stmt*         stmt;
-  const char*           sql_error;
-  int                   ret;
-
-  sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, NULL);
-
-  ret = sqlite3_prepare_v2(db, sql_cmd_buffer, strlen(sql_cmd_buffer), &stmt, &sql_error);
+  // step 3. delete all channel_logs that are not traced
+  ret = sqlite3_exec(db, sql_cmd_buffer_clear, NULL, NULL, NULL);
   if(ret != SQLITE_OK)
-  {
-    return FALSE;
-  }
-
-  sqlite3_bind_int(stmt, 1, chnl);
-
-  if(sqlite3_step(stmt) != SQLITE_DONE)
-  {
-    return FALSE;
-  }
-
-  if(sqlite3_finalize(stmt) != SQLITE_OK)
-  {
-    return FALSE;
-  }
-
-  ret = sqlite3_prepare_v2(db, sql_cmd_buffer_chnl_log, strlen(sql_cmd_buffer_chnl_log), &stmt, &sql_error);
-  if(ret != SQLITE_OK)
-  {
-    return FALSE;
-  }
-
-  sqlite3_bind_int(stmt, 1, chnl);
-
-  if(sqlite3_step(stmt) != SQLITE_DONE)
-  {
-    return FALSE;
-  }
-
-  if(sqlite3_finalize(stmt) != SQLITE_OK)
   {
     return FALSE;
   }

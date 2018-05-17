@@ -17,6 +17,7 @@ static double             _loop_interval;
 static core_driver_stat_t _stat;
 
 static evloop_timer_t     _update_timer;
+static evloop_timer_t     _trace_timer;
 
 static evloop_thread_t    _app_core_thread = 
 {
@@ -70,12 +71,21 @@ app_core_udpate(evloop_timer_t* t, void* arg)
 }
 
 static void
+app_core_do_log(evloop_timer_t* t, void* arg)
+{
+  channel_manager_do_log();
+}
+
+static void
 app_core_thread_init(evloop_thread_t* thrd)
 {
   TRACE(CORE_DRIVER, "initializing app_core before thread loop\n");
 
   evloop_timer_init(&_update_timer, app_core_udpate, NULL);
   evloop_timer_start(&_update_timer, _loop_interval, 0);
+
+  evloop_timer_init(&_trace_timer, app_core_do_log, NULL);
+  evloop_timer_start(&_trace_timer, 100.0/1000.0, 100.0/1000.0);  // FIXME
 
   TRACE(CORE_DRIVER, "done initializing app_core\n");
 

@@ -14,11 +14,9 @@ typedef enum
 
 extern void logger_init(void);
 
-extern void logger_signal_log(uint32_t chnl, double v);
-
-extern void logger_signal_trace_set(uint32_t chnl);
-extern void logger_signal_trace_clear(uint32_t chnl);
-
+extern void logger_signal_log(uint32_t chnl, double v, unsigned long timestamp);
 extern void logger_alarm_log(uint32_t alarm, logger_alarm_event_t evt);
+
+extern void logger_signal_trace_set_chnls(uint32_t* chnls, uint32_t num_chnls);
 
 #endif /*!__LOGGER_DEF_H__ */

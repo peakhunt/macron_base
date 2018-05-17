@@ -582,28 +582,40 @@ __get_all_trace_channels_cb(void* data, int argc, char** argv, char** azColName)
 static void
 cli_command_signal_trace(cli_intf_t* intf, int argc, const char** argv)
 {
-  uint32_t            chnl_num;
-
   if(argc < 2) goto command_error;
 
 
   if(strcmp(argv[1], "set") == 0)
   {
-    chnl_num = atoi(argv[2]);
+    uint32_t*   chnls = NULL;
+    uint32_t    n_chnls;
 
-    if(argc != 3) goto command_error;
+    n_chnls = argc - 2;
 
-    cli_printf(intf, "setting channel trace for %d"CLI_EOL, chnl_num);
-    logger_signal_trace_set(chnl_num);
-  }
-  else if(strcmp(argv[1], "clear") == 0)
-  {
-    chnl_num = atoi(argv[2]);
+    if(n_chnls > 0)
+    {
+      chnls = malloc(sizeof(uint32_t) * n_chnls);
+      if(chnls == NULL)
+      {
+        cli_printf(intf, "failed to malloc"CLI_EOL);
+        return;
+      }
 
-    if(argc != 3) goto command_error;
+      for(uint32_t i = 0; i < n_chnls; i++)
+      {
+        chnls[i] = atoi(argv[2 + i]);
+        cli_printf(intf, "CH - %d"CLI_EOL, chnls[i]);
+      }
+    }
 
-    cli_printf(intf, "clearing channel trace for %d"CLI_EOL, chnl_num);
-    logger_signal_trace_clear(chnl_num);
+    cli_printf(intf, "setting channel trace for %d channels"CLI_EOL, n_chnls);
+
+    logger_signal_trace_set_chnls(chnls, n_chnls);
+
+    if(chnls != NULL)
+    {
+      free(chnls);
+    }
   }
   else if(strcmp(argv[1], "show") == 0)
   {
@@ -636,8 +648,8 @@ cli_command_signal_trace(cli_intf_t* intf, int argc, const char** argv)
 
 command_error:
   cli_printf(intf, "invalid argument!!!"CLI_EOL CLI_EOL);
-  cli_printf(intf, "%s set chnl-num"CLI_EOL, argv[0]);
-  cli_printf(intf, "%s clear chnl-num"CLI_EOL, argv[0]);
+  cli_printf(intf, "%s set <chnls...> "CLI_EOL, argv[0]);
+  cli_printf(intf, "%s show"CLI_EOL, argv[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
