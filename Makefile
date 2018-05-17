@@ -37,6 +37,7 @@ src/utils/publish_observe.c                         \
 src/utils/atomic_file_update.c                      \
 src/utils/json_util.c                               \
 src/utils/indexer.c                                 \
+src/utils/rbtree.c                                  \
 src/utils/debug_log.c
 
 LIB_MODBUS_SOURCES =                                \
@@ -74,7 +75,9 @@ src/main/cli_driver.c                               \
 src/main/modbus_slave_driver.c                      \
 src/main/modbus_master_driver.c                     \
 src/main/webserver_driver.c                         \
+src/main/webserver_api_common.c                     \
 src/main/webserver_api.c                            \
+src/main/webserver_api_loggerif.c                   \
 src/main/cfg_mgr.c                                  \
 src/main/logger_sql3_common.c                       \
 src/main/logger.c

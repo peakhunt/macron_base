@@ -8,10 +8,12 @@
   TRACE_DEF(CLI_DRIVER),    \
   TRACE_DEF(WEBS_DRIVER),   \
   TRACE_DEF(WEBS_REQUEST),  \
+  TRACE_DEF(WEBL_REQUEST),  \
   TRACE_DEF(MBS_DRIVER),    \
   TRACE_DEF(MBM_DRIVER),    \
   TRACE_DEF(CORE_DRIVER),   \
-  TRACE_DEF(LOGGER), 
+  TRACE_DEF(LOGGER),        \
+  TRACE_DEF(DEBUG),
 
 
 #define APP_TRACE_STRS  \
@@ -19,10 +21,12 @@
   "CLI_DRIVER"          \
   "WEBS_DRIVER"         \
   "WEBS_REQUEST"        \
+  "WEBL_REQUEST"        \
   "MBS_DRIVER"          \
   "MBM_DRIVER"          \
   "CORE_DRIVER"         \
-  "LOGGER"
+  "LOGGER"              \
+  "DEBUG"
 
 
 #endif /*!__APP_TRACE_DEF_H__ */

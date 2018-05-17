@@ -1,3 +1,4 @@
+#include "trace.h"
 #include "logger_sql3_common.h"
 
 sqlite3*
@@ -147,6 +148,70 @@ logger_db_set_trace_channels(sqlite3* db, uint32_t* chnls, uint32_t n_chnls, uns
   return TRUE;
 }
 
+extern bool
+logger_db_get_trace_channels(sqlite3* db, uint32_t** chnls, uint32_t* n_chnls)
+{
+  const static char*    sql_cmd_buffer_count = 
+    "select count(*) from channel_trace";
+  const static char*    sql_cmd_buffer_select =
+    "select chnl_num from channel_trace";
+  sqlite3_stmt*         stmt;
+  const char*           sql_error;
+  int                   ret;
+  uint32_t              *tmp = NULL,
+                        num_chnls;
+
+  sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, NULL);    // for database lock. I believe this works ;)
+
+  ret = sqlite3_prepare_v2(db, sql_cmd_buffer_count, strlen(sql_cmd_buffer_count), &stmt, &sql_error);
+  if(ret != SQLITE_OK)
+  {
+    return FALSE;
+  }
+
+  ret = sqlite3_step(stmt);
+
+  // gotta be only one row. one column
+  if(ret != SQLITE_ROW)
+  {
+    return FALSE;
+  }
+
+  num_chnls = sqlite3_column_int(stmt, 0);
+
+  sqlite3_finalize(stmt);
+
+  ret = sqlite3_prepare_v2(db, sql_cmd_buffer_select, strlen(sql_cmd_buffer_select), &stmt, &sql_error);
+  if(ret != SQLITE_OK)
+  {
+    return FALSE;
+  }
+
+  if(num_chnls > 0)
+  {
+    tmp = malloc(sizeof(uint32_t) * num_chnls);
+    if(tmp == NULL)
+    {
+      return FALSE;
+    }
+  }
+
+  for(uint32_t i = 0; i < num_chnls; i++)
+  {
+    sqlite3_step(stmt);
+    tmp[i] = (uint32_t)sqlite3_column_int(stmt, 0);
+  }
+
+  sqlite3_finalize(stmt);
+  sqlite3_exec(db, "END TRANSACTION", NULL, NULL, NULL);
+
+
+  *chnls = tmp;
+  *n_chnls = num_chnls;
+
+  return TRUE;
+}
+
 bool
 logger_db_get_all_trace_channels(sqlite3* db, sqlite3_callback cb, void* cb_data)
 {
@@ -170,6 +235,7 @@ logger_db_check_if_channel_traced(sqlite3* db, uint32_t chnl)
   sqlite3_stmt*         stmt;
   const char*           sql_error;
   int                   ret;
+  bool                  result = TRUE;
 
   ret = sqlite3_prepare_v2(db, sql_cmd_buffer, strlen(sql_cmd_buffer), &stmt, &sql_error);
   if(ret != SQLITE_OK)
@@ -182,12 +248,78 @@ logger_db_check_if_channel_traced(sqlite3* db, uint32_t chnl)
   // gotta be exactly one row
   if(sqlite3_step(stmt) != SQLITE_ROW)
   {
-    return FALSE;
+    result = FALSE;
   }
 
   if(sqlite3_finalize(stmt) != SQLITE_OK)
   {
+    result = FALSE;
+  }
+  return result;
+}
+
+static void
+__create_query_for_get_channel_log(char* buf, size_t buf_size, unsigned long start, unsigned long end, uint32_t* chnls, uint32_t num_chnls)
+{
+  /*
+     select * from channel_log
+     where ((ch_num = 1 or ch_num = 2) and (time_stamp >= 1822310417 and time_stamp <= 1822312615))
+     order by ch_num asc, time_stamp asc;
+   */
+
+  int         len = 0;
+  uint32_t    ndx;
+
+  len += snprintf(&buf[len], buf_size - len, "select * from channel_log ");
+  if(len >= buf_size) return;
+
+  len += snprintf(&buf[len], buf_size - len, "where ((");
+  if(len >= buf_size) return;
+
+  for(ndx = 0; ndx < num_chnls; ndx++)
+  { 
+    len += snprintf(&buf[len], buf_size - len,  " ch_num = %d ", chnls[ndx]);
+    if(len >= buf_size) return;
+
+    if(ndx < (num_chnls - 1))
+    {
+      len += snprintf(&buf[len], buf_size - len, " or ");
+      if(len >= buf_size) return;
+    }
+  }
+  len += snprintf(&buf[len], buf_size - len, " ) and ");
+  if(len >= buf_size) return;
+
+  len += snprintf(&buf[len], buf_size - len, "(time_stamp >= %lu and time_stamp <= %lu)) ", start, end);
+  if(len >= buf_size) return;
+
+  len += snprintf(&buf[len], buf_size - len, "order by ch_num asc, time_stamp asc");
+}
+
+bool
+logger_db_get_channel_log(sqlite3* db, unsigned long start, unsigned long end, uint32_t* chnls, uint32_t num_chnls,
+    sqlite3_callback cb, void* cb_data)
+{
+  char sql_cmd_buffer[512];
+  int  ret;
+
+  __create_query_for_get_channel_log(sql_cmd_buffer, 512, start, end, chnls, num_chnls);
+
+  TRACE(DEBUG, "query: %s\n", sql_cmd_buffer);
+
+  ret = sqlite3_exec(db, sql_cmd_buffer, cb, cb_data, NULL);
+
+  if(ret != SQLITE_OK)
+  {
+    TRACE(DEBUG, "query failed: %s\n", sqlite3_errmsg(db));
     return FALSE;
   }
+
   return TRUE;
+}
+
+bool
+logger_db_get_alarm_log(sqlite3* db, uint32_t* chnls, uint32_t num_chnls, sqlite3_callback cb, void* cb_data)
+{
+  return FALSE;
 }

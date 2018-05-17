@@ -77,6 +77,9 @@ static logger_request_t       _req_buffer[LOGGER_REQUEST_SIZE];
 static struct list_head       _req_buffer_pool;
 static pthread_mutex_t        _req_buffer_lock;
 
+static uint32_t*              _trace_channels = NULL;
+static uint32_t               _num_trace_channels = 0;
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // utilities
@@ -92,6 +95,30 @@ logger_db_init(void)
     exit(-1);
   }
   TRACE(LOGGER, "logger db %s opened\n", LOGGER_DB);
+}
+
+static void
+load_traced_channels()
+{
+  uint32_t    *chnls,
+              num_chnls;
+
+  if(logger_db_get_trace_channels(_logger_db, &chnls, &num_chnls) == FALSE)
+  {
+    TRACE(LOGGER, "failed to load trace channels\n");
+    exit(-1);
+  }
+
+  TRACE(LOGGER, "num trace channels: %d\n", num_chnls);
+  for(uint32_t i = 0; i < num_chnls; i++)
+  {
+    TRACE(LOGGER, "trace channel: %d\n", chnls[i]);
+  }
+
+  _trace_channels     = chnls;
+  _num_trace_channels = num_chnls;
+
+  channel_manager_set_trace_channels(chnls, num_chnls);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -239,6 +266,7 @@ logger_init(void)
 {
   TRACE(LOGGER, "starting logger\n");
   logger_db_init();
+  load_traced_channels();
 
   thread_queue_init(&_req_q);
   evloop_thread_init(&_logger_thread);

@@ -135,55 +135,6 @@ struct __api_cmd_handler_t
 // common error handler
 //
 ///////////////////////////////////////////////////////////////////////////////
-static inline void
-webapi_not_found(struct mg_connection* nc, struct http_message* hm)
-{
-  mg_printf(nc, "%s",
-      "HTTP/1.1 404 Not Found\r\n"
-      "Content-Length: 0\r\n\r\n");
-}
-
-static inline void
-webapi_bad_request(struct mg_connection* nc, struct http_message* hm)
-{
-  mg_printf(nc, "%s",
-      "HTTP/1.1 400 Bad Request\r\n"
-      "Content-Length: 0\r\n\r\n");
-}
-
-static inline void
-webapi_server_error(struct mg_connection* nc, struct http_message* hm)
-{
-  mg_printf(nc, "%s",
-      "HTTP/1.1 500 Server Error\r\n"
-      "Content-Length: 0\r\n\r\n");
-}
-
-static inline void
-webapi_server_error_other(struct mg_connection* nc, struct http_message* hm)
-{
-  mg_printf(nc, "%s",
-      "HTTP/1.1 503 Server Error\r\n"
-      "Content-Length: 0\r\n\r\n");
-}
-
-static inline void
-webapi_server_json_response_ok(struct mg_connection* nc, const char* json, int len)
-{
-  mg_printf(nc,
-      "HTTP/1.1 200 OK\r\n"
-      "Content-Type: text/json\r\n"
-      "Content-Length: %d\r\n\r\n%s",
-      len, json);
-}
-
-static inline void
-webapi_server_response_ok(struct mg_connection* nc)
-{
-  mg_printf(nc,
-      "HTTP/1.1 200 OK\r\n"
-      "Content-Length: 0\r\n\r\n");
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -729,10 +680,6 @@ webapi_get_config_base(struct mg_connection* nc, struct http_message* hm, struct
 //
 ///////////////////////////////////////////////////////////////////////////////
 static struct mg_str    _api_v1_root = MG_MK_STR("/api/v1/");
-
-static struct mg_str    _op_get   = MG_MK_STR("GET"),
-                        _op_put   = MG_MK_STR("PUT"),
-                        _op_post  = MG_MK_STR("POST");
 
 static api_cmd_handler_t    _channel_cmd_handlers[] =
 {
