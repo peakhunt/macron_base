@@ -99,7 +99,7 @@ get_channel_log_callback(void* data, int argc, char** argv, char** azColName)
   }
 
   mg_printf_http_chunk(nc, "{\"ch\": %s, \"data\": %s, \"timestamp\": %s }",
-      argv[0],argv[1],argv[2]);
+      argv[0],argv[2],argv[1]);
   ctx->count++;
 
   return 0;
