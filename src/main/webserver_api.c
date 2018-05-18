@@ -5,8 +5,6 @@
 #include "time_util.h"
 #include "trace.h"
 #include "webserver_api.h"
-#include "mongoose_util.h"
-#include "cJSON.h"
 #include "json_util.h"
 
 struct __api_cmd_handler_t;
@@ -141,30 +139,6 @@ struct __api_cmd_handler_t
 // common utilities
 //
 ///////////////////////////////////////////////////////////////////////////////
-static cJSON*
-webapi_parse_json_body(struct mg_str* str, struct mg_connection* nc, struct http_message* hm)
-{
-  cJSON*              json;
-  char*               body;
-
-  body = mg_util_to_c_str_alloc(str);
-  if(body == NULL)
-  {
-    webapi_server_error(nc, hm);
-    return NULL;
-  }
-
-  json = cJSON_Parse(body);
-  free(body);
-
-  if(json == NULL)
-  {
-    webapi_bad_request(nc, hm);
-    return NULL;
-  }
-
-  return json;
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -515,6 +489,7 @@ webapi_update_channel_lookup_table(struct mg_connection* nc, struct http_message
   req = webapi_parse_json_body(&hm->body, nc, hm);
   if(req == NULL)
   {
+    webapi_bad_request(nc, hm);
     return;
   }
 

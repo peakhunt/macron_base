@@ -319,7 +319,24 @@ logger_db_get_channel_log(sqlite3* db, unsigned long start, unsigned long end, u
 }
 
 bool
-logger_db_get_alarm_log(sqlite3* db, uint32_t* chnls, uint32_t num_chnls, sqlite3_callback cb, void* cb_data)
+logger_db_get_alarm_log(sqlite3* db, unsigned long start_time, unsigned long end_time, sqlite3_callback cb, void* cb_data)
 {
-  return FALSE;
+  char sql_cmd_buffer[512];
+  int  ret;
+
+  snprintf(sql_cmd_buffer, 512, "select * from alarm_log where time_stamp >= %lu and time_stamp < %lu "
+      "order by time_stamp asc",
+      start_time, end_time);
+
+  TRACE(DEBUG, "query: %s\n", sql_cmd_buffer);
+
+  ret = sqlite3_exec(db, sql_cmd_buffer, cb, cb_data, NULL);
+
+  if(ret != SQLITE_OK)
+  {
+    TRACE(DEBUG, "query failed: %s\n", sqlite3_errmsg(db));
+    return FALSE;
+  }
+
+  return TRUE;
 }

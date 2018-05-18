@@ -24,7 +24,6 @@ extern bool logger_db_check_if_channel_traced(sqlite3* db, uint32_t chnl);
 extern bool logger_db_get_channel_log(sqlite3* db, unsigned long start, unsigned long end, uint32_t* chnls, uint32_t num_chnls,
     sqlite3_callback cb, void* cb_data);
 
-extern bool logger_db_get_alarm_log(sqlite3* db, uint32_t* chnls, uint32_t num_chnls,
-    sqlite3_callback cb, void* cb_data);
+extern bool logger_db_get_alarm_log(sqlite3* db, unsigned long start_time, unsigned long end_time, sqlite3_callback cb, void* cb_data);
 
 #endif /* !__LOGGER_SQL3_COMMON_DEF_H__ */

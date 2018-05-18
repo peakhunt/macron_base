@@ -4,7 +4,9 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#ifndef bool
 typedef uint8_t bool;
+#endif
 
 #define TRUE          1
 #define FALSE         0
@@ -27,8 +29,13 @@ typedef uint8_t bool;
   b[0] = HI_BYTE(w);                  \
   b[1] = LO_BYTE(w);
 
+#ifndef MIN
 #define MIN(a,b)      (a < b ? a : b)
+#endif
+
+#ifndef MAX
 #define MAX(a,b)      (a > b ? a : b)
+#endif
 
 
 #endif /* !__COMMON_DEF_H__ */
