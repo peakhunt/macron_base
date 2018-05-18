@@ -24,6 +24,9 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define LOGGER_REQUEST_SIZE         1024
 
+#define HOUR_TO_MSEC(h)             (h*60*60*1000)
+#define DAYS_TO_MSEC(d)             HOUR_TO_MSEC(d*24)
+
 struct __logger_request_t;
 typedef struct __logger_request_t logger_request_t;
 
@@ -269,7 +272,38 @@ logger_signal_trace_set_chnls_handler(logger_request_t* lr)
 static void
 logger_do_cleanup(evloop_timer_t* t, void* arg)
 {
-  // FIXME
+  unsigned long now,
+                channel_log_old,
+                alarm_log_old,
+                start;
+
+  start = time_util_get_sys_clock_in_ms();
+
+  now = time_util_get_current_time_in_ms();
+
+  channel_log_old = now - HOUR_TO_MSEC(_logger_cfg.signal_log_keep);
+  alarm_log_old   = now - DAYS_TO_MSEC(_logger_cfg.alarm_log_keep);
+
+  TRACE(LOGGER, "cleaning channel/alarm logs %lu, %lu, %lu\n", now, channel_log_old, alarm_log_old);
+
+#if 0
+  if(logger_db_clean_up_old_channel_logs(_logger_db, channel_log_old) == FALSE)
+  {
+    TRACE(LOGGER, "cleaning channel logs failed\n");
+  }
+
+  if(logger_db_clean_up_old_alarm_logs(_logger_db, alarm_log_old) == FALSE)
+  {
+    TRACE(LOGGER, "cleaning alarm logs failed\n");
+  }
+#else
+  if(logger_db_clean_up_old_channel_alarm_logs(_logger_db, channel_log_old, alarm_log_old) == FALSE)
+  {
+    TRACE(LOGGER, "cleaning alarm/channel logs failed\n");
+  }
+#endif
+
+  TRACE(LOGGER, "took %lu ms to clean up logs\n", time_util_get_sys_clock_elapsed_in_ms(start));
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -281,6 +315,11 @@ static void
 logger_thread_init(evloop_thread_t* thrd)
 {
   TRACE(LOGGER, "entering logger loop\n");
+
+  evloop_timer_init(&_log_clean_timer, logger_do_cleanup, NULL);
+  evloop_timer_start(&_log_clean_timer,
+      _logger_cfg.log_clean_period,
+      _logger_cfg.log_clean_period);
 
   app_init_complete_signal();
 }
@@ -331,11 +370,6 @@ logger_init(void)
 
   ev_async_init(&_req_q_noti, logger_req_q_noti_callback);
   ev_async_start(_logger_thread.ev_loop, &_req_q_noti);
-
-  evloop_timer_init(&_log_clean_timer, logger_do_cleanup, NULL);
-  evloop_timer_start(&_log_clean_timer,
-      _logger_cfg.log_clean_period,
-      _logger_cfg.log_clean_period);
 
   logger_req_buffer_pool_init();
 

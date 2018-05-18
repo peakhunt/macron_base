@@ -25,4 +25,9 @@ extern bool logger_db_get_channel_log(sqlite3* db, unsigned long start, unsigned
 
 extern bool logger_db_get_alarm_log(sqlite3* db, unsigned long start_time, unsigned long end_time, sqlite3_callback cb, void* cb_data);
 
+extern bool logger_db_clean_up_old_channel_logs(sqlite3* db, unsigned long older_than);
+extern bool logger_db_clean_up_old_alarm_logs(sqlite3* db, unsigned long older_than);
+
+extern bool logger_db_clean_up_old_channel_alarm_logs(sqlite3* db, unsigned long channel_older_than, unsigned long alarm_older_than);
+
 #endif /* !__LOGGER_SQL3_COMMON_DEF_H__ */
