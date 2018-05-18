@@ -19,7 +19,6 @@ extern bool logger_db_set_trace_channels(sqlite3* db, uint32_t* chnls, uint32_t 
 extern bool logger_db_get_trace_channels(sqlite3* db, uint32_t** chnls, uint32_t* n_chnls);
 
 extern bool logger_db_get_all_trace_channels(sqlite3* db, sqlite3_callback cb, void* cb_data);
-extern bool logger_db_check_if_channel_traced(sqlite3* db, uint32_t chnl);
 
 extern bool logger_db_get_channel_log(sqlite3* db, unsigned long start, unsigned long end, uint32_t* chnls, uint32_t num_chnls,
     sqlite3_callback cb, void* cb_data);

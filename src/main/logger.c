@@ -121,6 +121,19 @@ load_traced_channels()
   channel_manager_set_trace_channels(chnls, num_chnls);
 }
 
+static bool
+check_if_channe_is_traced(uint32_t chnl_num)
+{
+  for(uint32_t ndx = 0; ndx < _num_trace_channels; ndx++)
+  {
+    if(_trace_channels[ndx] == chnl_num)
+    {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // logger request buffer pool
@@ -176,7 +189,7 @@ logger_req_buffer_pool_put(logger_request_t* lr)
 static void
 logger_chnl_log_req_handler(logger_request_t* lr)
 {
-  if(logger_db_check_if_channel_traced(_logger_db, lr->chnl) == FALSE)
+  if(check_if_channe_is_traced(lr->chnl) == FALSE)
   {
     // may happen, especially during clearing due to queued requests
     return;
@@ -216,6 +229,28 @@ logger_signal_trace_set_chnls_handler(logger_request_t* lr)
   else
   {
     channel_manager_set_trace_channels(arg->chnls, arg->n_chnls);
+
+    if(_trace_channels)
+    {
+      free(_trace_channels);
+    }
+
+    _trace_channels = NULL;
+    _num_trace_channels = arg->n_chnls;
+
+    if(_num_trace_channels != 0)
+    {
+      _trace_channels = malloc(sizeof(uint32_t) * _num_trace_channels);
+      if(_trace_channels == NULL)
+      {
+        _num_trace_channels = 0;
+        TRACE(LOGGER, "failed to malloc _trace_channels\n");
+      }
+      else
+      {
+        memcpy(_trace_channels, arg->chnls, sizeof(uint32_t) * _num_trace_channels);
+      }
+    }
   }
 
   completion_signal(&arg->c);
