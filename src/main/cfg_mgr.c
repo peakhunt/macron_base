@@ -1190,3 +1190,27 @@ cfg_mgr_update_lookup_table(uint32_t chnl_num, lookup_table_t* ltable)
   cfg_mgr_unlock();
   return TRUE;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// channel/alarm logging
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool
+cfg_mgr_get_logging_config(logger_config_t* cfg)
+{
+  cJSON   *logging;
+
+  cfg_mgr_read_lock();
+
+  logging = cfg_mgr_get_node(_jroot, "logging");
+
+  cfg->interval         = (uint32_t)cfg_mgr_get_int(logging, "interval");
+  cfg->signal_log_keep  = (uint32_t)cfg_mgr_get_int(logging, "signal_log_keep");
+  cfg->alarm_log_keep   = (uint32_t)cfg_mgr_get_int(logging, "alarm_log_keep");
+  cfg->log_clean_period = (uint32_t)cfg_mgr_get_int(logging, "log_clean_period");
+
+  cfg_mgr_unlock();
+
+  return TRUE;
+}

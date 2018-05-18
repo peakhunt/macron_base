@@ -12,8 +12,10 @@
 #include "app_init_completion.h"
 #include "completion.h"
 #include "channel_manager.h"
+#include "cfg_mgr.h"
 #include "logger.h"
 #include "logger_sql3_common.h"
+#include "evloop_timer.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -79,6 +81,9 @@ static pthread_mutex_t        _req_buffer_lock;
 
 static uint32_t*              _trace_channels = NULL;
 static uint32_t               _num_trace_channels = 0;
+
+static logger_config_t        _logger_cfg;
+static evloop_timer_t         _log_clean_timer;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -258,6 +263,17 @@ logger_signal_trace_set_chnls_handler(logger_request_t* lr)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
+// periodic cleanup
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static void
+logger_do_cleanup(evloop_timer_t* t, void* arg)
+{
+  // FIXME
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
 // logger thread
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -300,6 +316,13 @@ void
 logger_init(void)
 {
   TRACE(LOGGER, "starting logger\n");
+
+  cfg_mgr_get_logging_config(&_logger_cfg);
+
+  TRACE(LOGGER, "signal log keep: %u\n", _logger_cfg.signal_log_keep);
+  TRACE(LOGGER, "alarm log keep: %u\n", _logger_cfg.alarm_log_keep);
+  TRACE(LOGGER, "log clean period: %u\n", _logger_cfg.log_clean_period);
+
   logger_db_init();
   load_traced_channels();
 
@@ -308,6 +331,11 @@ logger_init(void)
 
   ev_async_init(&_req_q_noti, logger_req_q_noti_callback);
   ev_async_start(_logger_thread.ev_loop, &_req_q_noti);
+
+  evloop_timer_init(&_log_clean_timer, logger_do_cleanup, NULL);
+  evloop_timer_start(&_log_clean_timer,
+      _logger_cfg.log_clean_period,
+      _logger_cfg.log_clean_period);
 
   logger_req_buffer_pool_init();
 

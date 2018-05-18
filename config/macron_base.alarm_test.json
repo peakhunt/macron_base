@@ -10,6 +10,12 @@
 	"core_config":	{
 		"loop_interval":	10
 	},
+  "logging": {
+    "interval": 100,
+    "signal_log_keep": 5,
+    "alarm_log_keep": 730,
+    "log_clean_period": 120
+  },
 	"cli":	{
 		"prompt":	"macron_bog> ",
 		"telnet":	{

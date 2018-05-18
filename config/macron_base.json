@@ -10,6 +10,12 @@
 	"core_config":	{
 		"loop_interval":	10
 	},
+  "logging": {
+    "interval": 100,
+    "signal_log_keep": 120,
+    "alarm_log_keep": 730,
+    "log_clean_period": 120
+  },
 	"cli":	{
 		"prompt":	"macron_bog> ",
 		"telnet":	{
@@ -27,7 +33,9 @@
 	},
 	"web":	{
 		"http_address":	"8000",
-		"doc_root":	"./"
+		"doc_root":	"./",
+    "loggerif_http_address": "8001",
+		"loggerif_doc_root":	"./"
 	},
 	"modbus_slave_list":	[{
 			"protocol":	"tcp",

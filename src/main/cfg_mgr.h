@@ -9,6 +9,7 @@
 #include "core_driver.h"
 #include "alarm_manager.h"
 #include "channel_manager.h"
+#include "logger.h"
 
 extern void cfg_mgr_init(const char* cfg_file);
 
@@ -64,5 +65,7 @@ extern uint32_t cfg_mgr_get_channel_from_index(int ndx);
 extern int cfg_mgr_get_alarm_index_equal_or_bigger(uint32_t alarm_num);
 extern int cfg_mgr_get_alarm_next(int ndx);
 extern uint32_t cfg_mgr_get_alarm_from_index(int ndx);
+
+extern bool cfg_mgr_get_logging_config(logger_config_t* cfg);
 
 #endif /* !__CFG_MGR_DEF_H__ */

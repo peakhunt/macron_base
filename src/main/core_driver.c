@@ -25,6 +25,8 @@ static evloop_thread_t    _app_core_thread =
   .fini = app_core_thread_fini,
 };
 
+static double _log_interval;
+
 static void
 app_core_run_application(void)
 {
@@ -85,7 +87,7 @@ app_core_thread_init(evloop_thread_t* thrd)
   evloop_timer_start(&_update_timer, _loop_interval, 0);
 
   evloop_timer_init(&_trace_timer, app_core_do_log, NULL);
-  evloop_timer_start(&_trace_timer, 100.0/1000.0, 100.0/1000.0);  // FIXME
+  evloop_timer_start(&_trace_timer, _log_interval, _log_interval);
 
   TRACE(CORE_DRIVER, "done initializing app_core\n");
 
@@ -199,11 +201,18 @@ void
 core_driver_init(void)
 {
   core_driver_config_t    cfg;
+  logger_config_t         logging_cfg;
 
   TRACE(CORE_DRIVER, "starting up core driver\n");
 
   cfg_mgr_get_core_driver_config(&cfg);
   _loop_interval = cfg.loop_interval / 1000.0;
+
+  cfg_mgr_get_logging_config(&logging_cfg);
+
+  TRACE(CORE_DRIVER, "logging interval : %u ms\n", logging_cfg.interval);
+
+  _log_interval = logging_cfg.interval / 1000.0;
 
 
   _stat.input_scan_min  = 0xffffffff;
