@@ -393,3 +393,42 @@ logger_db_clean_up_old_channel_alarm_logs(sqlite3* db, unsigned long channel_old
 
   return TRUE;
 }
+
+bool
+logger_db_clean_up_old_channel_alarm_logs2(sqlite3* db, uint32_t* chnls, uint32_t num_chnl,
+    unsigned long channel_older_than, unsigned long alarm_older_than)
+{
+  char sql_cmd_buffer[512];
+  int  ret;
+
+  sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, NULL);
+
+  for(uint32_t ndx = 0; ndx < num_chnl; ndx++)
+  {
+    snprintf(sql_cmd_buffer, 512, "delete from channel_log where time_stamp <= %lu and ch_num = %u", channel_older_than,
+        chnls[ndx]);
+    TRACE(DEBUG, "%s\n", sql_cmd_buffer);
+
+    sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, NULL);
+
+    ret = sqlite3_exec(db, sql_cmd_buffer, NULL, NULL, NULL);
+
+    if(ret != SQLITE_OK)
+    {
+      TRACE(DEBUG, "cmd failed: %s\n", sqlite3_errmsg(db));
+      return FALSE;
+    }
+  }
+
+  snprintf(sql_cmd_buffer, 512, "delete from alarm_log where time_stamp <= %lu", alarm_older_than);
+  ret = sqlite3_exec(db, sql_cmd_buffer, NULL, NULL, NULL);
+
+  sqlite3_exec(db, "END TRANSACTION", NULL, NULL, NULL);
+  if(ret != SQLITE_OK)
+  {
+    TRACE(DEBUG, "cmd failed: %s\n", sqlite3_errmsg(db));
+    return FALSE;
+  }
+
+  return TRUE;
+}

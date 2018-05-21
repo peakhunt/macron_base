@@ -297,7 +297,14 @@ logger_do_cleanup(evloop_timer_t* t, void* arg)
     TRACE(LOGGER, "cleaning alarm logs failed\n");
   }
 #else
+  /* performanced optimized out
   if(logger_db_clean_up_old_channel_alarm_logs(_logger_db, channel_log_old, alarm_log_old) == FALSE)
+  {
+    TRACE(LOGGER, "cleaning alarm/channel logs failed\n");
+  }
+  */
+  if(logger_db_clean_up_old_channel_alarm_logs2(_logger_db, _trace_channels, _num_trace_channels,
+        channel_log_old, alarm_log_old) == FALSE)
   {
     TRACE(LOGGER, "cleaning alarm/channel logs failed\n");
   }

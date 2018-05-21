@@ -30,4 +30,8 @@ extern bool logger_db_clean_up_old_alarm_logs(sqlite3* db, unsigned long older_t
 
 extern bool logger_db_clean_up_old_channel_alarm_logs(sqlite3* db, unsigned long channel_older_than, unsigned long alarm_older_than);
 
+bool
+logger_db_clean_up_old_channel_alarm_logs2(sqlite3* db, uint32_t* chnls, uint32_t num_chnl,
+    unsigned long channel_older_than, unsigned long alarm_older_than);
+
 #endif /* !__LOGGER_SQL3_COMMON_DEF_H__ */
