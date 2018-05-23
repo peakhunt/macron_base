@@ -2,6 +2,7 @@ const global = require('../global')
 const _config = global.config
 const axios = require('axios')
 var _baseURL = null
+var _loggerIfURL = null
 
 function getServerBaseUrl () {
   if (_baseURL == null) {
@@ -9,6 +10,14 @@ function getServerBaseUrl () {
   }
 
   return _baseURL
+}
+
+function getLoggerIfBaseUrl () {
+  if (_loggerIfURL == null) {
+    _loggerIfURL = 'http://' + _config.server.ipAddress + ':' + _config.server.loggerIfPort
+  }
+
+  return _loggerIfURL
 }
 
 function loadSystemConfig (callback) {
@@ -109,6 +118,24 @@ function updateAlarmConfig (alarmNum, config, callback) {
     })
 }
 
+function getAlarmLog (Date startTime, Date endTime, callback) {
+  var url = getLoggerIfBaseUrl() + '/api/v1/loggerif/alarm'
+  var startTimeStamp;
+  var endTimeStamp;
+
+  startTimeStamp = startTime.getTime()
+  endTimeStamp = endTime.getTime()
+
+  url += '?start_time=' + startTimeStamp + '&end_time=' + endTimeStamp
+
+  axios.get(url)
+    .then(response) => {
+      callback(null, response)
+    }, (err) => {
+      callback(err, null)
+    })
+}
+
 module.exports = {
   loadSystemConfig: loadSystemConfig,
   updateLookupTable: updateLookupTable,
@@ -116,5 +143,6 @@ module.exports = {
   getAlarmStatus: getAlarmStatus,
   ackAlarm: ackAlarm,
   updateChannelConfig: updateChannelConfig,
-  updateAlarmConfig: updateAlarmConfig
+  updateAlarmConfig: updateAlarmConfig,
+  getAlarmLog: getAlarmLog
 }
