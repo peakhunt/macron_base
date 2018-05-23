@@ -13,6 +13,7 @@ function loadAppConfig (app, cb) {
     server: {
       ipAddress: '192.168.227.211',
       webPort: 8000,
+      loggerIfPort: 8001,
       modbusPort: 8080
     },
     poll_schedule: {
