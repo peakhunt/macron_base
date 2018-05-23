@@ -44,6 +44,10 @@ export default new Router({
       component: require('@/components/SignalTraceView').default
     },
     {
+      path: '/alarm-log',
+      component: require('@/components/AlarmLogView').default
+    },
+    {
       path: '*',
       redirect: '/'
     }

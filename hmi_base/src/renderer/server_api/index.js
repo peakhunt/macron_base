@@ -118,10 +118,10 @@ function updateAlarmConfig (alarmNum, config, callback) {
     })
 }
 
-function getAlarmLog (Date startTime, Date endTime, callback) {
+function getAlarmLog (startTime, endTime, callback) {
   var url = getLoggerIfBaseUrl() + '/api/v1/loggerif/alarm'
-  var startTimeStamp;
-  var endTimeStamp;
+  var startTimeStamp
+  var endTimeStamp
 
   startTimeStamp = startTime.getTime()
   endTimeStamp = endTime.getTime()
@@ -129,7 +129,7 @@ function getAlarmLog (Date startTime, Date endTime, callback) {
   url += '?start_time=' + startTimeStamp + '&end_time=' + endTimeStamp
 
   axios.get(url)
-    .then(response) => {
+    .then((response) => {
       callback(null, response)
     }, (err) => {
       callback(err, null)
