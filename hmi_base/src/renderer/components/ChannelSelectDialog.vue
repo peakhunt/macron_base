@@ -42,8 +42,8 @@
 
       <v-card-actions>
         <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" flat @click.native="$emit('dismiss')">Dismiss</v-btn>
-          <v-btn color="blue darken-1" flat @click.native="$emit('select', selectedChannels)">Select</v-btn>
+        <v-btn color="blue darken-1" flat @click.native="$emit('dismiss')">Dismiss</v-btn>
+        <v-btn color="blue darken-1" flat @click.native="$emit('select', selectedChannels)">Select</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -98,7 +98,7 @@
         selectedChannels: [],
         selected: [],
         headers: [
-          { text: 'Number', align: 'left', value: 'alarm_num', sortable: false },
+          { text: 'Number', align: 'left', value: 'unused', sortable: false },
           { text: 'Description', align: 'left', value: 'chnl_num', sortable: false },
           { text: 'delete', align: 'right', value: 'chnl_num', sortable: false }
         ]

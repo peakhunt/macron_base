@@ -23,7 +23,7 @@
             </v-tooltip>
               
             <v-tooltip bottom>
-              <v-btn color="green" slot="activator" :disabled="realtimePlaying === true">
+              <v-btn color="green" slot="activator" :disabled="realtimePlaying === true" @click="onCloudDownloadClick()">
                 <v-icon>cloud_download</v-icon>
               </v-btn>
               <span>Query Signal Log</span>
@@ -39,14 +39,27 @@
 
           <line-chart id="wrapper" :chartData="data" :options="options" ref="lineGraph"
            v-dragged="onDragged" v-wheel="onWheel"></line-chart>
+
           <channel-select-dialog :showDialog="showChannelSelectDialog" :currentChannels="channels"
            @dismiss="showChannelSelectDialog = false"
            @select="onChannelSelectionModified"
           ></channel-select-dialog>
+
           <plot-settings-dialog :showDialog="showSettingsDialog" :plotCfg="plotCfg"
            @dismiss="showSettingsDialog = false"
            @change="onSettingsModified"
           ></plot-settings-dialog>
+
+          <signal-log-select-dialog :showDialog="showSignalLogSelectDialog" :currentChannels="tracedChannels"
+           @traceSetting="onTraceSettingClick()"
+           @select="onSignalLogTraceSelect"
+           @dismiss="showSignalLogSelectDialog = false"
+          ></signal-log-select-dialog>
+
+          <channel-select-dialog :showDialog="showChannelTraceSettingDialog" :currentChannels="tracedChannels"
+           @dismiss="showChannelTraceSettingDialog = false"
+           @select="onChannelTraceSelectionModified"
+          ></channel-select-dialog>
         </v-card>
       </v-flex>
     </v-layout>
@@ -59,10 +72,12 @@
   import utils from '@/utils'
   import ChannelSelectDialog from '@/components/ChannelSelectDialog'
   import PlotSettingsDialog from '@/components/PlotSettingsDialog'
+  import SignalLogSelectDialog from '@/components/SignalLogSelectDialog'
+  import serverAPI from '@/server_api'
 
   export default {
     name: 'signalTraceView',
-    components: { LineChart, ChannelSelectDialog, PlotSettingsDialog },
+    components: { LineChart, ChannelSelectDialog, PlotSettingsDialog, SignalLogSelectDialog },
     methods: {
       onDragged ({ el, deltaX, deltaY, offsetX, offsetY, clientX, clientY, first, last }) {
         if (this.realtimePlaying === true) {
@@ -248,6 +263,138 @@
             ', max visible:' + this.plotCfg.maxSamplesVisible)
 
         this.reload_visible_data()
+      },
+      onChannelTraceSelectionModified: function (data) {
+        var self = this
+
+        this.showChannelTraceSettingDialog = false
+
+        serverAPI.setTracedChannels(data, (err, rsp) => {
+          if (err) {
+            console.log('failed to set channel trace')
+            console.log(err)
+            self.$notify({
+              title: 'Failed',
+              text: 'Failed to set channel trace',
+              type: 'error'
+            })
+            return
+          }
+
+          self.$notify({
+            title: 'Update Success',
+            text: 'Set channel trace success',
+            type: 'success'
+          })
+        })
+      },
+      onTraceSettingClick () {
+        var self = this
+
+        self.showSignalLogSelectDialog = false
+
+        serverAPI.getTracedChannels((err, rsp) => {
+          if (err) {
+            console.log('failed to retrieve channel trace info')
+            console.log(err)
+            self.$notify({
+              title: 'Failed',
+              text: 'Failed to retrieve channel trace info',
+              type: 'error'
+            })
+            return
+          }
+
+          self.tracedChannels = [...rsp.data.channels]
+          console.log(self.tracedChannels)
+          self.showChannelTraceSettingDialog = true
+        })
+      },
+      onCloudDownloadClick () {
+        var self = this
+
+        serverAPI.getTracedChannels((err, rsp) => {
+          if (err) {
+            console.log('failed to retrieve channel trace info')
+            console.log(err)
+            self.$notify({
+              title: 'Failed',
+              text: 'Failed to retrieve channel trace info',
+              type: 'error'
+            })
+            return
+          }
+          self.tracedChannels = [...rsp.data.channels]
+          console.log(self.tracedChannels)
+          self.showSignalLogSelectDialog = true
+        })
+      },
+      onSignalLogTraceSelect: function (setting) {
+        var self = this
+
+        console.log(setting)
+        self.showSignalLogSelectDialog = false
+
+        serverAPI.getSignalTraceLog(setting.startTime, setting.endTime, setting.channels, (err, rsp) => {
+          if (err) {
+            console.log('failed to retrieve signal log ')
+            console.log(err)
+            self.$notify({
+              title: 'Failed',
+              text: 'Failed to retrieve signal log',
+              type: 'error'
+            })
+            return
+          }
+          console.log('success in getting signal log')
+          self.populateSignaLog(rsp.data)
+        })
+      },
+      populateSignaLog: function (log) {
+        var self = this
+        var ts = 0
+
+        self.clear_data()
+        self.data.datasets = []
+
+        log.channels.forEach((c) => {
+          self.add_channel(c)
+        })
+
+        // signals are already ordered by timestamp
+        for (var ndx = 0; ndx < log.data.length; ndx++) {
+          if (ts === 0 || ts !== log.data[ndx].timestamp) {
+            ts = log.data[ndx].timestamp
+
+            var d = dateFormat(new Date(ts), 'yyyy-mm-dd HH:MM:ss')
+
+            self.data.labels_accumulated.push(d)
+
+            // start with default, in this case, null
+            self.data.datasets.forEach((s) => {
+              s.data_accumulated.push(null)
+            })
+          }
+
+          var ch = log.data[ndx].ch
+          var v = log.data[ndx].data
+          var setNdx = log.channels.indexOf(ch)
+          var l = self.data.datasets[setNdx].data_accumulated.length
+
+          self.data.datasets[setNdx].data_accumulated[l - 1] = v
+        }
+
+        // finally make visible portion
+        for (ndx = 0; ndx < self.plotCfg.maxSamplesVisible; ndx++) {
+          self.data.labels.push(self.data.labels_accumulated[ndx])
+
+          self.data.datasets.forEach((set) => {
+            set.data.push(set.data_accumulated[ndx])
+          })
+        }
+        self.visibleStart = 0
+
+        self.$refs['lineGraph'].refresh()
       }
     },
     created () {
@@ -314,7 +461,10 @@
           ]
         },
         options: configOptions,
-        visibleStart: 0
+        visibleStart: 0,
+        showSignalLogSelectDialog: false,
+        showChannelTraceSettingDialog: false,
+        tracedChannels: []
       }
     }
   }
