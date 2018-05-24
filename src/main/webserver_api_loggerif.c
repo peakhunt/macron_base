@@ -44,7 +44,8 @@ typedef struct
         { "ch": XXX, "data": XXX, "timestamp": XXX, },
         { "ch": XXX, "data": XXX, "timestamp": XXX, },
         ...
-      ]
+      ],
+      "channels": [xx, xx, xx, xx]
    }
 
    GET /api/vi/loggerif/alarm?start_time=xxx&end_time=xxx
@@ -176,6 +177,16 @@ webapi_get_channel_log(struct mg_connection* nc, struct http_message* hm)
           "Content-Type: text/json\r\n"
           "Transfer-Encoding: chunked\r\n\r\n");
       mg_printf_http_chunk(nc, "{\"data\": [");
+    }
+
+    mg_printf_http_chunk(nc, "], \"channels\": [");
+    for(uint32_t i = 0; i < num_chnls; i++)
+    {
+      mg_printf_http_chunk(nc, "%u", chnls[i]);
+      if( i < (num_chnls -1))
+      {
+        mg_printf_http_chunk(nc, ",");
+      }
     }
 
     mg_printf_http_chunk(nc, "]}");
