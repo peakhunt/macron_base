@@ -271,7 +271,9 @@ __create_query_for_get_channel_log(char* buf, size_t buf_size, unsigned long sta
   len += snprintf(&buf[len], buf_size - len, "(time_stamp >= %lu and time_stamp <= %lu)) ", start, end);
   if(len >= buf_size) return;
 
-  len += snprintf(&buf[len], buf_size - len, "order by ch_num asc, time_stamp asc");
+  // len += snprintf(&buf[len], buf_size - len, "order by ch_num asc, time_stamp asc");
+  // much easier this way on client side
+  len += snprintf(&buf[len], buf_size - len, "order by time_stamp asc");
 }
 
 bool
