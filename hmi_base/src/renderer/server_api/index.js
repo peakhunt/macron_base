@@ -136,6 +136,56 @@ function getAlarmLog (startTime, endTime, callback) {
     })
 }
 
+function getTracedChannels (callback) {
+  var url = getLoggerIfBaseUrl() + '/api/v1/loggerif/channel/trace'
+
+  axios.get(url)
+    .then((response) => {
+      callback(null, response)
+    }, (err) => {
+      callback(err, null)
+    })
+}
+
+function setTracedChannels (channels, callback) {
+  var url = getLoggerIfBaseUrl() + '/api/v1/loggerif/channel/trace'
+
+  axios.post(url,
+    {
+      channels: channels
+    },
+    {
+      headers: { 'Content-Type': 'application/json' }
+    })
+    .then((response) => {
+      callback(null, response)
+    }, (err) => {
+      callback(err, null)
+    })
+}
+
+function getSignalTraceLog (startTimeStamp, endTimeStamp, channels, callback) {
+  var url = getLoggerIfBaseUrl() + '/api/v1/loggerif/channel'
+
+  url += '?start_time=' + startTimeStamp + '&end_time=' + endTimeStamp
+  url += '&ch='
+
+  for (var ndx = 0; ndx < channels.length; ndx++) {
+    url += channels[ndx]
+    if (ndx < (channels.length - 1)) {
+      url += ','
+    }
+  }
+
+  console.log('channel log get:' + url)
+  axios.get(url)
+    .then((response) => {
+      callback(null, response)
+    }, (err) => {
+      callback(err, null)
+    })
+}
+
 module.exports = {
   loadSystemConfig: loadSystemConfig,
   updateLookupTable: updateLookupTable,
@@ -144,5 +194,8 @@ module.exports = {
   ackAlarm: ackAlarm,
   updateChannelConfig: updateChannelConfig,
   updateAlarmConfig: updateAlarmConfig,
-  getAlarmLog: getAlarmLog
+  getAlarmLog: getAlarmLog,
+  getTracedChannels: getTracedChannels,
+  setTracedChannels: setTracedChannels,
+  getSignalTraceLog: getSignalTraceLog
 }
