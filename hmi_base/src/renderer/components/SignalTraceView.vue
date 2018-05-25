@@ -85,7 +85,8 @@
         }
 
         if (deltaX !== undefined) {
-          this.shift_visible(deltaX)
+          console.log(deltaX)
+          this.shift_visible(deltaX * 5)
         }
       },
       onWheel (e) {
@@ -94,7 +95,11 @@
         }
         var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)))
 
-        this.shift_visible(delta * 10)
+        /*
+        this.shift_visible(delta * 50)
+        */
+        var shift = (this.plotCfg.maxSamplesVisible / 4) * (delta < 0 ? -1 : 1)
+        this.shift_visible(shift)
         e.preventDefault()
       },
       clear_data () {
