@@ -233,6 +233,11 @@
         timeFrame = this.getDateObjFromDateString()
 
         serverAPI.getAlarmLog(timeFrame.start, timeFrame.end, (err, data) => {
+          if (self.destroyed) {
+            console.log('instance destroyed. skipping ')
+            return
+          }
+
           if (err) {
             console.log('failed to retrieve alarm log')
             console.log(err)
@@ -248,8 +253,12 @@
         })
       }
     },
+    beforeDestroy () {
+      this.destroyed = true
+    },
     data () {
       return {
+        destroyed: false,
         showStartDate: false,
         showStartTime: false,
         showEndDate: false,

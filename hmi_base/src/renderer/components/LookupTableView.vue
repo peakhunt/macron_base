@@ -107,6 +107,7 @@
       }
 
       return {
+        destroyed: false,
         table_changed: false,
         updating_lookup_table: false,
         dialog: false,
@@ -159,6 +160,9 @@
         }
       }
     },
+    beforeDestroy () {
+      this.destroyed = true
+    },
     methods: {
       _add_entry: function (entry) {
         this.lookup_table.push(entry)
@@ -203,6 +207,11 @@
         self.updating_lookup_table = true
 
         serverAPI.updateLookupTable(self.chnl_num, self.lookup_table, (err, data) => {
+          if (self.destroyed) {
+            console.log('instance destroyed. skipping ')
+            return
+          }
+
           setTimeout(() => {
             self.updating_lookup_table = false
             if (err) {

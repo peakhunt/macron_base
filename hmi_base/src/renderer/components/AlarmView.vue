@@ -71,7 +71,7 @@
               </v-card-title>
               <v-card-text>
                 <v-container>
-                  <v-switch v-if="channel_type === 'digital'" :label="`Set Point: ${modSetPoint.toString()}`" v-model="modSetPoint"></v-switch>
+                  <v-switch v-if="channel_type === 'digital'" :label="`Set Point: ${modSetPoint ? 'on' : 'off'}`" v-model="modSetPoint"></v-switch>
                   <v-text-field v-if="channel_type === 'analog'" label="Set Point" v-model.number="modSetPoint" required></v-text-field>
                   <v-text-field label="Delay" v-model.number="modDelay" required></v-text-field>
                 </v-container>
@@ -105,7 +105,15 @@
       },
       edit_alarm: function () {
         if (this.alarmModified === false) {
-          this.modSetPoint = this.set_point
+          if (this.channel_type === 'analog') {
+            this.modSetPoint = this.set_point
+          } else {
+            if (this.set_point === 'off') {
+              this.modSetPoint = false
+            } else {
+              this.modSetPoint = true
+            }
+          }
           this.modDelay = this.delay
         }
         this.showModDialog = true
@@ -124,6 +132,11 @@
         self.updating_alarm = true
 
         serverAPI.updateAlarmConfig(self.alarmNum, req, (err, data) => {
+          if (self.destroyed) {
+            console.log('instance destroyed. skipping ')
+            return
+          }
+
           setTimeout(() => {
             self.updating_alarm = false
             if (err) {
@@ -194,8 +207,12 @@
         return this.$store.getters.alarm(this.alarmNum).state
       }
     },
+    beforeDestroy () {
+      this.destroyed = true
+    },
     data () {
       return {
+        destroyed: false,
         items: [''],
         headers: [
           { align: 'left' },

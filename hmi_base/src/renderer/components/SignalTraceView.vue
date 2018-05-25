@@ -270,6 +270,11 @@
         this.showChannelTraceSettingDialog = false
 
         serverAPI.setTracedChannels(data, (err, rsp) => {
+          if (self.destroyed) {
+            console.log('instance destroyed. skipping ')
+            return
+          }
+
           if (err) {
             console.log('failed to set channel trace')
             console.log(err)
@@ -294,6 +299,11 @@
         self.showSignalLogSelectDialog = false
 
         serverAPI.getTracedChannels((err, rsp) => {
+          if (self.destroyed) {
+            console.log('instance destroyed. skipping ')
+            return
+          }
+
           if (err) {
             console.log('failed to retrieve channel trace info')
             console.log(err)
@@ -314,6 +324,11 @@
         var self = this
 
         serverAPI.getTracedChannels((err, rsp) => {
+          if (self.destroyed) {
+            console.log('instance destroyed. skipping ')
+            return
+          }
+
           if (err) {
             console.log('failed to retrieve channel trace info')
             console.log(err)
@@ -336,6 +351,11 @@
         self.showSignalLogSelectDialog = false
 
         serverAPI.getSignalTraceLog(setting.startTime, setting.endTime, setting.channels, (err, rsp) => {
+          if (self.destroyed) {
+            console.log('instance destroyed. skipping ')
+            return
+          }
+
           if (err) {
             console.log('failed to retrieve signal log ')
             console.log(err)
@@ -369,6 +389,9 @@
             var d = dateFormat(new Date(ts), 'yyyy-mm-dd HH:MM:ss')
 
             self.data.labels_accumulated.push(d)
+            if (self.data.labels.length < self.plotCfg.maxSamplesVisible) {
+              self.data.labels.push(d)
+            }
 
             // start with default, in this case, null
             self.data.datasets.forEach((s) => {
@@ -382,18 +405,12 @@
           var l = self.data.datasets[setNdx].data_accumulated.length
 
           self.data.datasets[setNdx].data_accumulated[l - 1] = v
+          if (self.data.datasets[setNdx].data.length < self.plotCfg.maxSamplesVisible) {
+            self.data.datasets[setNdx].data.push(v)
+          }
         }
 
-        // finally make visible portion
-        for (ndx = 0; ndx < self.plotCfg.maxSamplesVisible; ndx++) {
-          self.data.labels.push(self.data.labels_accumulated[ndx])
-
-          self.data.datasets.forEach((set) => {
-            set.data.push(set.data_accumulated[ndx])
-          })
-        }
         self.visibleStart = 0
-
         self.$refs['lineGraph'].refresh()
       }
     },
@@ -404,6 +421,7 @@
       if (this.$options.interval_timer != null) {
         clearInterval(this.$options.interval_timer)
       }
+      this.destroyed = true
     },
     data () {
       var configOptions = {
@@ -442,6 +460,7 @@
       }
 
       return {
+        destroyed: false,
         showChannelSelectDialog: false,
         realtimePlaying: false,
         plotCfg: {

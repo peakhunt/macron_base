@@ -146,6 +146,11 @@
 
         self.updating_channel = true
         serverAPI.updateChannelConfig(self.chnlNum, req, (err, data) => {
+          if (self.destroyed) {
+            console.log('instance destroyed. skipping ')
+            return
+          }
+
           setTimeout(() => {
             self.updating_channel = false
             if (err) {
@@ -221,8 +226,12 @@
       }
     },
     components: { LookupTableView },
+    beforeDestroy () {
+      this.destroyed = true
+    },
     data () {
       return {
+        destroyed: false,
         items: [''],
         headers: [
           { align: 'left' },
