@@ -35,6 +35,7 @@ Goals
 ![Signal Trace Settings](captures/signal_trace_settings.png "signal trace settings")
 ![Alarm Log](captures/alarm_log.png "alarm log")
 ![Signal Log Query](captures/signal_log_query.png "signal log query")
+![Signal Log Setting](captures/channel_trace_setting.png "signal log setting")
 
 ### Milestone-2 (Reached on May/9/2018)
 1. HMI Development for base system functionalities
