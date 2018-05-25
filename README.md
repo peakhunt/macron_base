@@ -7,7 +7,7 @@ Goals
 1. common widgets for visual HMI development
    * label widget with alarm indication
    * gauge widget with alarm indication
-   * button widget with alarm & pgroess indication 
+   * button widget with alarm & progress indication 
    * mimic framework for data & system visualization
    * common dashboard framework (alarm summary and etc.)
 
