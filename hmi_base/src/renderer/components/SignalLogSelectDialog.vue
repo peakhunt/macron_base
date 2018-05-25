@@ -129,7 +129,8 @@
         if (this.startDate === null ||
             this.startTime === null ||
             this.period === null ||
-            this.selectedChannels.length === 0) {
+            this.selectedChannels.length === 0 ||
+            this.selectedChannels.length > 16) {
           return false
         }
         return true
