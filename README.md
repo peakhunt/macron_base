@@ -1,19 +1,40 @@
 # macron_base
 
-## current status : trying to reach milestone-3
+## current status : trying to reach milestone-4
 
-### Milestone-3
+### Milestone-4
 Goals
-1. event logger
+1. common widgets for visual HMI development
+   * label widget with alarm indication
+   * gauge widget with alarm indication
+   * button widget with alarm & pgroess indication 
+   * mimic framework for data & system visualization
+   * common dashboard framework (alarm summary and etc.)
+
+2. Control app library for faster & easier control app development on top of base framework.
+
+3. WAGO I/O module integration
+
+4. Advantech Local I/O module integration
+
+### Milestone-3 (Reached on May/25/2018)
+1. signal logger & realtime/offline tracing with line chart
+   * Realtime Signal Logging & Graphing
+   * Server side channel data logging
+   * Offline channel data query & graphing
+   * Channel data logging at 100ms resolution
+   * many days of channel data logging at 100ms resolution (more than a GB data)
+
 2. alarm logger
-3. signal logger & realtime/offline tracing with line chart
-4. common widgets for visual HMI development
-5. Control app framework development
+   * alarm event logging
+   * alarm event query on client side
+   * many years of alarm event storage
 
 ![Signal Trace Realtime](captures/signal_trace_realtime.png "realtime signal trace")
 ![Signal Trace Channel Select](captures/signal_trace_channel_select.png "trace channel select dialog")
 ![Signal Trace Settings](captures/signal_trace_settings.png "signal trace settings")
 ![Alarm Log](captures/alarm_log.png "alarm log")
+![Signal Log Query](captures/signal_log_query.png "signal log query")
 
 ### Milestone-2 (Reached on May/9/2018)
 1. HMI Development for base system functionalities
