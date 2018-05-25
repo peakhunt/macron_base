@@ -183,7 +183,7 @@
       },
       set_point () {
         if (this.alarmModified) {
-          return this.modSetPoint
+          return this.modSetPoint === true ? 'on' : 'off'
         }
         return this.$store.getters.alarm(this.alarmNum).set_point
       },
