@@ -4,18 +4,20 @@
 
 ### Milestone-4
 Goals
-1. common widgets for visual HMI development
+1. Runtime configuration sync
+
+2. common widgets for visual HMI development
    * label widget with alarm indication
    * gauge widget with alarm indication
    * button widget with alarm & progress indication 
    * mimic framework for data & system visualization
    * common dashboard framework (alarm summary and etc.)
 
-2. Control app library for faster & easier control app development on top of base framework.
+3. Control app library for faster & easier control app development on top of base framework.
 
-3. WAGO I/O module integration
+4. WAGO I/O module integration
 
-4. Advantech Local I/O module integration
+5. Advantech Local I/O module integration
 
 ### Milestone-3 (Reached on May/25/2018)
 1. signal logger & realtime/offline tracing with line chart
