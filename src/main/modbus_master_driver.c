@@ -555,7 +555,7 @@ alloc_init_modbus_master(modbus_master_driver_config_t* cfg)
   modbus_master_driver_t*     master;
   ModbusMasterCTX*            ctx;
 
-  master = malloc(sizeof(modbus_master_driver_t));
+  master = malloc_zero(sizeof(modbus_master_driver_t));
   if(master == NULL)
   {
     TRACE(MBM_DRIVER,"failed to alloc modbus_master_driver_t\n");
@@ -570,7 +570,7 @@ alloc_init_modbus_master(modbus_master_driver_config_t* cfg)
   {
     ModbusTCPMaster*    tcp_master;
 
-    tcp_master = malloc(sizeof(ModbusTCPMaster));
+    tcp_master = malloc_zero(sizeof(ModbusTCPMaster));
     if(tcp_master == NULL)
     {
       TRACE(MBM_DRIVER, "failed to alloc ModbusTCPMaster\n");
@@ -584,7 +584,7 @@ alloc_init_modbus_master(modbus_master_driver_config_t* cfg)
   {
     ModbusRTUMaster*    rtu_master;
 
-    rtu_master = malloc(sizeof(ModbusRTUMaster));
+    rtu_master = malloc_zero(sizeof(ModbusRTUMaster));
     if(rtu_master == NULL)
     {
       TRACE(MBM_DRIVER, "failed to alloc ModbusRTUMaster\n");
@@ -674,7 +674,7 @@ modbus_driver_load_masters(void)
     // load request schedule
     num_reqs = cfg_mgr_get_modbus_master_num_request_schedules(i);
     master->num_reqs = num_reqs;
-    master->request_schedule  = malloc(sizeof(modbus_master_driver_request_config_t) * num_reqs);
+    master->request_schedule  = malloc_zero(sizeof(modbus_master_driver_request_config_t) * num_reqs);
     if(master->request_schedule == NULL)
     {
       TRACE(MBM_DRIVER,"failed to malloc request_schedule\n");

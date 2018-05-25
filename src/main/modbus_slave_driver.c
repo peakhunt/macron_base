@@ -266,7 +266,7 @@ alloc_init_modbus_slave(modbus_slave_driver_config_t* cfg)
   modbus_slave_driver_t*    slave;
   ModbusSlaveCTX*           ctx;
 
-  slave = malloc(sizeof(modbus_slave_driver_t));
+  slave = malloc_zero(sizeof(modbus_slave_driver_t));
   if(slave == NULL)
   {
     TRACE(MBS_DRIVER,"failed to alloc modbus_slave_driver_t\n");
@@ -281,7 +281,7 @@ alloc_init_modbus_slave(modbus_slave_driver_config_t* cfg)
   {
     ModbusTCPSlave* tcp_slave;
 
-    tcp_slave = malloc(sizeof(ModbusTCPSlave));
+    tcp_slave = malloc_zero(sizeof(ModbusTCPSlave));
     if(tcp_slave == NULL)
     {
       TRACE(MBS_DRIVER,"failed to alloc ModbusTCPSlave\n");
@@ -295,7 +295,7 @@ alloc_init_modbus_slave(modbus_slave_driver_config_t* cfg)
   {
     ModbusRTUSlave* rtu_slave;
 
-    rtu_slave = malloc(sizeof(ModbusRTUSlave));
+    rtu_slave = malloc_zero(sizeof(ModbusRTUSlave));
     if(rtu_slave == NULL)
     {
       TRACE(MBS_DRIVER,"failed to alloc ModbusRTUSlave\n");

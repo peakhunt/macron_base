@@ -70,7 +70,7 @@ alloc_cli_connection(cli_server_t* server, int newsd)
   cli_connection_t*   conn;
   uint8_t             dummy = '\r';
 
-  conn = malloc(sizeof(cli_connection_t));
+  conn = malloc_zero(sizeof(cli_connection_t));
   if(conn == NULL)
   {
     close(newsd);

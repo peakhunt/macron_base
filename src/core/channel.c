@@ -6,7 +6,7 @@ channel_alloc(uint32_t chnl_num, channel_type_t chnl_type, channel_direction_t c
 {
   channel_t*    chnl;
 
-  chnl = malloc(sizeof(channel_t));
+  chnl = malloc_zero(sizeof(channel_t));
 
   chnl->chnl_num  = chnl_num;
   chnl->chnl_type = chnl_type;

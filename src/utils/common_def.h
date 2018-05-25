@@ -2,6 +2,8 @@
 #define __COMMON_DEF_H__
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 
 #ifndef bool
@@ -36,6 +38,21 @@ typedef uint8_t bool;
 #ifndef MAX
 #define MAX(a,b)      (a > b ? a : b)
 #endif
+
+static inline void*
+malloc_zero(size_t size)
+{
+  void* mem;
+
+  mem = malloc(size);
+  if(mem == NULL)
+  {
+    return NULL;
+  }
+
+  memset(mem, 0, size);
+  return mem;
+}
 
 
 #endif /* !__COMMON_DEF_H__ */

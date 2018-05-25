@@ -29,7 +29,7 @@ modbus_register_list_add(modbus_register_list_t* mb_list, uint32_t slave_id,
 {
   modbus_register_t*    reg;
 
-  reg = (modbus_register_t*)malloc(sizeof(modbus_register_t));
+  reg = (modbus_register_t*)malloc_zero(sizeof(modbus_register_t));
 
   INIT_LIST_HEAD(&reg->le);
 

@@ -119,7 +119,7 @@ modbus_tcp_slave_alloc_conn(ModbusTCPSlave* slave, int newsd, struct sockaddr_in
 
   TRACE(MB_TCP_SLAVE, "got new connection\n");
 
-  conn = malloc(sizeof(modbus_tcp_slave_connection_t));
+  conn = malloc_zero(sizeof(modbus_tcp_slave_connection_t));
   if(conn == NULL)
   {
     TRACE(MB_TCP_SLAVE, "connection alloc failed\n");

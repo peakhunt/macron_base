@@ -20,6 +20,9 @@ mg_util_to_c_str_alloc(struct mg_str* ms)
   char* str;
   
   str = malloc(ms->len + 1);
+
+  // FIXME check if malloc fails
+
   strncpy(str, ms->p, ms->len);
   str[ms->len] = '\0';
   

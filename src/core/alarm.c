@@ -178,7 +178,7 @@ alarm_alloc(uint32_t alarm_num, uint32_t chnl_num, alarm_severity_t severity,
 {
   alarm_t*    alarm;
 
-  alarm = malloc(sizeof(alarm_t));
+  alarm = malloc_zero(sizeof(alarm_t));
 
   alarm->alarm_num    = alarm_num;
   alarm->chnl_num     = chnl_num;
