@@ -188,6 +188,7 @@ alarm_alloc(uint32_t alarm_num, uint32_t chnl_num, alarm_severity_t severity,
   alarm->trigger_type = trigger_type;
   alarm->set_point    = set_point;
   alarm->delay        = delay;
+  alarm->occur_time   = 0;
 
   return alarm;
 }

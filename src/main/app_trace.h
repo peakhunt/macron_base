@@ -12,8 +12,7 @@
   TRACE_DEF(MBS_DRIVER),    \
   TRACE_DEF(MBM_DRIVER),    \
   TRACE_DEF(CORE_DRIVER),   \
-  TRACE_DEF(LOGGER),        \
-  TRACE_DEF(DEBUG),
+  TRACE_DEF(LOGGER),
 
 
 #define APP_TRACE_STRS  \
@@ -25,8 +24,7 @@
   "MBS_DRIVER"          \
   "MBM_DRIVER"          \
   "CORE_DRIVER"         \
-  "LOGGER"              \
-  "DEBUG"
+  "LOGGER"
 
 
 #endif /*!__APP_TRACE_DEF_H__ */

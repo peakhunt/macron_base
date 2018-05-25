@@ -44,6 +44,7 @@ static uint32_t   _initial_trace_setup[] =
   //TRACE_COMP(MB_MASTER),
   TRACE_COMP(LOGGER),
   TRACE_COMP(DEBUG),
+  TRACE_COMP(ERROR),
 };
 
 static evloop_thread_t      _main_thread = 

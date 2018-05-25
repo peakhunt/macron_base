@@ -36,6 +36,8 @@
 #define TRACE_DEF(__component__)           __TRACE__ ## __component__
 
 enum {
+  TRACE_DEF(DEBUG),
+  TRACE_DEF(ERROR),
   TRACE_DEF(MAIN),
   TRACE_DEF(TEST),
   TRACE_DEF(TASK),

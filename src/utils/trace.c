@@ -9,6 +9,8 @@
 
 const char* _trace_comp_strs[] = 
 {
+  "DEBUG",
+  "ERROR",
   "MAIN",
   "TEST",
   "TASK",

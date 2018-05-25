@@ -377,6 +377,8 @@ webapi_update_alarm_config(struct mg_connection* nc, struct http_message* hm, st
   req = webapi_parse_json_body(&hm->body, nc, hm);
   if(req == NULL)
   {
+    TRACE(ERROR, "alarm config bad request. json parse failed %d\n", alarm_num);
+    webapi_bad_request(nc, hm);
     return;
   }
 
@@ -392,6 +394,7 @@ webapi_update_alarm_config(struct mg_connection* nc, struct http_message* hm, st
   }
   else
   {
+    TRACE(ERROR, "alarm config bad request. parameter missing %d\n", alarm_num);
     webapi_bad_request(nc, hm);
     goto out;
   }
