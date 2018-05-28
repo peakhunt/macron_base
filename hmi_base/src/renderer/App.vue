@@ -92,11 +92,36 @@
         utils.quit()
       },
       systemConfigLoadComplete: function () {
+        // remove from event listener
+        EventBus.$off('systemConfigLoadComplete', this.systemConfigLoadComplete)
         console.log('****** systemConfigLoadComplete ******')
 
         console.log('initializing server poller')
         serverPoller.initPoller(this.$store.getters.channelList, this.$store.getters.alarmList)
         serverPoller.start(this)
+      },
+      systemConfigReloadComplete: function () {
+        EventBus.$off('systemConfigLoadComplete', this.systemConfigReloadComplete)
+        console.log('****** systemConfigReloadComplete ******')
+        serverPoller.initPoller(this.$store.getters.channelList, this.$store.getters.alarmList)
+        serverPoller.start(this)
+
+        router.push(this.savedPath)
+        this.savedPath = null
+      },
+      configUpdateDetected: function () {
+        // this is a message from poller
+        console.log('configUpdateDetected...')
+
+        // first stop poller
+        console.log('stopping poller...')
+        serverPoller.stop(this)
+
+        // reload configuration
+        this.savedPath = this.$route.path
+        EventBus.$on('systemConfigLoadComplete', this.systemConfigReloadComplete)
+
+        router.push('/system-loading-view')
       }
     },
     created () {
@@ -125,7 +150,8 @@
       ],
       miniVariant: false,
       right: true,
-      title: global.config.general.projectName
+      title: global.config.general.projectName,
+      savedPath: null
     })
   }
 </script>

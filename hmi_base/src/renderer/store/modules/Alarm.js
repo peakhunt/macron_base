@@ -21,6 +21,9 @@ const mutations = {
   },
   CLEAR_ALARMS (state) {
     state.alarms = {}
+    state.sortedList = []
+    state.current_alarms_list = []
+    currentAlarmHash = {}
   },
   SET_ALARM_VALUE (state, alarmStatus) {
     var alarm = state.alarms[alarmStatus.alarm_num]

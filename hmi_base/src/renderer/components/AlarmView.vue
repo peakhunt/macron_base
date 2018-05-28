@@ -156,7 +156,7 @@
               text: 'Alarm was successfully udpated!',
               type: 'success'
             })
-            console.log('alarm update success for ' + self.chnlNum)
+            console.log('alarm update success for ' + self.alarmNum)
           }, 1000)
         })
       }

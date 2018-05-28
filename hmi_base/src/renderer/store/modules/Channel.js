@@ -27,6 +27,7 @@ const mutations = {
   },
   CLEAR_CHANNELS (state) {
     state.channels = {}
+    state.sortedList = []
   },
   SET_CHANNEL_VALUE (state, chnlStatus) {
     var chnl = state.channels[chnlStatus.chnl_num]

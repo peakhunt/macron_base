@@ -76,22 +76,33 @@ function updateAlarmStatus (vueInstance, alarmStatus) {
 
 function pollNext (vueInstance) {
   var chnlPoll, alarmPoll
+  var r = vueInstance.$store.getters.configRevision
 
   chnlPoll = chnlPollList[chnlPollNdx]
   alarmPoll = alarmPollList[alarmPollNdx]
 
-  serverAPI.getChannelStatus(chnlPoll.start, chnlPoll.end, (err, data) => {
+  serverAPI.getChannelStatus(chnlPoll.start, chnlPoll.end, (err, rsp) => {
     if (err) {
       console.log('get channel status error: ' + chnlPoll.start + ',' + chnlPoll.end)
     } else {
-      updateChannelStatus(vueInstance, data.data.channels)
+      if (r !== rsp.data.revision) {
+        console.log('config update detected: current ' + r + ' new ' + rsp.data.revision)
+        vueInstance.configUpdateDetected()
+        return
+      }
+      updateChannelStatus(vueInstance, rsp.data.channels)
     }
 
-    serverAPI.getAlarmStatus(alarmPoll.start, alarmPoll.end, (err, data) => {
+    serverAPI.getAlarmStatus(alarmPoll.start, alarmPoll.end, (err, rsp) => {
       if (err) {
         console.log('get alarm status error: ' + alarmPoll.start + ',' + alarmPoll.end)
       } else {
-        updateAlarmStatus(vueInstance, data.data.alarms)
+        if (r !== rsp.data.revision) {
+          console.log('config update detected: current ' + r + ' new ' + rsp.data.revision)
+          vueInstance.configUpdateDetected()
+          return
+        }
+        updateAlarmStatus(vueInstance, rsp.data.alarms)
       }
 
       _timeoutHandle = setTimeout(() => { pollNext(vueInstance) }, interval)
@@ -103,7 +114,9 @@ function pollNext (vueInstance) {
 }
 
 function pollStop () {
+  console.log('pollStop')
   if (_timeoutHandle != null) {
+    console.log('pollStop clearTimeout')
     clearTimeout(_timeoutHandle)
   }
 }

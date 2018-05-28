@@ -72,6 +72,8 @@
         self.$store.commit('BUILD_ALARM_LIST')
       },
       populateStore: function (config) {
+        console.log('system config loaded: ' + config.update_info.revision)
+        this.$store.commit('SET_CONFIG_REVISION', config.update_info.revision)
         this.populateChannelStore(config.channels)
         this.populateAlarmStore(config.alarms)
       },

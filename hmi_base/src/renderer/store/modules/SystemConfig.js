@@ -1,5 +1,6 @@
 const state = {
-  isLoaded: false
+  isLoaded: false,
+  revision: -1
 }
 
 const mutations = {
@@ -8,6 +9,9 @@ const mutations = {
   },
   SET_SYSTEM_CONFIG_NOT_LOADED (state) {
     state.isLoaded = false
+  },
+  SET_CONFIG_REVISION (state, rev) {
+    state.revision = rev
   }
 }
 
@@ -20,6 +24,9 @@ const actions = {
 const getters = {
   isSysConfigLoaded (state) {
     return state.isLoaded
+  },
+  configRevision (state) {
+    return state.revision
   }
 }
 
