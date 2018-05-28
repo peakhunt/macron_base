@@ -27,6 +27,7 @@ struct __api_cmd_handler_t
 
    GET /api/v1/channel/status/<channel_num>
        {
+          "revision": xxx,
           "chnl_num": number,
           "eng_val": xxx or true or false,
           "raw_val": xxx
@@ -34,6 +35,7 @@ struct __api_cmd_handler_t
 
    GET /api/v1/channel/status_ranged?start=xxx&end=xxx
       {
+        "revision": xxx,
         "channels": [
            {
               "chnl_num": number,
@@ -51,6 +53,7 @@ struct __api_cmd_handler_t
 
    GET /api/v1/alarm/status/<alarm_num>
       {
+        "revision": xxx,
         "alarm_num": xxx,
         "state":    "inactive" or
                     "pending" or
@@ -61,6 +64,7 @@ struct __api_cmd_handler_t
 
    GET /api/v1/alarm/status_ranged?start=xxx&end=xxx
       {
+        "revision": xxx,
         "alarms": [
            {
               "alarm_num": xxx,
@@ -195,7 +199,9 @@ webapi_get_channel_status(struct mg_connection* nc, struct http_message* hm, str
   uint32_t            chnl_num;
   channel_status_t    status;
   char                data[128];
+  int                 revision;
 
+  revision = cfg_mgr_get_revision();
   chnl_num = (uint32_t)mg_util_get_int(subcmd);
 
   TRACE(WEBS_REQUEST, "channel status request for %d\n", chnl_num);
@@ -208,14 +214,16 @@ webapi_get_channel_status(struct mg_connection* nc, struct http_message* hm, str
 
   if(status.chnl_type == channel_type_analog)
   {
-    sprintf(data, "{ \"chnl_num\": %d, \"eng_val\": %.2f, \"raw_val\": %d }",
+    sprintf(data, "{ \"revision\": %d, \"chnl_num\": %d, \"eng_val\": %.2f, \"raw_val\": %d }",
+        revision,
         chnl_num,
         status.eng_val.f,
         status.raw_val);
   }
   else
   {
-    sprintf(data, "{ \"chnl_num\": %d, \"eng_val\": %s, \"raw_val\": %d }",
+    sprintf(data, "{ \"revision\": %d, \"chnl_num\": %d, \"eng_val\": %s, \"raw_val\": %d }",
+        revision,
         chnl_num,
         status.eng_val.b ? "true" : "false",
         status.raw_val);
@@ -233,6 +241,9 @@ webapi_get_channel_status_ranged(struct mg_connection* nc, struct http_message* 
   int           ndx;
   channel_status_t    status;
   bool comma_needed = false;
+  int                 revision;
+
+  revision = cfg_mgr_get_revision();
 
   qstr = mg_util_to_c_str_alloc(&hm->query_string);
   TRACE(WEBS_REQUEST, "channel status ranged request %s\n", qstr);
@@ -248,7 +259,7 @@ webapi_get_channel_status_ranged(struct mg_connection* nc, struct http_message* 
       "HTTP/1.1 200 OK\r\n"
       "Content-Type: text/json\r\n"
       "Transfer-Encoding: chunked\r\n\r\n");
-  mg_printf_http_chunk(nc, "{\"channels\": [");
+  mg_printf_http_chunk(nc, "{\"revision\": %d, \"channels\": [", revision);
 
   ndx = cfg_mgr_get_channel_index_equal_or_bigger(start);
   while(ndx != -1)
@@ -554,6 +565,9 @@ webapi_get_alarm_status(struct mg_connection* nc, struct http_message* hm, struc
   uint32_t          alarm_num;
   alarm_status_t    status;
   char              data[128];
+  int               revision;
+
+  revision = cfg_mgr_get_revision();
 
   alarm_num = (uint32_t)mg_util_get_int(subcmd);
 
@@ -565,7 +579,8 @@ webapi_get_alarm_status(struct mg_connection* nc, struct http_message* hm, struc
     return;
   }
 
-  sprintf(data, "{ \"alarm_num\": %d, \"state\": \"%s\", \"occur_time\": %ld }",
+  sprintf(data, "{ \"revision\": %d, \"alarm_num\": %d, \"state\": \"%s\", \"occur_time\": %ld }",
+      revision,
       alarm_num,
       alarm_get_string_state(status.state),
       status.occur_time);
@@ -581,6 +596,9 @@ webapi_get_alarm_status_ranged(struct mg_connection* nc, struct http_message* hm
   int           ndx;
   alarm_status_t    status;
   bool comma_needed = false;
+  int                 revision;
+
+  revision = cfg_mgr_get_revision();
 
   qstr = mg_util_to_c_str_alloc(&hm->query_string);
   TRACE(WEBS_REQUEST, "alarm status ranged request %s\n", qstr);
@@ -596,7 +614,7 @@ webapi_get_alarm_status_ranged(struct mg_connection* nc, struct http_message* hm
       "HTTP/1.1 200 OK\r\n"
       "Content-Type: text/json\r\n"
       "Transfer-Encoding: chunked\r\n\r\n");
-  mg_printf_http_chunk(nc, "{\"alarms\": [");
+  mg_printf_http_chunk(nc, "{\"revision\": %d, \"alarms\": [", revision);
 
   ndx = cfg_mgr_get_alarm_index_equal_or_bigger(start);
   while(ndx != -1)
