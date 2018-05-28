@@ -68,4 +68,6 @@ extern uint32_t cfg_mgr_get_alarm_from_index(int ndx);
 
 extern bool cfg_mgr_get_logging_config(logger_config_t* cfg);
 
+extern int cfg_mgr_get_revision(void);
+
 #endif /* !__CFG_MGR_DEF_H__ */

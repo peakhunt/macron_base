@@ -34,6 +34,8 @@ static int                _json_str_len = 0;
 static indexer_t        _channel_indexer,
                         _alarm_indexer;
 
+static int              _in_mem_revision;
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // utilities
@@ -465,6 +467,18 @@ cfg_mgr_atomic_file_update_cb(int fd)
   return 0;
 }
 
+static int
+__cfg_mgr_get_revision(void)
+{
+  cJSON*    update_info;
+  cJSON*    revision;
+
+  update_info = cJSON_GetObjectItem(_jroot, "update_info");
+  revision = cJSON_GetObjectItem(update_info, "revision");
+
+  return revision->valueint;
+}
+
 static void
 cfg_mgr_inc_revision(void)
 {
@@ -485,6 +499,8 @@ cfg_mgr_inc_revision(void)
   r = revision->valueint;
   r++;
   cJSON_SetNumberValue(revision, r);
+
+  _in_mem_revision = r;
 }
 
 static void
@@ -518,6 +534,9 @@ cfg_mgr_init(const char* cfg_file)
 
   cfg_mgr_regenerate_in_memory_string();
   cfg_mgr_build_indexers();
+
+  _in_mem_revision = __cfg_mgr_get_revision();
+  debug_log("config revision : %d\n", _in_mem_revision);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1213,4 +1232,16 @@ cfg_mgr_get_logging_config(logger_config_t* cfg)
   cfg_mgr_unlock();
 
   return TRUE;
+}
+
+int
+cfg_mgr_get_revision(void)
+{
+  int r;
+
+  cfg_mgr_read_lock();
+  r =  _in_mem_revision;
+  cfg_mgr_unlock();
+
+  return r;
 }
