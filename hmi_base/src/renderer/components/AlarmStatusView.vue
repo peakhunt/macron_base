@@ -57,6 +57,7 @@
 
           case 'active':
             state = 'ack'
+            break
         }
         return this.alarm_severity + '-' + state
       }

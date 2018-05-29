@@ -48,6 +48,10 @@ export default new Router({
       component: require('@/components/AlarmLogView').default
     },
     {
+      path: '/widget-demo',
+      component: require('@/components/WidgetDemoView').default
+    },
+    {
       path: '*',
       redirect: '/'
     }

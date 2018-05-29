@@ -146,7 +146,8 @@
         { icon: 'apps', title: 'Alarm List', to: '/alarm-list' },
         { icon: 'apps', title: 'Current Alarms', to: '/current-alarms' },
         { icon: 'apps', title: 'Signal Trace', to: '/signal-trace' },
-        { icon: 'apps', title: 'Alarm Log', to: '/alarm-log' }
+        { icon: 'apps', title: 'Alarm Log', to: '/alarm-log' },
+        { icon: 'apps', title: 'Widget Demo', to: '/widget-demo' }
       ],
       miniVariant: false,
       right: true,
