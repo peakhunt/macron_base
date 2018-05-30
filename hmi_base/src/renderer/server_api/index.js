@@ -186,6 +186,21 @@ function getSignalTraceLog (startTimeStamp, endTimeStamp, channels, callback) {
     })
 }
 
+function setChannelValue (chnlNum, v, callback) {
+  var url = getServerBaseUrl() + '/api/v1/channel/value/' + chnlNum
+
+  axios.post(url,
+    { value: v },
+    {
+      headers: { 'Content-Type': 'application/json' }
+    })
+    .then((response) => {
+      callback(null, response)
+    }, (err) => {
+      callback(err, null)
+    })
+}
+
 module.exports = {
   loadSystemConfig: loadSystemConfig,
   updateLookupTable: updateLookupTable,
@@ -197,5 +212,6 @@ module.exports = {
   getAlarmLog: getAlarmLog,
   getTracedChannels: getTracedChannels,
   setTracedChannels: setTracedChannels,
-  getSignalTraceLog: getSignalTraceLog
+  getSignalTraceLog: getSignalTraceLog,
+  setChannelValue: setChannelValue
 }

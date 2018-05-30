@@ -2,16 +2,40 @@
   <v-container>
     <v-layout row wrap>
       <v-flex xs12>
+        <span>HMI linear gauges</span>
         <hmi-linear-gauge :chnl="11" :alarm="4" :options="hmi_gauge1_option" :tickValue="tickValue"></hmi-linear-gauge>
-        <hmi-linear-gauge :chnl="3" :alarm="1"  :options="hmi_gauge2_option"  :tickValue="tickValue"></hmi-linear-gauge>
+        <hmi-linear-gauge :chnl="3" :alarm="2"  :options="hmi_gauge2_option"  :tickValue="tickValue"></hmi-linear-gauge>
         <hmi-linear-gauge :chnl="11" :alarm="3" :options="hmi_gauge1_option" :tickValue="tickValue"></hmi-linear-gauge>
         <hmi-linear-gauge :chnl="11" :alarm="7" :options="hmi_gauge1_option" :tickValue="tickValue"></hmi-linear-gauge>
       </v-flex>
+
+
       <v-flex xs12>
+        <span>HMI radial gauges</span>
         <hmi-radial-gauge :chnl="11" :alarm="4"  :options="hmi_gauge3_option"  :tickValue="tickValue"></hmi-radial-gauge>
-        <hmi-radial-gauge :chnl="11" :alarm="1"  :options="hmi_gauge3_option"  :tickValue="tickValue"></hmi-radial-gauge>
+        <hmi-radial-gauge :chnl="11" :alarm="2"  :options="hmi_gauge3_option"  :tickValue="tickValue"></hmi-radial-gauge>
         <hmi-radial-gauge :chnl="11" :alarm="3"  :options="hmi_gauge3_option"  :tickValue="tickValue"></hmi-radial-gauge>
         <hmi-radial-gauge :chnl="11" :alarm="7"  :options="hmi_gauge3_option"  :tickValue="tickValue"></hmi-radial-gauge>
+      </v-flex>
+
+      <v-flex xs12>
+        <span>HMI value boxes</span>
+        <hmi-value-box :chnl="11" :alarm="4" :options="hmi_value_box_options" :tickValue="tickValue"></hmi-value-box>
+        <hmi-value-box :chnl="11" :alarm="2" :options="hmi_value_box_options" :tickValue="tickValue"></hmi-value-box>
+        <hmi-value-box :chnl="11" :alarm="7" :options="hmi_value_box_options" :tickValue="tickValue"></hmi-value-box>
+        <hmi-value-box :chnl="1" :alarm="3" :onMsg="'Closed'" :offMsg="'Open'" :options="hmi_value_box_options" :tickValue="tickValue"></hmi-value-box>
+      </v-flex>
+
+      <v-flex xs12>
+        <span>HMI control buttons</span>
+        <hmi-button :outChnl="20" :progChnl="2" :alarm="1" :interlock="1" :text="'Start'" :tickValue="tickValue" :options="hmi_button_options1">
+        </hmi-button>
+        <hmi-button :outChnl="11" :progChnl="1" :alarm="4" :interlock="1" :text="'Stop'" :tickValue="tickValue" :options="hmi_button_options1">
+        </hmi-button>
+        <hmi-button :outChnl="11" :progChnl="2" :alarm="1" :interlock="2" :text="'Open'" :tickValue="tickValue" :options="hmi_button_options1">
+        </hmi-button>
+        <hmi-button :outChnl="11" :progChnl="1" :alarm="1" :interlock="1" :text="'Close'" :tickValue="tickValue" :options="hmi_button_options1">
+        </hmi-button>
       </v-flex>
     </v-layout>
   </v-container>
@@ -22,15 +46,62 @@
   import RadialGauge from 'vue2-canvas-gauges/src/RadialGauge'
   import HmiLinearGauge from '@/components/hmi/HmiLinearGauge'
   import HmiRadialGauge from '@/components/hmi/HmiRadialGauge'
+  import HmiValueBox from '@/components/hmi/HmiValueBox'
+  import HmiButton from '@/components/hmi/HmiButton'
 
   export default {
     components: {
       LinearGauge,
       RadialGauge,
       HmiLinearGauge,
-      HmiRadialGauge
+      HmiRadialGauge,
+      HmiValueBox,
+      HmiButton
     },
     computed: {
+      hmi_button_options1 () {
+        return {
+          // alarm
+          textNormal: '#ffffff',
+          backgroundNormal: '#000000',
+          textMinor: '#000000',
+          backgroundMinor: '#ffff00',
+          textMajor: '#ffffff',
+          backgroundMajor: '#ffa500',
+          textCritical: '#ffffff',
+          backgroundCritical: '#ff0000'
+        }
+      },
+      hmi_button_options2 () {
+        return {
+          // alarm
+          textNormal: '#ffffff',
+          backgroundNormal: '#000000',
+          textMinor: '#000000',
+          backgroundMinor: '#ffff00',
+          textMajor: '#ffffff',
+          backgroundMajor: '#ffa500',
+          textCritical: '#ffffff',
+          backgroundCritical: '#ff0000'
+        }
+      },
+      hmi_value_box_options () {
+        return {
+          units: '°C',
+          width: 100,
+          height: 35,
+          font: 'normal 20px Arial',
+          // for alarms
+          textNormal: '#ffffff',
+          backgroundNormal: '#000000',
+          textMinor: '#000000',
+          backgroundMinor: '#ffff00',
+          textMajor: '#ffffff',
+          backgroundMajor: '#ffa500',
+          textCritical: '#ffffff',
+          backgroundCritical: '#ff0000'
+        }
+      },
       hmi_default_gauge_option1 () {
         return {
           units: '°C',
