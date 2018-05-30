@@ -130,6 +130,12 @@ struct __api_cmd_handler_t
                   "active",
       "occur_time": xxx
     }
+
+    POST /api/v1/channel/value/<chnl_num>
+    request
+    {
+      "value": true/false or number
+    }
 */
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -560,6 +566,55 @@ out:
 }
 
 static void
+webapi_update_channel_value(struct mg_connection* nc, struct http_message* hm, struct mg_str* subcmd)
+{
+  uint32_t                    chnl_num;
+  cJSON                       *req;
+  channel_eng_value_t         v;
+
+  const static json_util_field_t      _param_bool[] =
+  {
+    { "value",    cJSON_False | cJSON_True      },
+  };
+  const static json_util_field_t      _param_number[] =
+  {
+    { "value",    cJSON_Number                  },
+  };
+
+  chnl_num = (uint32_t)mg_util_get_int(subcmd);
+
+  TRACE(WEBS_REQUEST, "channel value update request for %d\n", chnl_num);
+
+  req = webapi_parse_json_body(&hm->body, nc, hm);
+  if(req == NULL)
+  {
+    webapi_bad_request(nc, hm);
+    return;
+  }
+
+  if(json_util_simple_validate_message(req, _param_bool, NARRAY(_param_bool)))
+  {   
+    v.b     = cJSON_GetObjectItem(req, "value")->valueint;
+  }
+  else if(json_util_simple_validate_message(req, _param_number, NARRAY(_param_number)))
+  {   
+    v.f     = cJSON_GetObjectItem(req, "value")->valuedouble;
+  }
+  else
+  {
+    TRACE(ERROR, "channel value update bad request. parameter missing %d\n", chnl_num);
+    webapi_bad_request(nc, hm);
+    goto out;
+  }
+
+  channel_manager_set_eng_value(chnl_num, v);
+  webapi_server_response_ok(nc);
+
+out:
+  cJSON_Delete(req);
+}
+
+static void
 webapi_get_alarm_status(struct mg_connection* nc, struct http_message* hm, struct mg_str* subcmd)
 {
   uint32_t          alarm_num;
@@ -740,6 +795,10 @@ static api_cmd_handler_t  _top_level_post_handlers[] =
   {
     .prefix   = MG_MK_STR("channel/update/lookup_table/"),
     .handler  = webapi_update_channel_lookup_table,
+  },
+  {
+    .prefix   = MG_MK_STR("channel/value/"),
+    .handler  = webapi_update_channel_value,
   },
   {
     .prefix   = MG_MK_STR("alarm/update/config/"),
