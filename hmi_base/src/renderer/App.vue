@@ -128,11 +128,22 @@
       console.log('1:' + this.$route.path)
       EventBus.$on('systemConfigLoadComplete', this.systemConfigLoadComplete)
 
+      this.tickTimer = setInterval(() => {
+        global.tick500ms = !global.tick500ms
+        EventBus.$emit('global500msTick')
+      }, 500)
+
       if (!this.$store.getters.isSysConfigLoaded) {
         serverPoller.stop(this)
         router.push('/system-loading-view')
       } else {
         router.push('/')
+      }
+    },
+    beforeDestroy () {
+      if (this.tickTimer !== null) {
+        clearInterval(this.tickTimer)
+        this.tickTimer = null
       }
     },
     data: () => ({
@@ -152,6 +163,7 @@
       miniVariant: false,
       right: true,
       title: global.config.general.projectName,
+      tickTimer: null,
       savedPath: null
     })
   }
