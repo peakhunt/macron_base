@@ -38,6 +38,8 @@
 
 <script>
   import AlarmStatusView from '@/components/AlarmStatusView'
+  import {EventBus} from '@/event-bus'
+
   export default {
     name: 'currentAlarmsView',
     components: {
@@ -49,11 +51,10 @@
       }
     },
     created () {
-      // FIXME switch to vue-timers npm module
-      this.$options.interval = setInterval(this.blink, 250)
+      EventBus.$on('global500msTick', this.blink)
     },
     beforeDestroy () {
-      clearInterval(this.$options.interval)
+      EventBus.$off('global500msTick', this.blink)
     },
     data () {
       return {
