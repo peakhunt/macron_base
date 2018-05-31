@@ -51,6 +51,11 @@
         <hmi-led :color="'Blue'" :width="50" :height="50" :ledOn="true"></hmi-led>
         <hmi-led :color="'Blue'" :width="50" :height="50" :ledOn="false"></hmi-led>
       </v-flex>
+
+      <v-flex xs12>
+        <hmi-pump :width="250" :height="250" :color="'red'"></hmi-pump>
+        <hmi-tank :width="250" :height="450" :min="0" :max="350" :value="tankLevel"></hmi-tank>
+      </v-flex>
     </v-layout>
   </v-container>
 </template>
@@ -63,6 +68,8 @@
   import HmiValueBox from '@/components/hmi/HmiValueBox'
   import HmiButton from '@/components/hmi/HmiButton'
   import HmiLed from '@/components/hmi/HmiLed'
+  import HmiPump from '@/components/hmi/HmiPump'
+  import HmiTank from '@/components/hmi/HmiTank'
   import {EventBus} from '@/event-bus'
 
   export default {
@@ -73,7 +80,9 @@
       HmiRadialGauge,
       HmiValueBox,
       HmiButton,
-      HmiLed
+      HmiLed,
+      HmiPump,
+      HmiTank
     },
     computed: {
       hmi_button_options1 () {
@@ -241,12 +250,28 @@
     },
     data () {
       return {
-        tickValue: false
+        tickValue: false,
+        tankLevel: 0,
+        dir: true
       }
     },
     methods: {
       toggleTick () {
         this.tickValue = !this.tickValue
+
+        if (this.dir) {
+          this.tankLevel += 5
+          if (this.tankLevel > 350) {
+            this.dir = false
+            this.tankLevel = 350
+          }
+        } else {
+          this.tankLevel -= 5
+          if (this.tankLevel < 0) {
+            this.dir = true
+            this.tankLevel = 0
+          }
+        }
       }
     },
     created () {
