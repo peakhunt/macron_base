@@ -1,0 +1,148 @@
+<template>
+  <svg
+     :width="width"
+     :height="height"
+     viewBox="0 0 744.09448819 1052.3622047"
+     id="svg2"
+     version="1.1"
+     inkscape:version="0.91 r13725"
+     sodipodi:docname="tank.svg">
+    <defs
+       id="defs4">
+      <linearGradient
+         inkscape:collect="always"
+         id="linearGradient4353">
+        <stop
+           style="stop-color:#0000ff;stop-opacity:1;"
+           offset="0"
+           id="stop4355" />
+        <stop
+           style="stop-color:#0000ff;stop-opacity:0;"
+           offset="1"
+           id="stop4357" />
+      </linearGradient>
+      <linearGradient
+         inkscape:collect="always"
+         id="linearGradient4299">
+        <stop
+           style="stop-color:#999999;stop-opacity:1;"
+           offset="0"
+           id="stop4301" />
+        <stop
+           style="stop-color:#999999;stop-opacity:0;"
+           offset="1"
+           id="stop4303" />
+      </linearGradient>
+      <linearGradient
+         inkscape:collect="always"
+         xlink:href="#linearGradient4299"
+         id="linearGradient4305"
+         x1="166.46289"
+         y1="513.33789"
+         x2="939.02509"
+         y2="409.67935"
+         gradientUnits="userSpaceOnUse" />
+      <linearGradient
+         inkscape:collect="always"
+         xlink:href="#linearGradient4353"
+         id="linearGradient4359"
+         x1="167.68292"
+         y1="515.43539"
+         x2="1231.0975"
+         y2="20.313412"
+         gradientUnits="userSpaceOnUse" />
+    </defs>
+    <sodipodi:namedview
+       id="base"
+       pagecolor="#ffffff"
+       bordercolor="#666666"
+       borderopacity="1.0"
+       inkscape:pageopacity="0.0"
+       inkscape:pageshadow="2"
+       inkscape:zoom="0.82"
+       inkscape:cx="433.18927"
+       inkscape:cy="564.28571"
+       inkscape:document-units="px"
+       inkscape:current-layer="layer1"
+       showgrid="false"
+       inkscape:window-width="1920"
+       inkscape:window-height="1054"
+       inkscape:window-x="0"
+       inkscape:window-y="0"
+       inkscape:window-maximized="1" />
+    <metadata
+       id="metadata7">
+      <rdf:RDF>
+        <cc:Work
+           rdf:about="">
+          <dc:format>image/svg+xml</dc:format>
+          <dc:type
+             rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+          <dc:title></dc:title>
+        </cc:Work>
+      </rdf:RDF>
+    </metadata>
+    <g
+       inkscape:label="Layer 1"
+       inkscape:groupmode="layer"
+       id="layer1">
+      <path
+         style="fill:url(#linearGradient4305);fill-opacity:1"
+         d="M 379.87891 114.55664 A 212.80487 37.804878 0 0 0 167.07227 152.36133 A 212.80487 37.804878 0 0 0 167.55859 154.80078 L 167.07227 154.80078 L 167.07227 872.15234 A 212.80487 37.804878 0 0 0 166.46289 874.3125 A 212.80487 37.804878 0 0 0 379.26758 912.11914 A 212.80487 37.804878 0 0 0 591.72852 875.5332 L 592.68359 875.5332 L 592.68359 154.80078 L 591.99609 154.80078 A 212.80487 37.804878 0 0 0 592.68359 152.36133 A 212.80487 37.804878 0 0 0 379.87891 114.55664 z "
+         id="rect4234" />
+      <rect
+         style="fill:url(#linearGradient4359);fill-opacity:1"
+         ref="liquidLevel"
+         width="424.39023"
+         height="701.21954"
+         x="167.68292"
+         y="164.82562"
+         inkscape:label="#rect4234-5" />
+    </g>
+  </svg>
+</template>
+
+<script>
+  export default {
+    name: 'HmiPump',
+    components: {
+    },
+    computed: {
+    },
+    props: {
+      width: { type: Number },
+      height: { type: Number },
+      min: { type: Number },
+      max: { type: Number },
+      value: { type: Number }
+    },
+    methods: {
+      updateLiquidLevel () {
+        // these values are from the above SVG
+        var pct = (this.value / (this.max - this.min)) * 100
+        var w = 424.39023
+        var h = 701.21954
+        var cx = 167.68292 + w / 2
+        var cy = 164.82562 + h / 2
+
+        var t = 'rotate(180, ' + cx + ',' + cy + ')'
+
+        var nh = (h * pct) / 100
+
+        this.$refs.liquidLevel.setAttribute('transform', t)
+        this.$refs.liquidLevel.setAttribute('height', nh)
+      }
+    },
+    mounted () {
+      this.updateLiquidLevel()
+    },
+    watch: {
+      value (newV, oldV) {
+        this.updateLiquidLevel()
+      }
+    }
+  }
+</script>
+
+<style scoped>
+</style>
