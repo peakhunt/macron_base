@@ -19,17 +19,18 @@
 </template>
 
 <script>
+  import HmiCommon from '@/components/hmi/HmiCommon'
   import serverAPI from '@/server_api'
 
   export default {
     name: 'HmiButton',
+    mixins: [HmiCommon],
     props: {
       outChnl: { type: Number },
       progChnl: { type: Number },
       interlock: { type: Number },
       alarm: { type: Number },
       text: { type: String },
-      tickValue: { type: Boolean, default: false },
       options: { type: Object }
     },
     methods: {
@@ -92,7 +93,7 @@
         }
 
         if (this.errorColor === 'red') {
-          this.errorColor = 'red lighten-3'
+          this.errorColor = 'red lighten-4'
         } else {
           this.errorColor = 'red'
         }

@@ -18,13 +18,15 @@
 </template>
 
 <script>
+  import HmiCommon from '@/components/hmi/HmiCommon'
+
   export default {
     name: 'HmiValueBox',
+    mixins: [HmiCommon],
     props: {
       chnl: { type: Number },
       alarm: { type: Number },
       options: { type: Object, default: {} },
-      tickValue: { type: Boolean, default: false },
       onMsg: { type: String, default: null },
       offMsg: { type: String, default: null }
     },
@@ -53,6 +55,8 @@
     created () {
       this.hmi_options = Object.assign(this.options, {})
       this.updateAlarmColor()
+    },
+    beforeDestroy () {
     },
     methods: {
       updateAlarmColor () {

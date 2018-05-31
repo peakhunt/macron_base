@@ -3,10 +3,12 @@
 </template>
 
 <script>
+  import HmiCommon from '@/components/hmi/HmiCommon'
   import RadialGauge from 'vue2-canvas-gauges/src/RadialGauge'
 
   export default {
     name: 'HmiRadialGauge',
+    mixins: [HmiCommon],
     components: {
       RadialGauge
     },
@@ -92,8 +94,7 @@
     props: {
       chnl: { type: Number },
       alarm: { type: Number },
-      options: { type: Object, default: {} },
-      tickValue: { type: Boolean, default: false }
+      options: { type: Object, default: {} }
     },
     watch: {
       hmi_alarm_state (newO, oldO) {

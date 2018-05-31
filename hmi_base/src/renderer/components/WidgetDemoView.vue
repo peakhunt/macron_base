@@ -3,39 +3,53 @@
     <v-layout row wrap>
       <v-flex xs12>
         <span>HMI linear gauges</span>
-        <hmi-linear-gauge :chnl="11" :alarm="4" :options="hmi_gauge1_option" :tickValue="tickValue"></hmi-linear-gauge>
-        <hmi-linear-gauge :chnl="3" :alarm="2"  :options="hmi_gauge2_option"  :tickValue="tickValue"></hmi-linear-gauge>
-        <hmi-linear-gauge :chnl="11" :alarm="3" :options="hmi_gauge1_option" :tickValue="tickValue"></hmi-linear-gauge>
-        <hmi-linear-gauge :chnl="11" :alarm="7" :options="hmi_gauge1_option" :tickValue="tickValue"></hmi-linear-gauge>
+        <hmi-linear-gauge :chnl="11" :alarm="4" :options="hmi_gauge1_option" ></hmi-linear-gauge>
+        <hmi-linear-gauge :chnl="3" :alarm="2"  :options="hmi_gauge2_option" ></hmi-linear-gauge>
+        <hmi-linear-gauge :chnl="11" :alarm="3" :options="hmi_gauge1_option" ></hmi-linear-gauge>
+        <hmi-linear-gauge :chnl="11" :alarm="7" :options="hmi_gauge1_option" ></hmi-linear-gauge>
       </v-flex>
 
 
       <v-flex xs12>
         <span>HMI radial gauges</span>
-        <hmi-radial-gauge :chnl="11" :alarm="4"  :options="hmi_gauge3_option"  :tickValue="tickValue"></hmi-radial-gauge>
-        <hmi-radial-gauge :chnl="11" :alarm="2"  :options="hmi_gauge3_option"  :tickValue="tickValue"></hmi-radial-gauge>
-        <hmi-radial-gauge :chnl="11" :alarm="3"  :options="hmi_gauge3_option"  :tickValue="tickValue"></hmi-radial-gauge>
-        <hmi-radial-gauge :chnl="11" :alarm="7"  :options="hmi_gauge3_option"  :tickValue="tickValue"></hmi-radial-gauge>
+        <hmi-radial-gauge :chnl="11" :alarm="4"  :options="hmi_gauge3_option" ></hmi-radial-gauge>
+        <hmi-radial-gauge :chnl="11" :alarm="2"  :options="hmi_gauge3_option" ></hmi-radial-gauge>
+        <hmi-radial-gauge :chnl="11" :alarm="3"  :options="hmi_gauge3_option" ></hmi-radial-gauge>
+        <hmi-radial-gauge :chnl="11" :alarm="7"  :options="hmi_gauge3_option" ></hmi-radial-gauge>
       </v-flex>
 
       <v-flex xs12>
         <span>HMI value boxes</span>
-        <hmi-value-box :chnl="11" :alarm="4" :options="hmi_value_box_options" :tickValue="tickValue"></hmi-value-box>
-        <hmi-value-box :chnl="11" :alarm="2" :options="hmi_value_box_options" :tickValue="tickValue"></hmi-value-box>
-        <hmi-value-box :chnl="11" :alarm="7" :options="hmi_value_box_options" :tickValue="tickValue"></hmi-value-box>
-        <hmi-value-box :chnl="1" :alarm="3" :onMsg="'Closed'" :offMsg="'Open'" :options="hmi_value_box_options" :tickValue="tickValue"></hmi-value-box>
+        <hmi-value-box :chnl="11" :alarm="4" :options="hmi_value_box_options" ></hmi-value-box>
+        <hmi-value-box :chnl="11" :alarm="2" :options="hmi_value_box_options" ></hmi-value-box>
+        <hmi-value-box :chnl="11" :alarm="7" :options="hmi_value_box_options" ></hmi-value-box>
+        <hmi-value-box :chnl="1" :alarm="3" :onMsg="'Closed'" :offMsg="'Open'" :options="hmi_value_box_options"></hmi-value-box>
       </v-flex>
 
       <v-flex xs12>
         <span>HMI control buttons</span>
-        <hmi-button :outChnl="20" :progChnl="2" :alarm="1" :interlock="1" :text="'Start'" :tickValue="tickValue" :options="hmi_button_options1">
+        <hmi-button :outChnl="20" :progChnl="2" :alarm="1" :interlock="1" :text="'Start'" :options="hmi_button_options1">
         </hmi-button>
-        <hmi-button :outChnl="11" :progChnl="1" :alarm="4" :interlock="1" :text="'Stop'" :tickValue="tickValue" :options="hmi_button_options1">
+        <hmi-button :outChnl="11" :progChnl="1" :alarm="4" :interlock="1" :text="'Stop'" :options="hmi_button_options1">
         </hmi-button>
-        <hmi-button :outChnl="11" :progChnl="2" :alarm="1" :interlock="2" :text="'Open'" :tickValue="tickValue" :options="hmi_button_options1">
+        <hmi-button :outChnl="11" :progChnl="2" :alarm="1" :interlock="2" :text="'Open'" :options="hmi_button_options1">
         </hmi-button>
-        <hmi-button :outChnl="11" :progChnl="1" :alarm="1" :interlock="1" :text="'Close'" :tickValue="tickValue" :options="hmi_button_options1">
+        <hmi-button :outChnl="11" :progChnl="1" :alarm="1" :interlock="1" :text="'Close'" :options="hmi_button_options1">
         </hmi-button>
+      </v-flex>
+
+      <v-flex xs12>
+        <hmi-led :color="'Green'" :width="50" :height="50" :ledOn="tickValue"></hmi-led>
+        <hmi-led :color="'Green'" :width="50" :height="50" :ledOn="true"></hmi-led>
+        <hmi-led :color="'Green'" :width="50" :height="50" :ledOn="false"></hmi-led>
+
+        <hmi-led :color="'Red'" :width="50" :height="50" :ledOn="tickValue"></hmi-led>
+        <hmi-led :color="'Red'" :width="50" :height="50" :ledOn="true"></hmi-led>
+        <hmi-led :color="'Red'" :width="50" :height="50" :ledOn="false"></hmi-led>
+
+        <hmi-led :color="'Blue'" :width="50" :height="50" :ledOn="tickValue"></hmi-led>
+        <hmi-led :color="'Blue'" :width="50" :height="50" :ledOn="true"></hmi-led>
+        <hmi-led :color="'Blue'" :width="50" :height="50" :ledOn="false"></hmi-led>
       </v-flex>
     </v-layout>
   </v-container>
@@ -48,6 +62,8 @@
   import HmiRadialGauge from '@/components/hmi/HmiRadialGauge'
   import HmiValueBox from '@/components/hmi/HmiValueBox'
   import HmiButton from '@/components/hmi/HmiButton'
+  import HmiLed from '@/components/hmi/HmiLed'
+  import {EventBus} from '@/event-bus'
 
   export default {
     components: {
@@ -56,7 +72,8 @@
       HmiLinearGauge,
       HmiRadialGauge,
       HmiValueBox,
-      HmiButton
+      HmiButton,
+      HmiLed
     },
     computed: {
       hmi_button_options1 () {
@@ -224,20 +241,19 @@
     },
     data () {
       return {
-        tickValue: false,
-        timerHandle: null
+        tickValue: false
       }
     },
     methods: {
-      feedTickEvent () {
+      toggleTick () {
         this.tickValue = !this.tickValue
       }
     },
     created () {
-      this.timerHandle = setInterval(this.feedTickEvent, 500)
+      EventBus.$on('global500msTick', this.toggleTick)
     },
     beforeDestroy () {
-      clearInterval(this.timerHandle)
+      EventBus.$off('global500msTick', this.toggleTick)
     }
   }
 </script>
