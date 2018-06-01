@@ -20,10 +20,10 @@
 
       <v-flex xs12>
         <span>HMI value boxes</span>
-        <hmi-value-box :chnl="11" :alarm="4" :options="hmi_value_box_options" ></hmi-value-box>
-        <hmi-value-box :chnl="11" :alarm="2" :options="hmi_value_box_options" ></hmi-value-box>
-        <hmi-value-box :chnl="11" :alarm="7" :options="hmi_value_box_options" ></hmi-value-box>
-        <hmi-value-box :chnl="1" :alarm="3" :onMsg="'Closed'" :offMsg="'Open'" :options="hmi_value_box_options"></hmi-value-box>
+        <hmi-value-box :chnl="11" :alarms="[1,7,4,2]" :options="hmi_value_box_options" ></hmi-value-box>
+        <hmi-value-box :chnl="11" :alarms="[7]" :options="hmi_value_box_options" ></hmi-value-box>
+        <hmi-value-box :chnl="11" :alarms="[3]" :options="hmi_value_box_options" ></hmi-value-box>
+        <hmi-value-box :chnl="1" :alarms="[7]" :onMsg="'Closed'" :offMsg="'Open'" :options="hmi_value_box_options"></hmi-value-box>
       </v-flex>
 
       <v-flex xs12>

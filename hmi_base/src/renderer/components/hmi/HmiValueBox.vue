@@ -1,18 +1,18 @@
 <template>
   <span>
     <button v-if="hmi_channel_type === 'analog'" v-bind:style="{
-      width: hmi_options.width + 'px',
-      height: hmi_options.height + 'px',
-      'background-color': hmi_options.backgroundColor,
-      font: hmi_options.font,
-      color: hmi_options.textColor
-    }" class="value-box-html">{{hmi_value}}&nbsp;{{hmi_options.units}}</button>
+      width: options.width + 'px',
+      height: options.height + 'px',
+      'background-color': backgroundColor,
+      font: options.font,
+      color: textColor
+    }" class="value-box-html">{{hmi_value}}&nbsp;{{options.units}}</button>
     <button v-if="hmi_channel_type === 'digital'" v-bind:style="{
-      width: hmi_options.width + 'px',
-      height: hmi_options.height + 'px',
-      'background-color': hmi_options.backgroundColor,
-      font: hmi_options.font,
-      color: hmi_options.textColor
+      width: options.width + 'px',
+      height: options.height + 'px',
+      'background-color': backgroundColor,
+      font: options.font,
+      color: textColor
     }" class="value-box-html">{{hmi_value}}</button>
   </span>
 </template>
@@ -25,8 +25,6 @@
     mixins: [HmiCommon],
     props: {
       chnl: { type: Number },
-      alarm: { type: Number },
-      options: { type: Object, default: {} },
       onMsg: { type: String, default: null },
       offMsg: { type: String, default: null }
     },
@@ -42,88 +40,38 @@
           return v === true ? this.onMsg : this.offMsg
         }
       },
-      hmi_alarm_state () {
-        return {
-          state: this.$store.getters.alarm(this.alarm).state,
-          tick: this.tickValue
-        }
-      },
       hmi_channel_type () {
         return this.$store.getters.channel(this.chnl).chnl_type
       }
     },
     created () {
-      this.hmi_options = Object.assign(this.options, {})
       this.updateAlarmColor()
     },
     beforeDestroy () {
     },
     methods: {
       updateAlarmColor () {
-        var state = this.$store.getters.alarm(this.alarm).state
-        var c = this.getAlarmColor(state)
+        var c = this.getAlarmColor()
 
-        this.hmi_options.backgroundColor = c.backgroundColor
-        this.hmi_options.textColor = c.textColor
-      },
-      getSeverityColor (severity) {
-        var obj = {
-          textColor: this.options.textNormal,
-          backgroundColor: this.options.backgroundNormal
-        }
-
-        switch (severity) {
-          case 'minor':
-            obj = {
-              textColor: this.options.textMinor,
-              backgroundColor: this.options.backgroundMinor
-            }
-            break
-
-          case 'major':
-            obj = {
-              textColor: this.options.textMajor,
-              backgroundColor: this.options.backgroundMajor
-            }
-            break
-
-          case 'critical':
-            obj = {
-              textColor: this.options.textCritical,
-              backgroundColor: this.options.backgroundCritical
-            }
-        }
-        return obj
-      },
-      getAlarmColor (alarmState) {
-        var severity = this.$store.getters.alarm(this.alarm).severity
-
-        switch (alarmState) {
-          case 'inactive':
-            return this.getSeverityColor('normal')
-
-          case 'pending':
-          case 'inactive_pending':
-            if (this.tickValue === true) {
-              return this.getSeverityColor(severity)
-            } else {
-              return this.getSeverityColor('normal')
-            }
-
-          case 'active':
-            return this.getSeverityColor(severity)
-        }
-        return this.getSeverityColor('normal')
+        console.log('updateAlarmColor : ' + c.backgroundColor)
+        this.backgroundColor = c.backgroundColor
+        this.textColor = c.textColor
       }
     },
     data () {
       return {
         value: 0,
-        hmi_options: {}
+        backgroundColor: null,
+        textColor: null
       }
     },
     watch: {
-      hmi_alarm_state (newO, oldO) {
+      highest_alarm_num (newS, oldS) {
+        console.log('highest_alarm_num : ' + newS)
+        this.updateAlarmColor()
+      },
+      tickValue (newV, oldV) {
+        console.log('tickValue ' + newV)
         this.updateAlarmColor()
       }
     }

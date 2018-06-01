@@ -23,15 +23,26 @@ const graphColorPack = [
   '#757575'
 ]
 
+const alarmRank = {
+  'minor': 0,
+  'major': 1,
+  'critical': 2
+}
+
 function getColor (ndx) {
   var n = ndx % graphColorPack.length
 
   return graphColorPack[n]
 }
 
+function getAlarmRank (severity) {
+  return alarmRank[severity]
+}
+
 module.exports = {
   quit: function () {
     app.quit()
   },
-  getColor: getColor
+  getColor: getColor,
+  getAlarmRank: getAlarmRank
 }
