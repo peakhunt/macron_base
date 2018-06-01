@@ -29,7 +29,6 @@
       outChnl: { type: Number },
       progChnl: { type: Number },
       interlock: { type: Number },
-      alarm: { type: Number },
       text: { type: String },
       options: { type: Object }
     },
@@ -70,15 +69,10 @@
         return this.$store.getters.channel(this.progChnl).eng_val
       },
       errorOccurred () {
-        var v = this.$store.getters.alarm(this.alarm).state
-
-        if (v === 'pending' ||
-            v === 'inactive_pending' ||
-            v === 'active') {
-          return true
-        } else {
+        if (this.highest_alarm_num === -1) {
           return false
         }
+        return true
       }
     },
     data () {
