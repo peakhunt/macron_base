@@ -53,7 +53,6 @@
       updateAlarmColor () {
         var c = this.getAlarmColor()
 
-        console.log('updateAlarmColor : ' + c.backgroundColor)
         this.backgroundColor = c.backgroundColor
         this.textColor = c.textColor
       }
@@ -67,11 +66,9 @@
     },
     watch: {
       highest_alarm_num (newS, oldS) {
-        console.log('highest_alarm_num : ' + newS)
         this.updateAlarmColor()
       },
       tickValue (newV, oldV) {
-        console.log('tickValue ' + newV)
         this.updateAlarmColor()
       }
     }
