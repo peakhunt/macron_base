@@ -54,8 +54,12 @@
 
       <v-flex xs12>
         <hmi-pump :width="250" :height="250" :color="'red'"></hmi-pump>
-        <hmi-tank :width="250" :height="450" :min="0" :max="350" :value="tankLevel"></hmi-tank>
       </v-flex>
+
+      <v-flex xs12>
+        <hmi-tank :min="0" :max="350" :value="tankLevel" :width="'100px'" :height="'100px'"></hmi-tank>
+      </v-flex>
+
     </v-layout>
   </v-container>
 </template>

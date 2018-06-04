@@ -1,16 +1,14 @@
 <template>
   <svg
+     version="1.1"
      :width="width"
      :height="height"
-     viewBox="0 0 744.09448819 1052.3622047"
-     id="svg2"
-     version="1.1"
-     inkscape:version="0.91 r13725"
+     preserveAspectRatio="none"
+     viewBox="0 0 1052.3622 744.09448"
      sodipodi:docname="tank.svg">
     <defs
        id="defs4">
       <linearGradient
-         inkscape:collect="always"
          id="linearGradient4353">
         <stop
            style="stop-color:#0000ff;stop-opacity:1;"
@@ -22,7 +20,6 @@
            id="stop4357" />
       </linearGradient>
       <linearGradient
-         inkscape:collect="always"
          id="linearGradient4299">
         <stop
            style="stop-color:#999999;stop-opacity:1;"
@@ -34,7 +31,6 @@
            id="stop4303" />
       </linearGradient>
       <linearGradient
-         inkscape:collect="always"
          xlink:href="#linearGradient4299"
          id="linearGradient4305"
          x1="166.46289"
@@ -43,7 +39,6 @@
          y2="409.67935"
          gradientUnits="userSpaceOnUse" />
       <linearGradient
-         inkscape:collect="always"
          xlink:href="#linearGradient4353"
          id="linearGradient4359"
          x1="167.68292"
@@ -57,19 +52,7 @@
        pagecolor="#ffffff"
        bordercolor="#666666"
        borderopacity="1.0"
-       inkscape:pageopacity="0.0"
-       inkscape:pageshadow="2"
-       inkscape:zoom="0.82"
-       inkscape:cx="433.18927"
-       inkscape:cy="564.28571"
-       inkscape:document-units="px"
-       inkscape:current-layer="layer1"
-       showgrid="false"
-       inkscape:window-width="1920"
-       inkscape:window-height="1054"
-       inkscape:window-x="0"
-       inkscape:window-y="0"
-       inkscape:window-maximized="1" />
+       showgrid="false"/>
     <metadata
        id="metadata7">
       <rdf:RDF>
@@ -83,35 +66,31 @@
       </rdf:RDF>
     </metadata>
     <g
-       inkscape:label="Layer 1"
-       inkscape:groupmode="layer"
-       id="layer1">
+      :transform="transform">
       <path
          style="fill:url(#linearGradient4305);fill-opacity:1"
-         d="M 379.87891 114.55664 A 212.80487 37.804878 0 0 0 167.07227 152.36133 A 212.80487 37.804878 0 0 0 167.55859 154.80078 L 167.07227 154.80078 L 167.07227 872.15234 A 212.80487 37.804878 0 0 0 166.46289 874.3125 A 212.80487 37.804878 0 0 0 379.26758 912.11914 A 212.80487 37.804878 0 0 0 591.72852 875.5332 L 592.68359 875.5332 L 592.68359 154.80078 L 591.99609 154.80078 A 212.80487 37.804878 0 0 0 592.68359 152.36133 A 212.80487 37.804878 0 0 0 379.87891 114.55664 z "
-         id="rect4234" />
+         d="m 526.41506,395.55805 a 162.87654,26.995247 0 0 0 -162.8779,26.99511 162.87654,26.995247 0 0 0 0.37222,1.74194 l -0.37222,0 0,512.23763 a 162.87654,26.995247 0 0 0 -0.46641,1.54252 162.87654,26.995247 0 0 0 162.8764,26.99648 162.87654,26.995247 0 0 0 162.61331,-26.12481 l 0.73099,0 0,-514.65182 -0.5262,0 a 162.87654,26.995247 0 0 0 0.5262,-1.74194 162.87654,26.995247 0 0 0 -162.87639,-26.99511 z"
+         />
       <rect
          style="fill:url(#linearGradient4359);fill-opacity:1"
          ref="liquidLevel"
-         width="424.39023"
-         height="701.21954"
-         x="167.68292"
-         y="164.82562"
-         inkscape:label="#rect4234-5" />
+         width="324.8197"
+         height="500.71829"
+         x="363.77124"
+         y="429.95575"/>
     </g>
   </svg>
 </template>
 
 <script>
   export default {
-    name: 'HmiPump',
+    name: 'HmiTank',
     components: {
     },
-    computed: {
-    },
     props: {
-      width: { type: Number },
-      height: { type: Number },
+      transform: { type: String, default: 'scale(1, 1)' },
+      width: { type: String, default: null },
+      height: { type: String, default: null },
       min: { type: Number },
       max: { type: Number },
       value: { type: Number }
@@ -120,10 +99,10 @@
       updateLiquidLevel () {
         // these values are from the above SVG
         var pct = (this.value / (this.max - this.min)) * 100
-        var w = 424.39023
-        var h = 701.21954
-        var cx = 167.68292 + w / 2
-        var cy = 164.82562 + h / 2
+        var w = 324.8197
+        var h = 500.71829
+        var cx = 363.77124 + w / 2
+        var cy = 429.95575 + h / 2
 
         var t = 'rotate(180, ' + cx + ',' + cy + ')'
 
