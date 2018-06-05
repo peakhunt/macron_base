@@ -4,8 +4,20 @@
       <v-flex xs12>
         <div class="hmi_container">
           <!-- UI Element start -->
-          <hmi-value-box style="position: absolute; top: 130.3px; left: 150.9px;" :chnl="11" :alarms="[2]"
+          <hmi-value-box style="position: absolute; z-index: 100; top: 130.3px; left: 140.9px;" :chnl="11" :alarms="[2]"
            :options="hmi_value_box_options"></hmi-value-box>
+
+          <hmi-value-box style="position: absolute; z-index: 100; top: 170.3px; left: 140.9px;" :chnl="11" :alarms="[2]"
+           :options="hmi_value_box_options2"></hmi-value-box>
+
+          <hmi-radial-gauge style="position: absolute; z-index: 100; top: -90px; left: 390px;" :chnl="11" :alarms="[4]" :options="hmi_gauge3_option">
+          </hmi-radial-gauge>
+
+          <hmi-radial-gauge style="position: absolute; z-index: 100; top: 330px; left: 290px;" :chnl="11" :alarms="[4]" :options="hmi_gauge3_option">
+          </hmi-radial-gauge>
+          
+          <hmi-button style="position: absolute; z-index: 100; top: 60px; left: 600px;" :outChnl="20" :progChnl="2" :alarms="[1]" :interlock="1" :text="'Shutdown'" :options="hmi_button_options1">
+          </hmi-button>
 
           <!-- SVG start -->
           <svg
@@ -325,6 +337,8 @@
   import HmiHccremover from '@/components/hmi/HmiHccremover'
   import HmiReliquefier from '@/components/hmi/HmiReliquefier'
   import HmiValueBox from '@/components/hmi/HmiValueBox'
+  import HmiRadialGauge from '@/components/hmi/HmiRadialGauge'
+  import HmiButton from '@/components/hmi/HmiButton'
   import {EventBus} from '@/event-bus'
 
   export default {
@@ -335,13 +349,28 @@
       HmiCompressor,
       HmiHccremover,
       HmiReliquefier,
-      HmiValueBox
+      HmiValueBox,
+      HmiRadialGauge,
+      HmiButton
     },
     computed: {
+      hmi_button_options1 () {
+        return {
+          // alarm
+          textNormal: '#ffffff',
+          backgroundNormal: '#000000',
+          textMinor: '#000000',
+          backgroundMinor: '#ffff00',
+          textMajor: '#ffffff',
+          backgroundMajor: '#ffa500',
+          textCritical: '#ffffff',
+          backgroundCritical: '#ff0000'
+        }
+      },
       hmi_value_box_options () {
         return {
           units: '°C',
-          width: 100,
+          width: 120,
           height: 35,
           font: 'normal 20px Arial',
           // for alarms
@@ -354,6 +383,130 @@
           textCritical: '#ffffff',
           backgroundCritical: '#ff0000'
         }
+      },
+      hmi_value_box_options2 () {
+        return {
+          units: 'Bar',
+          width: 120,
+          height: 35,
+          font: 'normal 20px Arial',
+          // for alarms
+          textNormal: '#ffffff',
+          backgroundNormal: '#000000',
+          textMinor: '#000000',
+          backgroundMinor: '#ffff00',
+          textMajor: '#ffffff',
+          backgroundMajor: '#ffa500',
+          textCritical: '#ffffff',
+          backgroundCritical: '#ff0000'
+        }
+      },
+      hmi_default_gauge_option1 () {
+        return {
+          units: '°C',
+          title: 'title',
+          minValue: 0,
+          maxValue: 320,
+          width: 130,
+          height: 360,
+          strokeTicks: true,
+          colorBar: 'white',
+          colorBarProgress: 'blue',
+          highlights: [
+            {
+              'from': 0,
+              'to': 100,
+              'color': '#00E676'
+            },
+            {
+              'from': 100,
+              'to': 220,
+              'color': '#FFFF8D'
+            }, {
+              'from': 220,
+              'to': 320,
+              'color': '#FF3D00'
+            }
+          ],
+          minorTicks: 10,
+          majorTicks: [
+            '0',
+            '40',
+            '80',
+            '120',
+            '160',
+            '200',
+            '240',
+            '280',
+            '320'
+          ],
+          colorPlate: '#fff',
+          borderShadowWidth: 0,
+          borders: false,
+          needleType: 'arrow',
+          needleShadow: true,
+          needleWidth: 0,
+          needleCircleSize: 7,
+          needleCircleOuter: true,
+          needleCircleInner: false,
+          numberSide: 'left',
+          needleSide: 'left',
+          animationDuration: 25,
+          animationRule: 'linear',
+          barWidth: 15,
+          valueBox: true,
+          valueBoxStroke: 5,
+          valueTextShadow: true,
+          valueDec: 1,
+          barBeginCircle: 0,
+          fontNumbersSize: 28,
+          fontUnitsSize: 30,
+          fontValueSize: 30,
+          colorValueText: '#ffffff',
+          colorValueBoxBackground: '#000000',
+          // hkim extension
+          textNormal: '#ffffff',
+          backgroundNormal: '#000000',
+          textMinor: '#000000',
+          backgroundMinor: '#ffff00',
+          textMajor: '#ffffff',
+          backgroundMajor: '#ffa500',
+          textCritical: '#ffffff',
+          backgroundCritical: '#ff0000'
+        }
+      },
+      hmi_gauge3_option () {
+        var def = this.hmi_default_gauge_option1
+        var ret = Object.assign({}, def)
+
+        return Object.assign(ret, {title: 'Inlet 1',
+          units: '°C',
+          width: 200,
+          minValue: -200,
+          maxValue: 400,
+          highlights: [
+            { 'from': -200, 'to': 0, 'color': '#42A5F5' },
+            { 'from': 0, 'to': 200, 'color': '#00E676' },
+            { 'from': 200, 'to': 400, 'color': '#FF3D00' }
+          ],
+          minorTicks: 5,
+          majorTicks: [
+            '-200',
+            '-150',
+            '-100',
+            '-50',
+            '0',
+            '50',
+            '100',
+            '150',
+            '200',
+            '250',
+            '300',
+            '350',
+            '400'
+          ],
+          fontNumbersSize: 15
+        })
       }
     },
     data () {
