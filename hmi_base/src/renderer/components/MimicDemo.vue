@@ -12,8 +12,8 @@
            xmlns:xlink="http://www.w3.org/1999/xlink"
            xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
            xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-           width="297mm"
-           height="210mm"
+           width="1052.3622"
+           height="744.09448"
            viewBox="0 0 1052.3622 744.09451"
            id="svg2"
            version="1.1"
@@ -72,7 +72,7 @@
                x2="939.02509"
                y1="513.33789"
                x1="166.46289"
-               id="linearGradient4305-3"
+               id="linearGradient4305-5"
                xlink:href="#linearGradient4299"
                inkscape:collect="always" />
             <linearGradient
@@ -82,7 +82,7 @@
                x2="1231.0975"
                y1="515.43536"
                x1="167.68292"
-               id="linearGradient4359-6"
+               id="linearGradient4359-9"
                xlink:href="#linearGradient4353"
                inkscape:collect="always" />
           </defs>
@@ -94,17 +94,17 @@
              inkscape:pageopacity="0.0"
              inkscape:pageshadow="2"
              inkscape:zoom="1"
-             inkscape:cx="406.56376"
-             inkscape:cy="402.89059"
-             inkscape:document-units="mm"
+             inkscape:cx="384.06376"
+             inkscape:cy="301.89059"
+             inkscape:document-units="px"
              inkscape:current-layer="layer2"
              showgrid="false"
-             inkscape:window-width="1920"
-             inkscape:window-height="1054"
-             inkscape:window-x="0"
-             inkscape:window-y="0"
-             inkscape:window-maximized="1"
-             units="mm"
+             inkscape:window-width="1457"
+             inkscape:window-height="827"
+             inkscape:window-x="26"
+             inkscape:window-y="94"
+             inkscape:window-maximized="0"
+             units="px"
              showborder="false" />
           <metadata
              id="metadata7">
@@ -302,320 +302,14 @@
              id="layer2"
              inkscape:label="equipments"
              transform="translate(0,3.5188977e-5)">
-            <g
-               id="valve1"
-               transform="matrix(0.05328797,0,0,0.05496874,590.91157,174.80645)"
-               inkscape:label="valve1">
-              <g
-                 id="g4706">
-                <g
-                   id="g4708">
-                  <path
-                     id="path4710"
-                     d="m 672.8,333.6 -74.4,0 0,-91.8 -74.1,0 0,-56 c 36.4,-0.7 72.8,-3 109.4,-6.9 40.3,-22.9 40.3,-39 0,-61.9 -36.5,-3.9 -73,-6.2 -109.4,-6.9 l 0,-17.2 -48.7,0 0,17.2 c -36.4,0.7 -72.8,3 -109.4,6.9 -40.3,22.9 -40.3,39 0,61.9 36.5,3.9 73,6.2 109.4,6.9 l 0,56 -74.1,0 0,91.8 -74.4,0 0,53.3 345.6,0 0,-53.3 0.1,0 z m -224.7,-45.3 103.9,0 0,45.3 -103.9,0 0,-45.3 0,0 z"
-                     inkscape:connector-curvature="0" />
-                  <path
-                     id="path4712"
-                     d="m 825.8,639.9 -153.9,0 c -22.8,-0.5 -41.2,-19.1 -41.2,-42.1 l 0,-59.9 c 0,-23.2 18.9,-42.1 42.1,-42.1 l 0,-6.8 0,-20.6 0,-32.7 -345.6,0 0,32.7 0,20.6 0,6.8 c 23.2,0 42.1,18.9 42.1,42.1 l 0,59.9 c 0,22.9 -18.4,41.6 -41.2,42.1 l -153.9,0 0,-36.1 -57.7,0 0,303.3 57.7,0 0,-36.9 651.6,0 0,36.9 57.7,0 0,-303.4 -57.7,0 0,36.2 0,0 z"
-                     inkscape:connector-curvature="0" />
-                  <rect
-                     id="rect4714"
-                     height="303.29999"
-                     width="57.700001"
-                     y="603.70001"
-                     x="932.29999" />
-                  <rect
-                     id="rect4716"
-                     height="303.29999"
-                     width="57.700001"
-                     y="603.70001"
-                     x="10" />
-                </g>
-              </g>
-              <g
-                 id="g4718" />
-              <g
-                 id="g4720" />
-              <g
-                 id="g4722" />
-              <g
-                 id="g4724" />
-              <g
-                 id="g4726" />
-              <g
-                 id="g4728" />
-              <g
-                 id="g4730" />
-              <g
-                 id="g4732" />
-              <g
-                 id="g4734" />
-              <g
-                 id="g4736" />
-              <g
-                 id="g4738" />
-              <g
-                 id="g4740" />
-              <g
-                 id="g4742" />
-              <g
-                 id="g4744" />
-              <g
-                 id="g4746" />
-            </g>
-            <g
-               id="valve2"
-               transform="matrix(0,-0.05328797,0.05496874,0,494.04533,356.84958)"
-               inkscape:label="valve2">
-              <g
-                 id="g4706-3">
-                <g
-                   id="g4708-7">
-                  <path
-                     id="path4710-5"
-                     d="m 672.8,333.6 -74.4,0 0,-91.8 -74.1,0 0,-56 c 36.4,-0.7 72.8,-3 109.4,-6.9 40.3,-22.9 40.3,-39 0,-61.9 -36.5,-3.9 -73,-6.2 -109.4,-6.9 l 0,-17.2 -48.7,0 0,17.2 c -36.4,0.7 -72.8,3 -109.4,6.9 -40.3,22.9 -40.3,39 0,61.9 36.5,3.9 73,6.2 109.4,6.9 l 0,56 -74.1,0 0,91.8 -74.4,0 0,53.3 345.6,0 0,-53.3 0.1,0 z m -224.7,-45.3 103.9,0 0,45.3 -103.9,0 0,-45.3 0,0 z"
-                     inkscape:connector-curvature="0" />
-                  <path
-                     id="path4712-9"
-                     d="m 825.8,639.9 -153.9,0 c -22.8,-0.5 -41.2,-19.1 -41.2,-42.1 l 0,-59.9 c 0,-23.2 18.9,-42.1 42.1,-42.1 l 0,-6.8 0,-20.6 0,-32.7 -345.6,0 0,32.7 0,20.6 0,6.8 c 23.2,0 42.1,18.9 42.1,42.1 l 0,59.9 c 0,22.9 -18.4,41.6 -41.2,42.1 l -153.9,0 0,-36.1 -57.7,0 0,303.3 57.7,0 0,-36.9 651.6,0 0,36.9 57.7,0 0,-303.4 -57.7,0 0,36.2 0,0 z"
-                     inkscape:connector-curvature="0" />
-                  <rect
-                     id="rect4714-2"
-                     height="303.29999"
-                     width="57.700001"
-                     y="603.70001"
-                     x="932.29999" />
-                  <rect
-                     id="rect4716-2"
-                     height="303.29999"
-                     width="57.700001"
-                     y="603.70001"
-                     x="10" />
-                </g>
-              </g>
-              <g
-                 id="g4718-8" />
-              <g
-                 id="g4720-9" />
-              <g
-                 id="g4722-7" />
-              <g
-                 id="g4724-3" />
-              <g
-                 id="g4726-6" />
-              <g
-                 id="g4728-1" />
-              <g
-                 id="g4730-2" />
-              <g
-                 id="g4732-9" />
-              <g
-                 id="g4734-3" />
-              <g
-                 id="g4736-1" />
-              <g
-                 id="g4738-9" />
-              <g
-                 id="g4740-4" />
-              <g
-                 id="g4742-7" />
-              <g
-                 id="g4744-8" />
-              <g
-                 id="g4746-4" />
-            </g>
-            <g
-               id="compressor"
-               transform="matrix(0.14168675,0,0,0.11790489,353.83561,161.30663)"
-               inkscape:label="compressor">
-              <g
-                 id="g4363">
-                <g
-                   id="g4365">
-                  <path
-                     id="path4367"
-                     d="m 612.744,273.408 251.791,0 c 9.541,0 17.277,-7.736 17.277,-17.278 l 0,-46.801 c 0,-9.542 -7.736,-17.278 -17.277,-17.278 l -282.101,0 c 4.67,9.079 9.082,18.769 13.207,29.097 6.443,16.135 12.158,33.64 17.103,52.26 z"
-                     inkscape:connector-curvature="0" />
-                  <path
-                     id="path4369"
-                     d="m 925.588,362.705 c 0,-9.542 -7.736,-17.278 -17.277,-17.278 l -281.071,0 c 3.758,26.027 6.252,53.305 7.404,81.357 l 273.664,0 c 9.543,0 17.279,-7.736 17.279,-17.278 l 0,-46.801 10e-4,0 z"
-                     inkscape:connector-curvature="0" />
-                  <path
-                     id="path4371"
-                     d="m 925.588,562.883 0,-46.801 c 0,-9.543 -7.736,-17.278 -17.277,-17.278 l -273.666,0 c -1.15,28.053 -3.646,55.331 -7.404,81.357 l 281.07,0 c 9.541,0 17.277,-7.736 17.277,-17.278 z"
-                     inkscape:connector-curvature="0" />
-                  <path
-                     id="path4373"
-                     d="m 881.814,716.259 0,-46.801 c 0,-9.542 -7.736,-17.278 -17.279,-17.278 l -251.791,0 c -4.945,18.62 -10.66,36.125 -17.104,52.261 -4.125,10.328 -8.537,20.019 -13.207,29.098 l 282.102,0 c 9.543,-10e-4 17.279,-7.737 17.279,-17.28 z"
-                     inkscape:connector-curvature="0" />
-                  <path
-                     id="path4375"
-                     d="m 458.533,800.794 c 39.536,0 71.35,-25.774 95.446,-67.256 13.301,-22.896 24.246,-50.582 32.842,-81.357 6.303,-22.565 11.344,-46.794 15.117,-72.019 3.934,-26.29 6.494,-53.66 7.68,-81.357 1.025,-23.926 1.025,-48.094 0,-72.02 -1.186,-27.697 -3.746,-55.068 -7.68,-81.357 -3.773,-25.225 -8.812,-49.453 -15.117,-72.019 C 578.225,242.633 567.28,214.948 553.979,192.052 529.883,150.568 498.067,124.794 458.533,124.794 256.061,124.794 0,276.122 0,462.794 c 0,186.672 256.061,338 458.533,338 z"
-                     inkscape:connector-curvature="0" />
-                </g>
-              </g>
-              <g
-                 id="g4377" />
-              <g
-                 id="g4379" />
-              <g
-                 id="g4381" />
-              <g
-                 id="g4383" />
-              <g
-                 id="g4385" />
-              <g
-                 id="g4387" />
-              <g
-                 id="g4389" />
-              <g
-                 id="g4391" />
-              <g
-                 id="g4393" />
-              <g
-                 id="g4395" />
-              <g
-                 id="g4397" />
-              <g
-                 id="g4399" />
-              <g
-                 id="g4401" />
-              <g
-                 id="g4403" />
-              <g
-                 id="g4405" />
-            </g>
-            <g
-               id="boiler"
-               inkscape:label="boiler"
-               transform="matrix(0.42498401,0,0,0.34681903,645.83034,6.5122621)">
-              <path
-                 inkscape:connector-curvature="0"
-                 id="rect4136"
-                 d="m 185.93006,280.23372 c -11.81226,0 -21.37399,10.25886 -21.83985,23.19141 -1.6e-4,0.004 1.7e-4,0.006 0,0.01 -0.0115,0.32429 -0.0215,0.64904 -0.0215,0.97657 l 0,163.49023 -4.07422,0 c -31.94675,0 -57.66601,25.71927 -57.66601,57.66602 l 0,162.13476 c 0,31.94675 25.71926,57.66406 57.66601,57.66406 l 8.53125,0 0,26.76172 59.1543,0 0,-26.76172 288.73242,0 0,26.76172 59.15625,0 0,-26.76172 8.53125,0 c 31.94675,0 57.66605,-25.71731 57.66601,-57.66406 l 0,-162.13476 c 0,-31.94675 -25.71926,-57.66602 -57.66601,-57.66602 l -14.89063,0 a 50.703895,47.887138 0 0 0 14.8379,-33.80273 50.703895,47.887138 0 0 0 -50.70508,-47.88672 50.703895,47.887138 0 0 0 -47.51953,31.35937 50.703895,47.887138 0 0 0 -47.52149,-31.35937 50.703895,47.887138 0 0 0 -50.70312,47.88672 50.703895,47.887138 0 0 0 14.83593,33.80273 l -195.13281,0 0,-139.31055 250.69336,0 c 12.11174,0 21.86328,-10.78513 21.86328,-24.17968 0,-13.39456 -9.75154,-24.17774 -21.86328,-24.17774 l -272.06445,0 z m 252.37109,122.30274 a 35.321819,31.561977 0 0 1 35.32227,31.5625 35.321819,31.561977 0 0 1 -35.32227,31.5625 35.321819,31.561977 0 0 1 -35.32226,-31.5625 35.321819,31.561977 0 0 1 35.32226,-31.5625 z m 95.04102,0 a 35.321819,31.561977 0 0 1 35.32226,31.5625 35.321819,31.561977 0 0 1 -35.32226,31.5625 35.321819,31.561977 0 0 1 -35.32227,-31.5625 35.321819,31.561977 0 0 1 35.32227,-31.5625 z m -109.32618,9.24414 -9.08007,8.67383 22.83789,21.8125 9.08008,-8.67188 -22.8379,-21.81445 z m 123.61133,0 -22.83593,21.81445 9.08007,8.67188 22.83594,-21.8125 -9.08008,-8.67383 z m -61.80664,38.92383 a 50.703895,47.887138 0 0 0 11.65039,17.19726 l -23.29687,0 a 50.703895,47.887138 0 0 0 11.64648,-17.19726 z m -236.08593,45.36718 29.52734,0 c 7.42647,0 13.4043,5.97783 13.4043,13.4043 l 0,194.31641 c 0,7.42647 -5.97783,13.40625 -13.4043,13.40625 l -29.52734,0 c -7.42648,0 -13.40624,-5.97978 -13.40626,-13.40625 l 0,-194.31641 c 0,-7.42647 5.97978,-13.4043 13.40626,-13.4043 z m 221.04101,0 29.52734,0 c 7.42648,0 13.40625,5.97783 13.40625,13.4043 l 0,194.31641 c 0,7.42647 -5.97977,13.40625 -13.40625,13.40625 l -29.52734,0 c -7.42647,0 -13.4043,-5.97978 -13.4043,-13.40625 l 0,-194.31641 c 0,-7.42647 5.97783,-13.4043 13.4043,-13.4043 z"
-                 style="fill:#000000;fill-opacity:0.99215686" />
-            </g>
-            <g
-               id="hcc_remover"
-               transform="translate(215.51852,-449.93439)"
-               inkscape:label="hcc_remover">
-              <rect
-                 y="750.51038"
-                 x="687.03705"
-                 height="158.33333"
-                 width="132.40741"
-                 id="rect5106"
-                 style="fill:#000000;fill-opacity:1" />
-              <g
-                 style="fill:#ececec"
-                 transform="matrix(0.54991292,0,0,0.84794138,552.32824,80.274393)"
-                 id="g5156">
-                <flowRoot
-                   xml:space="preserve"
-                   id="flowRoot5120"
-                   style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ececec;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-                   transform="translate(167.59259,211.0455)"><flowRegion
-                     id="flowRegion5122"><rect
-                       style="fill:#ececec"
-                       id="rect5124"
-                       width="517.59259"
-                       height="75.925926"
-                       x="150"
-                       y="617.24261" /></flowRegion><flowPara
-                     id="flowPara5126">HCC</flowPara></flowRoot>        <flowRoot
-                   xml:space="preserve"
-                   id="flowRoot5120-0"
-                   style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ececec;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-                   transform="translate(122.79948,247.77356)"><flowRegion
-                     id="flowRegion5122-6"><rect
-                       style="fill:#ececec"
-                       id="rect5124-1"
-                       width="517.59259"
-                       height="75.925926"
-                       x="150"
-                       y="617.24261" /></flowRegion><flowPara
-                     id="flowPara5126-5">Remover</flowPara></flowRoot>      </g>
-            </g>
-            <g
-               id="reliquefier"
-               transform="translate(-217.35189,-304.10107)"
-               inkscape:label="reliquefier">
-              <rect
-                 y="750.51038"
-                 x="687.03705"
-                 height="158.33333"
-                 width="132.40741"
-                 id="rect5106-6"
-                 style="fill:#000000;fill-opacity:1" />
-              <g
-                 style="fill:#ececec"
-                 transform="matrix(0.54991292,0,0,0.84794138,552.32824,80.274393)"
-                 id="g5156-5">
-                <flowRoot
-                   xml:space="preserve"
-                   id="flowRoot5120-6"
-                   style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ececec;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-                   transform="translate(100.24186,231.79292)"><flowRegion
-                     id="flowRegion5122-9"><rect
-                       style="fill:#ececec"
-                       id="rect5124-3"
-                       width="517.59259"
-                       height="75.925926"
-                       x="150"
-                       y="617.24261" /></flowRegion><flowPara
-                     id="flowPara5126-7">ReLiquefier</flowPara></flowRoot>      </g>
-            </g>
-            <g
-               transform="matrix(0.35948677,0,0,0.30412976,18.04844,-3.5268939)"
-               id="layer1-8"
-               inkscape:label="Layer 1" />
-            <!--
-            <g
-               transform="matrix(0.47581499,0,0,0.46621124,-97.864856,-156.076)"
-               id="tank1"
-               inkscape:label="tank1">
-              <path
-                 inkscape:connector-curvature="0"
-                 id="rect4234"
-                 d="m 526.41506,395.55805 a 162.87654,26.995247 0 0 0 -162.8779,26.99511 162.87654,26.995247 0 0 0 0.37222,1.74194 l -0.37222,0 0,512.23763 a 162.87654,26.995247 0 0 0 -0.46641,1.54252 162.87654,26.995247 0 0 0 162.8764,26.99648 162.87654,26.995247 0 0 0 162.61331,-26.12481 l 0.73099,0 0,-514.65182 -0.5262,0 a 162.87654,26.995247 0 0 0 0.5262,-1.74194 162.87654,26.995247 0 0 0 -162.87639,-26.99511 z"
-                 style="fill:url(#linearGradient4305);fill-opacity:1" />
-              <rect
-                 inkscape:label="#rect4234-5"
-                 y="429.95575"
-                 x="363.77124"
-                 height="500.71829"
-                 width="324.8197"
-                 id="liquidLevel"
-                 style="fill:url(#linearGradient4359);fill-opacity:1" />
-            </g>
-            -->
-            <hmi-tank :min="0" :max="350" :value="tankLevel"
-               :transform="'matrix(0.47581499,0,0,0.46621124,-97.864856,-156.076)'">
-            </hmi-tank>
-
-            <hmi-tank :min="0" :max="350" :value="tankLevel2"
-               :transform="'matrix(0.47581499,0,0,0.46621124,-97.364855,129.924)'">
-            </hmi-tank>
-            <!--
-            <g
-               transform="matrix(0.47581499,0,0,0.46621124,-97.364855,129.924)"
-               id="tank2"
-               inkscape:label="tank2">
-              <path
-                 inkscape:connector-curvature="0"
-                 id="rect4234-8"
-                 d="m 526.41506,395.55805 a 162.87654,26.995247 0 0 0 -162.8779,26.99511 162.87654,26.995247 0 0 0 0.37222,1.74194 l -0.37222,0 0,512.23763 a 162.87654,26.995247 0 0 0 -0.46641,1.54252 162.87654,26.995247 0 0 0 162.8764,26.99648 162.87654,26.995247 0 0 0 162.61331,-26.12481 l 0.73099,0 0,-514.65182 -0.5262,0 a 162.87654,26.995247 0 0 0 0.5262,-1.74194 162.87654,26.995247 0 0 0 -162.87639,-26.99511 z"
-                 style="fill:url(#linearGradient4305-3);fill-opacity:1" />
-              <rect
-                 inkscape:label="#rect4234-5"
-                 y="429.95575"
-                 x="363.77124"
-                 height="500.71829"
-                 width="324.8197"
-                 id="liquidLevel-7"
-                 style="fill:url(#linearGradient4359-6);fill-opacity:1" />
-            </g>
-            -->
+            <hmi-valve :x="592" :y="182" :width="52.2" :height="44.8"></hmi-valve>
+            <hmi-valve :x="497.5" :y="304" :width="49.8" :height="52.2" :rotate="-90"></hmi-valve>
+            <hmi-boiler :x="689.3" :y="103.7" :width="229.3" :height="170.6">/</hmi-boiler>
+            <hmi-compressor :x="353.8" :y="176" :width="131.1" :height="79.7">/</hmi-compressor>
+            <hmi-hccremover :x="883" :y="300" :width="155" :height="159"></hmi-hccremover>
+            <hmi-reliquefier :x="466" :y="445" :width="141.3" :height="134"></hmi-reliquefier>
+            <hmi-tank :x="78.9" :y="20.3" :width="150.2" :height="255.5" :min="0" :max="350" :value="tankLevel"></hmi-tank>
+            <hmi-tank :x="78.9" :y="308.3" :width="150.2" :height="255.5" :min="0" :max="350" :value="tankLevel2"></hmi-tank>
           </g>
         </svg>
         <!-- SVG end -->
@@ -627,10 +321,22 @@
 
 <script>
   import HmiTank from '@/components/hmi/HmiTank'
+  import HmiBoiler from '@/components/hmi/HmiBoiler'
+  import HmiValve from '@/components/hmi/HmiValve'
+  import HmiCompressor from '@/components/hmi/HmiCompressor'
+  import HmiHccremover from '@/components/hmi/HmiHccremover'
+  import HmiReliquefier from '@/components/hmi/HmiReliquefier'
   import {EventBus} from '@/event-bus'
 
   export default {
-    components: { HmiTank },
+    components: {
+      HmiTank,
+      HmiBoiler,
+      HmiValve,
+      HmiCompressor,
+      HmiHccremover,
+      HmiReliquefier
+    },
     data () {
       return {
         tankLevel: 175,
@@ -681,22 +387,6 @@
 </script>
 
 <style scoped>
-#boiler {
-  fill: green;
-}
-
-#valve1 {
-  fill: purple;
-}
-
-#valve2 {
-  fill: green;
-}
-
-#compressor {
-  fill: green;
-}
-
 #hcc_remover {
   fill: green;
 }

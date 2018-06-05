@@ -54,10 +54,14 @@
 
       <v-flex xs12>
         <hmi-pump :width="250" :height="250" :color="'red'"></hmi-pump>
+        <hmi-tank :width="150" :height="250" :min="0" :max="350" :value="tankLevel"></hmi-tank>
+        <hmi-boiler :width="250" :height="150"></hmi-boiler>
+        <hmi-valve :width="250" :height="250"></hmi-valve>
       </v-flex>
-
       <v-flex xs12>
-        <hmi-tank :min="0" :max="350" :value="tankLevel" :width="'100px'" :height="'100px'"></hmi-tank>
+        <hmi-compressor :width="250" :height="250"></hmi-compressor>
+        <hmi-hccremover :width="250" :height="250"></hmi-hccremover>
+        <hmi-reliquefier :width="250" :height="250"></hmi-reliquefier>
       </v-flex>
 
     </v-layout>
@@ -74,6 +78,11 @@
   import HmiLed from '@/components/hmi/HmiLed'
   import HmiPump from '@/components/hmi/HmiPump'
   import HmiTank from '@/components/hmi/HmiTank'
+  import HmiBoiler from '@/components/hmi/HmiBoiler'
+  import HmiValve from '@/components/hmi/HmiValve'
+  import HmiCompressor from '@/components/hmi/HmiCompressor'
+  import HmiHccremover from '@/components/hmi/HmiHccremover'
+  import HmiReliquefier from '@/components/hmi/HmiReliquefier'
   import {EventBus} from '@/event-bus'
 
   export default {
@@ -86,7 +95,12 @@
       HmiButton,
       HmiLed,
       HmiPump,
-      HmiTank
+      HmiTank,
+      HmiBoiler,
+      HmiValve,
+      HmiCompressor,
+      HmiHccremover,
+      HmiReliquefier
     },
     computed: {
       hmi_button_options1 () {

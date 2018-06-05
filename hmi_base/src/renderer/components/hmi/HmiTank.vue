@@ -1,10 +1,12 @@
 <template>
   <svg
      version="1.1"
+     :x="x"
+     :y="y"
      :width="width"
      :height="height"
      preserveAspectRatio="none"
-     viewBox="0 0 1052.3622 744.09448"
+     viewBox="0 0 326.22071 569.51367"
      sodipodi:docname="tank.svg">
     <defs
        id="defs4">
@@ -53,24 +55,12 @@
        bordercolor="#666666"
        borderopacity="1.0"
        showgrid="false"/>
-    <metadata
-       id="metadata7">
-      <rdf:RDF>
-        <cc:Work
-           rdf:about="">
-          <dc:format>image/svg+xml</dc:format>
-          <dc:type
-             rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-          <dc:title></dc:title>
-        </cc:Work>
-      </rdf:RDF>
-    </metadata>
     <g
-      :transform="transform">
+       transform="translate(-363.07075,-395.55805)">
       <path
          style="fill:url(#linearGradient4305);fill-opacity:1"
          d="m 526.41506,395.55805 a 162.87654,26.995247 0 0 0 -162.8779,26.99511 162.87654,26.995247 0 0 0 0.37222,1.74194 l -0.37222,0 0,512.23763 a 162.87654,26.995247 0 0 0 -0.46641,1.54252 162.87654,26.995247 0 0 0 162.8764,26.99648 162.87654,26.995247 0 0 0 162.61331,-26.12481 l 0.73099,0 0,-514.65182 -0.5262,0 a 162.87654,26.995247 0 0 0 0.5262,-1.74194 162.87654,26.995247 0 0 0 -162.87639,-26.99511 z"
-         />
+         id="rect4234"/>
       <rect
          style="fill:url(#linearGradient4359);fill-opacity:1"
          ref="liquidLevel"
@@ -89,8 +79,10 @@
     },
     props: {
       transform: { type: String, default: 'scale(1, 1)' },
-      width: { type: String, default: null },
-      height: { type: String, default: null },
+      x: { type: Number, default: 0 },
+      y: { type: Number, default: 0 },
+      width: { type: Number },
+      height: { type: Number },
       min: { type: Number },
       max: { type: Number },
       value: { type: Number }
