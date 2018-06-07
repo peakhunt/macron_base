@@ -55,7 +55,12 @@
       <v-flex xs12>
         <hmi-pump :width="250" :height="250" :color="'red'"></hmi-pump>
         <hmi-tank :width="150" :height="250" :min="0" :max="350" :value="tankLevel"></hmi-tank>
-        <hmi-boiler :width="250" :height="150"></hmi-boiler>
+        <hmi-boiler :width="250" :height="150"
+                            :options="hmi_icon_options"
+                            :runningChnl="20"
+                            :startingChnl="2"
+                            :stoppingChnl="2"
+                            :alarms="[]">/</hmi-boiler>
         <hmi-valve :width="250" :height="250"></hmi-valve>
       </v-flex>
       <v-flex xs12>
@@ -264,6 +269,18 @@
           ],
           fontNumbersSize: 15
         })
+      },
+      hmi_icon_options () {
+        var def = {
+          onColor: 'green',
+          offColor: 'black',
+          backgroundNormal: '#000000',
+          backgroundMinor: '#ffff00',
+          backgroundMajor: '#ffa500',
+          backgroundCritical: '#ff0000'
+        }
+
+        return Object.assign({}, def)
       }
     },
     data () {
