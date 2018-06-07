@@ -35,7 +35,7 @@
 
         </v-list>
       </v-navigation-drawer>
-      <v-toolbar fixed app :clipped-left="clipped">
+      <v-toolbar style="z-index: 200;" fixed app :clipped-left="clipped">
         <v-toolbar-side-icon @click.native.stop="drawer = !drawer"></v-toolbar-side-icon>
         <v-btn 
           icon
