@@ -1,3 +1,6 @@
+<template>
+</template>
+
 <script>
   import {EventBus} from '@/event-bus'
   import utils from '@/utils'
@@ -118,3 +121,6 @@
     }
   }
 </script>
+
+<style scoped>
+</style>
