@@ -1,4 +1,4 @@
-// import Vue from 'vue'
+import Vue from 'vue'
 
 const state = {
   channels: {},
@@ -23,7 +23,8 @@ const mutations = {
 
     var chnlNum = copy.chnl_num
 
-    state.channels[chnlNum] = copy
+    // state.channels[chnlNum] = copy
+    Vue.set(state.channels, chnlNum, copy)
   },
   CLEAR_CHANNELS (state) {
     state.channels = {}

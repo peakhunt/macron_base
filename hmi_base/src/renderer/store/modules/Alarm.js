@@ -1,4 +1,4 @@
-// import Vue from 'vue'
+import Vue from 'vue'
 
 var currentAlarmHash = {
 }
@@ -17,7 +17,8 @@ const mutations = {
     copy.state = 'inactive'
     copy.time = 0
 
-    state.alarms[copy.alarm_num] = copy
+    // state.alarms[copy.alarm_num] = copy
+    Vue.set(state.alarms, copy.alarm_num, copy)
   },
   CLEAR_ALARMS (state) {
     state.alarms = {}
