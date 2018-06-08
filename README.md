@@ -4,13 +4,13 @@
 
 ### Milestone-4
 Goals
-1. Runtime configuration sync
+1. ~~Runtime configuration sync~~
 
 2. common widgets for visual HMI development
-   * label widget with alarm indication
-   * gauge widget with alarm indication
-   * button widget with alarm & progress indication 
-   * mimic framework for data & system visualization
+   * ~~label widget with alarm indication~~
+   * ~~gauge widget with alarm indication~~
+   * ~~button widget with alarm & progress indication~~
+   * ~~mimic framework for data & system visualization~~
    * common dashboard framework (alarm summary and etc.)
 
 3. Control app library for faster & easier control app development on top of base framework.
