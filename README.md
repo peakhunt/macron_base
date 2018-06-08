@@ -20,6 +20,9 @@ Goals
 5. Advantech Local I/O module integration
 
 ![Linear & Radial Gauges](captures/gauges.png "linear and radial gauges")
+![Widget Demo1](captures/widget_demo1.png "widget demo1")
+![Widget Demo2](captures/widget_demo2.png "widget demo2")
+![Mimic Demo](captures/mimic_demo.png "mimic demo")
 
 ### Milestone-3 (Reached on May/25/2018)
 1. signal logger & realtime/offline tracing with line chart
