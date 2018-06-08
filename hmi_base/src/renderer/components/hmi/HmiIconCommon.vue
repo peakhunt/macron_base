@@ -2,11 +2,11 @@
 </template>
 
 <script>
-  import {EventBus} from '@/event-bus'
-  import utils from '@/utils'
+  import HmiCommon from '@/components/hmi/HmiCommon'
 
   export default {
     name: 'HmiIconCommon',
+    mixins: [HmiCommon],
     props: {
       alarms: { type: Array, default: null },
       options: { type: Object, default: {} },
@@ -14,43 +14,9 @@
       startingChnl: { type: Number },
       stoppingChnl: { type: Number }
     },
-    created () {
-      EventBus.$on('global500msTick', this.toggleTick)
-    },
-    beforeDestroy () {
-      EventBus.$off('global500msTick', this.toggleTick)
-    },
     computed: {
-      highest_alarm_num () {
-        if (this.alarms === null || this.alarms.length === 0) {
-          return -1
-        }
-
-        var highestRank = -1
-        var highestAlarm = -1
-
-        this.alarms.forEach((alarmNum) => {
-          if (this.isAlarmActive(alarmNum) === false) {
-            return
-          }
-
-          var severity = this.$store.getters.alarm(alarmNum).severity
-          var currentRank = utils.getAlarmRank(severity)
-
-          if (currentRank > highestRank) {
-            highestRank = currentRank
-            highestAlarm = alarmNum
-          }
-        })
-        return highestAlarm
-      },
       isRunning () {
-        var v
-
-        v = this.$store.getters.channel(this.runningChnl).eng_val
-        console.log('======== ' + v + ' =========')
-
-        return v
+        return this.$store.getters.channel(this.runningChnl).eng_val
       },
       isStarting () {
         return this.$store.getters.channel(this.startingChnl).eng_val
@@ -79,87 +45,33 @@
           backgroundColor: this.options.offColor
         }
       },
-      severityColor () {
-        var severity = this.$store.getters.alarm(this.highest_alarm_num).severity
-        var obj = {
-          backgroundColor: this.options.backgroundNormal
-        }
-
-        switch (severity) {
-          case 'minor':
-            obj = {
-              backgroundColor: this.options.backgroundMinor
-            }
-            break
-
-          case 'major':
-            obj = {
-              backgroundColor: this.options.backgroundMajor
-            }
-            break
-
-          case 'critical':
-            obj = {
-              backgroundColor: this.options.backgroundCritical
-            }
-        }
-        return obj
-      },
       backgroundColor () {
         var highestActiveAlarm
-        var c
 
         highestActiveAlarm = this.highest_alarm_num
 
         if (highestActiveAlarm === -1) {
-          c = this.runningColor
-          return c.backgroundColor
+          return this.runningColor.backgroundColor
         }
 
         var state = this.$store.getters.alarm(highestActiveAlarm).state
+        var severity = this.$store.getters.alarm(highestActiveAlarm).severity
 
         switch (state) {
           case 'active':
-            c = this.severityColor
-            break
+            return this.getSeverityColor(severity).backgroundColor
 
           case 'pending':
           case 'inactive_pending':
             if (this.tickValue === true) {
-              c = this.severityColor
-            } else {
-              c = this.runningColor
+              return this.getSeverityColor(severity).backgroundColor
             }
-            break
-
-          default:
-            c = {
-              backgroundColor: this.options.backgroundNormal
-            }
-            break
+            return this.getSeverityColor('normal').backgroundColor
         }
-        return c.backgroundColor
+        return this.getSeverityColor('normal').backgroundColor
       }
     },
     methods: {
-      toggleTick () {
-        this.tickValue = !this.tickValue
-      },
-      isAlarmActive (alarmNum) {
-        var state = this.$store.getters.alarm(alarmNum).state
-
-        if (state === 'active' ||
-            state === 'pending' ||
-            state === 'inactive_pending') {
-          return true
-        }
-        return false
-      }
-    },
-    data () {
-      return {
-        tickValue: false
-      }
     }
   }
 </script>

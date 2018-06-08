@@ -6,7 +6,7 @@
    :height="height"
    viewBox="0 0 512.00216 403.99997"
    preserveAspectRatio="none"
-   fill="green">
+   :fill="backgroundColor">
     <g :transform="transform">
       <g transform="translate(1.9987991e-4,-54.001)">
         <g>
@@ -44,27 +44,21 @@
 </template>
 
 <script>
+  import HmiIconCommon from '@/components/hmi/HmiIconCommon'
+
   export default {
     name: 'HmiValve',
+    mixins: [HmiIconCommon],
     components: {
     },
     props: {
-      rotate: { type: Number, default: 0 },
+      transform: { type: String, default: 'scale(1, 1)' },
       x: { type: Number, default: 0 },
       y: { type: Number, default: 0 },
       width: { type: Number },
       height: { type: Number }
     },
-    data () {
-      return {
-        transform: 'scale(1,1)'
-      }
-    },
     methods: {
-    },
-    mounted () {
-      this.transform = 'rotate(' + this.rotate + ' 256.00108 201.999985)'
-      console.log(this.transform)
     },
     watch: {
     }

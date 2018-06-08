@@ -316,20 +316,45 @@
                  id="layer2"
                  inkscape:label="equipments"
                  transform="translate(0,3.5188977e-5)">
-                <hmi-valve :x="592" :y="182" :width="52.2" :height="44.8"></hmi-valve>
-                <hmi-valve :x="497.5" :y="304" :width="49.8" :height="52.2" :rotate="-90"></hmi-valve>
+                <hmi-valve :x="592" :y="182" :width="52.2" :height="44.8"
+                           :options="hmi_icon_options"
+                           :runningChnl="20"
+                           :startingChnl="2"
+                           :stoppingChnl="2"></hmi-valve>
+                <hmi-valve :x="497.5" :y="304" :width="49.8" :height="52.2" :rotate="-90"
+                           :options="hmi_icon_options"
+                           :runningChnl="2"
+                           :startingChnl="20"
+                           :stoppingChnl="2"></hmi-valve>
                 <hmi-boiler :x="689.3"
                             :y="103.7"
                             :width="229.3"
                             :height="170.6"
                             :options="hmi_icon_options"
-                            :runningChnl="20"
+                            :runningChnl="2"
                             :startingChnl="2"
                             :stoppingChnl="2"
-                            :alarms="[1]">/</hmi-boiler>
-                <hmi-compressor :x="353.8" :y="176" :width="131.1" :height="79.7">/</hmi-compressor>
-                <hmi-hccremover :x="883" :y="300" :width="155" :height="159"></hmi-hccremover>
-                <hmi-reliquefier :x="466" :y="445" :width="141.3" :height="134"></hmi-reliquefier>
+                            :alarms="[20]">/</hmi-boiler>
+                <hmi-compressor :x="353.8" :y="176" :width="131.1" :height="79.7"
+                                :options="hmi_icon_options"
+                                :runningChnl="20"
+                                :startingChnl="2"
+                                :stoppingChnl="2">/</hmi-compressor>
+                <hmi-hccremover :x="883"
+                                :y="300"
+                                :width="155"
+                                :height="159"
+                                :options="hmi_icon_options"
+                                :runningChnl="20"
+                                :startingChnl="2"
+                                :stoppingChnl="2"
+                                :alarms="[1]"></hmi-hccremover>
+                <hmi-reliquefier :x="466" :y="445" :width="141.3" :height="134"
+                                 :options="hmi_icon_options"
+                                 :runningChnl="2"
+                                 :startingChnl="2"
+                                 :stoppingChnl="2"
+                                 :alarms="[20]"></hmi-reliquefier>
                 <hmi-tank :x="78.9" :y="20.3" :width="150.2" :height="255.5" :min="0" :max="350" :value="tankLevel"></hmi-tank>
                 <hmi-tank :x="78.9" :y="308.3" :width="150.2" :height="255.5" :min="0" :max="350" :value="tankLevel2"></hmi-tank>
               </g>

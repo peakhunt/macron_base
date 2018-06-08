@@ -61,12 +61,31 @@
                             :startingChnl="2"
                             :stoppingChnl="2"
                             :alarms="[]">/</hmi-boiler>
-        <hmi-valve :width="250" :height="250"></hmi-valve>
+        <hmi-valve :width="250" :height="250"
+                   :options="hmi_icon_options"
+                   :runningChnl="20"
+                   :startingChnl="2"
+                   :stoppingChnl="2"></hmi-valve>
       </v-flex>
       <v-flex xs12>
-        <hmi-compressor :width="250" :height="250"></hmi-compressor>
-        <hmi-hccremover :width="250" :height="250"></hmi-hccremover>
-        <hmi-reliquefier :width="250" :height="250"></hmi-reliquefier>
+        <hmi-compressor :width="250" :height="250"
+                        :options="hmi_icon_options"
+                        :runningChnl="20"
+                        :startingChnl="2"
+                        :stoppingChnl="2"
+                        :alarms="[]"></hmi-compressor>
+        <hmi-hccremover :width="250" :height="250"
+                        :options="hmi_icon_options"
+                        :runningChnl="20"
+                        :startingChnl="2"
+                        :stoppingChnl="2"
+                        :alarms="[]"></hmi-hccremover>
+        <hmi-reliquefier :width="250" :height="250"
+                         :options="hmi_icon_options"
+                         :runningChnl="20"
+                         :startingChnl="2"
+                         :stoppingChnl="2"
+                         :alarms="[]"></hmi-reliquefier>
       </v-flex>
 
     </v-layout>

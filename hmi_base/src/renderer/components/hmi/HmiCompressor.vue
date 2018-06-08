@@ -6,7 +6,7 @@
      :height="height"
      viewBox="0 0 925.588 675.99999"
      preserveAspectRatio="none"
-     fill="green">
+     :fill="backgroundColor">
     <g transform="translate(0,-124.794)">
       <path d="m 612.744,273.408 251.791,0 c 9.541,0 17.277,-7.736 17.277,-17.278 l 0,-46.801 c 0,-9.542 -7.736,-17.278 -17.277,-17.278 l -282.101,0 c 4.67,9.079 9.082,18.769 13.207,29.097 6.443,16.135 12.158,33.64 17.103,52.26 z"/>
       <path d="m 925.588,362.705 c 0,-9.542 -7.736,-17.278 -17.277,-17.278 l -281.071,0 c 3.758,26.027 6.252,53.305 7.404,81.357 l 273.664,0 c 9.543,0 17.279,-7.736 17.279,-17.278 l 0,-46.801 10e-4,0 z"/>
@@ -18,27 +18,21 @@
 </template>
 
 <script>
+  import HmiIconCommon from '@/components/hmi/HmiIconCommon'
+
   export default {
     name: 'HmiCompressor',
+    mixins: [HmiIconCommon],
     components: {
     },
     props: {
-      rotate: { type: Number, default: 0 },
+      transform: { type: String, default: 'scale(1, 1)' },
       x: { type: Number, default: 0 },
       y: { type: Number, default: 0 },
       width: { type: Number },
       height: { type: Number }
     },
-    data () {
-      return {
-        transform: 'scale(1,1)'
-      }
-    },
     methods: {
-    },
-    mounted () {
-      this.transform = 'rotate(' + this.rotate + ' 500 500)'
-      console.log(this.transform)
     },
     watch: {
     }
