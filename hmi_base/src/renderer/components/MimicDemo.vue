@@ -15,10 +15,10 @@
             <hmi-value-box style="position: absolute; z-index: 100; top: 170.3px; left: 140.9px;" :chnl="11" :alarms="[2]"
              :options="hmi_value_box_options2"></hmi-value-box>
 
-            <hmi-radial-gauge style="position: absolute; z-index: 100; top: -90px; left: 390px;" :chnl="11" :alarms="[4]" :options="hmi_gauge3_option">
+            <hmi-radial-gauge style="position: absolute; z-index: 100; top: 0px; left: 390px;" :chnl="11" :alarms="[4]" :options="hmi_gauge3_option">
             </hmi-radial-gauge>
 
-            <hmi-radial-gauge style="position: absolute; z-index: 100; top: 330px; left: 290px;" :chnl="11" :alarms="[4]" :options="hmi_gauge3_option">
+            <hmi-radial-gauge style="position: absolute; z-index: 100; top: 420px; left: 290px;" :chnl="11" :alarms="[4]" :options="hmi_gauge3_option">
             </hmi-radial-gauge>
             
             <hmi-button style="position: absolute; z-index: 100; top: 60px; left: 600px;" :outChnl="20" :progChnl="2" :alarms="[1]" :interlock="1" :text="'Test Button'" :options="hmi_button_options1">
@@ -484,20 +484,21 @@
           borderShadowWidth: 0,
           borders: false,
           needleType: 'arrow',
-          needleShadow: true,
+          needleShadow: false,
           needleWidth: 0,
           needleCircleSize: 7,
           needleCircleOuter: true,
           needleCircleInner: false,
           numberSide: 'left',
           needleSide: 'left',
+          animation: false,
           animationDuration: 25,
           animationRule: 'linear',
           barWidth: 15,
           valueBox: true,
           valueBoxStroke: 5,
-          valueTextShadow: true,
-          valueDec: 1,
+          valueTextShadow: false,
+          valueDec: 2,
           barBeginCircle: 0,
           fontNumbersSize: 28,
           fontUnitsSize: 30,
@@ -522,6 +523,7 @@
         return Object.assign(ret, {title: 'Inlet 1',
           units: '°C',
           width: 180,
+          height: 180,
           minValue: -200,
           maxValue: 400,
           highlights: [
