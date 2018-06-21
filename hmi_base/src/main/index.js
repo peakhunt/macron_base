@@ -37,6 +37,8 @@ function createWindow () {
   })
 
   mainWindow.loadURL(winURL)
+  // uncomment this for production debugging hkim
+  // mainWindow.openDevTools()
 
   mainWindow.on('closed', () => {
     mainWindow = null
