@@ -16,15 +16,15 @@
 
 
 #define APP_TRACE_STRS  \
-  "APP_START"           \
-  "CLI_DRIVER"          \
-  "WEBS_DRIVER"         \
-  "WEBS_REQUEST"        \
-  "WEBL_REQUEST"        \
-  "MBS_DRIVER"          \
-  "MBM_DRIVER"          \
-  "CORE_DRIVER"         \
-  "LOGGER"
+  "APP_START",          \
+  "CLI_DRIVER",         \
+  "WEBS_DRIVER",        \
+  "WEBS_REQUEST",       \
+  "WEBL_REQUEST",       \
+  "MBS_DRIVER",         \
+  "MBM_DRIVER",         \
+  "CORE_DRIVER",        \
+  "LOGGER",
 
 
 #endif /*!__APP_TRACE_DEF_H__ */

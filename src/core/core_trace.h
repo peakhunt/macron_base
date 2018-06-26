@@ -9,7 +9,7 @@
 
 
 #define CORE_TRACE_STRS  \
-  "CHANNEL"             \
-  "CHANNELM"
+  "CHANNEL",             \
+  "CHANNELM",
 
 #endif /* !__CORE_TRACE_DEF_H__ */
