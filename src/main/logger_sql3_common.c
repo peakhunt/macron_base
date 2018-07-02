@@ -115,8 +115,15 @@ logger_db_set_trace_channels(sqlite3* db, uint32_t* chnls, uint32_t n_chnls, uns
     "delete from channel_trace";
   const static char*    sql_cmd_buffer_insert = 
     "insert into channel_trace (chnl_num, time_started) values (?1, ?2)";
+#if 0
   const static char*    sql_cmd_buffer_clear =
     "delete from channel_log where not exists (select * from channel_trace where channel_trace.chnl_num = channel_log.ch_num);";
+#else
+  // for now whenever there is a new set request, just delete everything
+  // we have some performance problem with deleting
+  const static char*    sql_cmd_buffer_clear =
+    "delete from channel_log;";
+#endif
   sqlite3_stmt*         stmt;
   const char*           sql_error;
   int                   ret;
