@@ -37,27 +37,14 @@
       </v-navigation-drawer>
       <v-toolbar style="z-index: 200;" fixed app :clipped-left="clipped">
         <v-toolbar-side-icon @click.native.stop="drawer = !drawer"></v-toolbar-side-icon>
-        <v-btn 
-          icon
-          @click.native.stop="miniVariant = !miniVariant"
-        >
+
+        <v-btn icon @click.native.stop="miniVariant = !miniVariant">
           <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
         </v-btn>
-        <v-btn
-          icon
-          @click.native.stop="clipped = !clipped"
-        >
-          <v-icon>web</v-icon>
-        </v-btn>
-        <v-btn
-          icon
-          @click.native.stop="fixed = !fixed"
-        >
-          <v-icon>remove</v-icon>
-        </v-btn>
+
         <v-toolbar-title v-text="title"></v-toolbar-title>
-        <v-spacer></v-spacer>
       </v-toolbar>
+
       <v-content>
         <v-container fluid fill-height>
           <v-slide-y-transition mode="out-in">
@@ -147,7 +134,7 @@
       }
     },
     data: () => ({
-      clipped: false,
+      clipped: true,
       drawer: true,
       fixed: false,
       items: [
