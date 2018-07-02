@@ -170,6 +170,10 @@ MIGRATION_SOURCES := $(LIB_UTILS_SOURCES) src/app/config_migration.c
 MIGRATION_OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(MIGRATION_SOURCES:.c=.o)))
 vpath %.c $(sort $(dir $(MIGRATION_SOURCES)))
 
+SQLITE3_SOURCES := test/sqlite3_test.c
+SQLITE3_OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(SQLITE3_SOURCES:.c=.o)))
+vpath %.c $(sort $(dir $(SQLITE3_SOURCES)))
+
 #######################################
 # C source build rule
 #######################################
@@ -207,6 +211,10 @@ test: $(BUILD_DIR)/test_$(TARGET)
 $(BUILD_DIR)/config_migration: $(MIGRATION_OBJECTS) Makefile
 	@echo "[LD]         $@"
 	$Q$(CC) $(MIGRATION_OBJECTS) $(LDFLAGS) -o $@
+
+$(BUILD_DIR)/sqlite3_test: $(SQLITE3_OBJECTS) Makefile
+	@echo "[LD]         $@"
+	$Q$(CC) $(SQLITE3_OBJECTS) $(LDFLAGS) -o $@
 
 #######################################
 # clean up

@@ -15,6 +15,7 @@ logger_db_open(const char* path)
   
   sqlite3_busy_timeout(sq3, 5000);    // to deal with "database is locked"
 
+#if 0
   //
   // set incremental vacuum
   //
@@ -22,6 +23,11 @@ logger_db_open(const char* path)
   {
     TRACE(DEBUG, "failed to set auto_vacuum\n");
   }
+#else
+  sqlite3_exec(sq3, "pragma cache_size=100", 0, 0, 0);
+  sqlite3_exec(sq3, "pragma journal_mode = WAL", 0, 0, 0);
+  sqlite3_exec(sq3, "pragma journal_size_limit = 40960", 0, 0, 0);
+#endif
 
   return sq3;
 }
