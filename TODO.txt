@@ -1,2 +1,12 @@
+0-1) raw sensor value interpretation
+0-2) variable mapper
+0-3) standard PLC operator functions
+
 1) IO driver: sensor fault handling 
 2) channel core: init/fail safety and sensor fault
+
+1) HMI Graphic Widget (tank/pump/boiler/valve)
+2) Widget Alarm List
+3) Demo Mimic
+
+4) Control App Programming
