@@ -4,18 +4,18 @@
 		"last_update":	"Mar/30/2018"
 	},
 	"update_info":	{
-		"revision":	68,
-		"update_time":	"Wed May  9 11:44:34 2018\n"
+		"revision":	123,
+		"update_time":	"Tue Jun 26 10:35:21 2018\n"
 	},
 	"core_config":	{
 		"loop_interval":	10
 	},
-  "logging": {
-    "interval": 100,
-    "signal_log_keep": 120,
-    "alarm_log_keep": 730,
-    "log_clean_period": 120
-  },
+	"logging":	{
+		"interval":	100,
+		"signal_log_keep":	72,
+		"alarm_log_keep":	730,
+		"log_clean_period":	120
+	},
 	"cli":	{
 		"prompt":	"macron_bog> ",
 		"telnet":	{
@@ -34,7 +34,7 @@
 	"web":	{
 		"http_address":	"8000",
 		"doc_root":	"./",
-    "loggerif_http_address": "8001",
+		"loggerif_http_address":	"8001",
 		"loggerif_doc_root":	"./"
 	},
 	"modbus_slave_list":	[{
@@ -100,7 +100,65 @@
 					"channel":	11
 				}]
 		}],
-	"modbus_master_list":	[],
+	"modbus_master_list":	[{
+			"schedule_finish_delay":	0,
+			"inter_request_delay":	20,
+			"timeout":	2000,
+			"protocol":	"tcp",
+			"dest_ip":	"192.168.227.211",
+			"dest_port":	9000,
+			"reg_map":	[{
+					"slave":	1,
+					"reg":	"coil",
+					"address":	1,
+					"channel":	1
+				}, {
+					"slave":	1,
+					"reg":	"coil",
+					"address":	2,
+					"channel":	2
+				}, {
+					"slave":	1,
+					"reg":	"coil",
+					"address":	3,
+					"channel":	23
+				}, {
+					"slave":	1,
+					"reg":	"hold",
+					"address":	10,
+					"channel":	11
+        }, {
+					"slave":	1,
+					"reg":	"hold",
+					"address":	11,
+					"channel":	22
+				}],
+			"request_schedule":	[{
+					"slave":	1,
+					"op":	"read",
+					"reg":	"coil",
+					"reg_addr":	1,
+					"num_regs":	1
+				}, {
+					"slave":	1,
+					"op":	"read",
+					"reg":	"hold",
+					"reg_addr":	10,
+					"num_regs":	1
+        }, {
+					"slave":	1,
+					"op":	"write",
+					"reg":	"hold",
+					"reg_addr":	11,
+					"num_regs":	1
+        }, {
+					"slave":	1,
+					"op":	"write",
+					"reg":	"coil",
+					"reg_addr":	2,
+					"num_regs":	2
+				}]
+		}],
 	"channels":	[{
 			"name":	"test channel #1",
 			"chnl_num":	1,
@@ -186,18 +244,58 @@
 			"chnl_num":	11,
 			"chnl_dir":	"input",
 			"chnl_type":	"analog",
+			"init_val":	0,
+			"failsafe_val":	0,
+			"min_val":	1,
+			"max_val":	30,
+      "sensor_type": "wago_4_20ma",
 			"lookup_table":	[{
 					"raw":	0,
 					"eng":	0
 				}, {
 					"raw":	10,
 					"eng":	10
-				}],
+				}, {
+					"raw":	20,
+					"eng":	20
+				}]
+		}, {
+			"name":	"test channel #20",
+			"chnl_num":	20,
+			"chnl_dir":	"input",
+			"chnl_type":	"digital",
+			"init_val":	false,
+			"failsafe_val":	false,
+			"lookup_table":	[]
+		}, {
+			"name":	"test analog channel #22",
+			"chnl_num":	22,
+			"chnl_dir":	"output",
+			"chnl_type":	"analog",
 			"init_val":	0,
-			"failsafe_val":	2,
-			"min_val":	3,
-			"max_val":	30
-		}],
+			"failsafe_val":	0,
+			"min_val":	1,
+			"max_val":	30,
+      "sensor_type": "wago_4_20ma",
+			"lookup_table":	[{
+					"raw":	0,
+					"eng":	0
+				}, {
+					"raw":	10,
+					"eng":	10
+				}, {
+					"raw":	20,
+					"eng":	20
+				}]
+    }, {
+			"name":	"test channel #23",
+			"chnl_num":	23,
+			"chnl_dir":	"output",
+			"chnl_type":	"digital",
+			"init_val":	false,
+			"failsafe_val":	false,
+			"lookup_table":	[]
+    }],
 	"alarms":	[{
 			"name":	"test alarm #1",
 			"alarm_num":	1,
@@ -205,7 +303,7 @@
 			"trigger_type":	"digital",
 			"severity":	"critical",
 			"set_point":	"off",
-			"delay":	50
+			"delay":	100
 		}, {
 			"name":	"test alarm #2",
 			"alarm_num":	2,
@@ -228,7 +326,7 @@
 			"chnl_num":	4,
 			"trigger_type":	"digital",
 			"severity":	"major",
-			"set_point":	"on",
+			"set_point":	"off",
 			"delay":	0
 		}, {
 			"name":	"test alarm #5",
@@ -252,7 +350,7 @@
 			"chnl_num":	7,
 			"trigger_type":	"digital",
 			"severity":	"minor",
-			"set_point":	"on",
+			"set_point":	"off",
 			"delay":	0
 		}, {
 			"name":	"test alarm #8",
@@ -268,8 +366,8 @@
 			"chnl_num":	9,
 			"trigger_type":	"digital",
 			"severity":	"minor",
-			"set_point":	"on",
-			"delay":	0
+			"set_point":	"off",
+			"delay":	2000
 		}, {
 			"name":	"test alarm #10",
 			"alarm_num":	10,
@@ -284,8 +382,8 @@
 			"chnl_num":	11,
 			"trigger_type":	"low",
 			"severity":	"minor",
-			"set_point":	1,
-			"delay":	1000
+			"set_point":	25,
+			"delay":	200
 		}, {
 			"name":	"test alarm #12 high",
 			"alarm_num":	12,
@@ -294,5 +392,21 @@
 			"severity":	"minor",
 			"set_point":	20,
 			"delay":	1000
-		}]
+		}, {
+			"name":	"test alarm #20",
+			"alarm_num":	20,
+			"chnl_num":	20,
+			"trigger_type":	"digital",
+			"severity":	"minor",
+			"set_point":	"on",
+			"delay":	0
+		}, {
+			"name":	"test alarm #23",
+			"alarm_num":	23,
+			"chnl_num":	23,
+			"trigger_type":	"digital",
+			"severity":	"minor",
+			"set_point":	"on",
+			"delay":	0
+    }]
 }

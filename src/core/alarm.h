@@ -46,6 +46,12 @@ typedef union
 
 typedef struct
 {
+  uint32_t          alarm_num;
+  alarm_state_t*    state;
+} alarm_var_t;
+
+typedef struct
+{
   struct list_head      le;
   struct list_head      le_for_active;
   BHashElement          hash_by_alarm_num;
@@ -64,6 +70,8 @@ typedef struct
   time_t                occur_time;
 
   observer_t            chnl_obs;
+
+  alarm_var_t*          alarm_var;
 } alarm_t;
 
 extern alarm_t* alarm_alloc(uint32_t alarm_num, uint32_t chnl_num, alarm_severity_t severity,

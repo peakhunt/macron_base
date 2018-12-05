@@ -163,3 +163,23 @@ alarm_manager_update_alarm_config(uint32_t alarm_num, alarm_runtime_config_t* cf
 
   return TRUE;
 }
+
+void
+alarm_manager_bind_alarm_vars(alarm_var_t* alarm_vars, int num_alarm_vars)
+{
+  alarm_t*    alarm;
+
+  for(int i = 0; i < num_alarm_vars; i++)
+  {
+    alarm = alarm_manager_alarm_get(alarm_vars[i].alarm_num);
+    if(alarm == NULL)
+    {
+      continue;
+    }
+
+    alarm->alarm_var = &alarm_vars[i];
+    *(alarm->alarm_var->state) = alarm->state;
+
+    alarm_manager_alarm_put(alarm);
+  }
+}

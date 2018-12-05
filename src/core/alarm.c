@@ -27,6 +27,11 @@ static inline void
 alarm_move_state(alarm_t* alarm, alarm_state_t new_state)
 {
   alarm->state = new_state;
+
+  if(alarm->alarm_var != NULL)
+  {
+    *(alarm->alarm_var->state) = alarm->state;
+  }
 }
 
 static inline void
@@ -189,6 +194,8 @@ alarm_alloc(uint32_t alarm_num, uint32_t chnl_num, alarm_severity_t severity,
   alarm->set_point    = set_point;
   alarm->delay        = delay;
   alarm->occur_time   = 0;
+
+  alarm->alarm_var    = NULL;
 
   return alarm;
 }

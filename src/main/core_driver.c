@@ -8,6 +8,7 @@
 #include "app_init_completion.h"
 #include "trace.h"
 #include "time_util.h"
+#include "app.h"
 
 static void app_core_thread_init(evloop_thread_t* thrd);
 static void app_core_thread_fini(evloop_thread_t* thrd);
@@ -28,14 +29,6 @@ static evloop_thread_t    _app_core_thread =
 static double _log_interval;
 
 static void
-app_core_run_application(void)
-{
-  //
-  // FIXME run control application
-  //
-}
-
-static void
 app_core_udpate(evloop_timer_t* t, void* arg)
 {
   unsigned long   start,
@@ -54,7 +47,7 @@ app_core_udpate(evloop_timer_t* t, void* arg)
   _stat.input_scan_avg = (_stat.input_scan_avg + took) / 2;
 
   start = time_util_get_sys_clock_in_ms();
-  app_core_run_application();
+  app_run();
   took = time_util_get_sys_clock_elapsed_in_ms(start);
 
   _stat.app_min = MIN(_stat.app_min, took);
@@ -89,6 +82,7 @@ app_core_thread_init(evloop_thread_t* thrd)
   evloop_timer_init(&_trace_timer, app_core_do_log, NULL);
   evloop_timer_start(&_trace_timer, _log_interval, _log_interval);
 
+  app_start();
   TRACE(CORE_DRIVER, "done initializing app_core\n");
 
   app_init_complete_signal();
@@ -159,6 +153,7 @@ __load_channels(void)
     {
       chnl->min_val       = chnl_cfg.min_val;
       chnl->max_val       = chnl_cfg.max_val;
+      chnl->sensor_type   = chnl_cfg.sensor_type;
 
       chnl->lookup_table  = __load_lookup_table(i);
     }
@@ -238,6 +233,8 @@ core_driver_init(void)
   __load_alarms();
 
   channel_manager_init_channels();
+
+  app_init();
 
   evloop_thread_run(&_app_core_thread);
 

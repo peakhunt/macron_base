@@ -134,6 +134,24 @@ ev_loggerif_handler(struct mg_connection* nc, int ev, void* ev_data)
     }
     break;
 
+  // https://github.com/cesanta/mongoose/blob/master/examples/websocket_chat/websocket_chat.c
+  case MG_EV_WEBSOCKET_HANDSHAKE_DONE:    // websocket connection is made
+    break;
+
+  case MG_EV_WEBSOCKET_FRAME:             // websocket data received
+    /*
+    struct websocket_message *wm = (struct websocket_message *) ev_data;
+    struct mg_str d = {(char *) wm->data, wm->size};
+    for (c = mg_next(nc->mgr, NULL); c != NULL; c = mg_next(nc->mgr, c)) {
+      if (c == nc) continue; 
+      mg_send_websocket_frame(c, WEBSOCKET_OP_TEXT, buf, strlen(buf));
+    }
+    */
+    break;
+
+  case MG_EV_CLOSE:                       // normal or websocket connection is closed
+    break;
+
   default:
     break;
   }

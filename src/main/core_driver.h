@@ -12,6 +12,7 @@ typedef struct
   channel_eng_value_t init_val;
   channel_eng_value_t failsafe_val;
   channel_direction_t chnl_dir;
+  channel_sensor_t    sensor_type;
   //
   // only for analog channels
   //

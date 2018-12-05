@@ -24,4 +24,6 @@ extern int alarm_manager_get_alarm_status(uint32_t alarm_num, alarm_status_t* st
 
 extern bool alarm_manager_update_alarm_config(uint32_t alarm_num, alarm_runtime_config_t* cfg);
 
+extern void alarm_manager_bind_alarm_vars(alarm_var_t* alarm_vars, int num_alarm_vars);
+
 #endif /* !__ALARM_MANAGER_DEF_H__ */

@@ -3,11 +3,13 @@
 
 #include "channel.h"
 #include "lookup_table.h"
+#include "io_var.h"
 
 typedef struct
 {
   channel_type_t          chnl_type;
   channel_eng_value_t     eng_val;
+  double                  raw_sensor_val;
   uint32_t                raw_val;
   bool                    sensor_fault;
 } channel_status_t;
@@ -46,5 +48,7 @@ extern bool channel_manager_update_channel_config(uint32_t chnl_num, channel_run
 extern bool channel_manager_set_trace_channels(uint32_t* chnls, uint32_t n_chnls);
 
 extern void channel_manager_do_log(void);
+
+extern void channel_manager_bind_io_vars(io_var_t* io_vars, int num_io_vars);
 
 #endif /* !__CHANNEL_MANAGER_DEF_H__ */

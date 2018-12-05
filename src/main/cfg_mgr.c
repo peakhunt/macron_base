@@ -117,6 +117,33 @@ cfg_mgr_get_double(cJSON* node, const char* name)
   return cfg_mgr_get_node(node, name)->valuedouble;
 }
 
+static inline channel_sensor_t
+cfg_mgr_get_sensor_type(cJSON* node, const char* name)
+{
+  cJSON* child;
+  char*  str;
+  channel_sensor_t ret = channel_sensor_raw;
+
+  child = cfg_mgr_get_node(node, name);
+  if(child == NULL)
+  {
+    return channel_sensor_raw;
+  }
+
+  str = child->valuestring;
+
+  if(strcmp(str, "wago_4_20ma") == 0)
+  {
+    ret = channel_sensor_wago_4_20ma;
+  }
+  else if(strcmp(str, "wago_pt100") == 0)
+  {
+    ret = channel_sensor_wago_pt100;
+  }
+
+  return ret;
+}
+
 static inline char*
 cfg_mgr_get_str(cJSON* node, const char* name)
 {
@@ -879,6 +906,8 @@ cfg_mgr_get_channel_at(int ndx, core_driver_channel_config_t* chnl_cfg)
     chnl_cfg->failsafe_val.f  = cfg_mgr_get_double(node, "failsafe_val");
     chnl_cfg->min_val         = cfg_mgr_get_double(node, "min_val");
     chnl_cfg->max_val         = cfg_mgr_get_double(node, "max_val");
+
+    chnl_cfg->sensor_type     = cfg_mgr_get_sensor_type(node, "sensor_type");
   }
 
   str = cfg_mgr_get_str(node, "chnl_dir");

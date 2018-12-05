@@ -16,6 +16,8 @@
 #include "logger.h"
 #include "logger_sql3_common.h"
 
+#include "app.h"
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // private definitions
@@ -103,6 +105,10 @@ cli_command_core(cli_intf_t* intf, int argc, const char** argv)
     cli_printf(intf, "app max:         %d ms"CLI_EOL, stat.app_max);
     cli_printf(intf, "app avg:         %d ms"CLI_EOL, stat.app_avg);
   }
+  else if(strcmp(argv[1], "app_debug") == 0)
+  {
+    app_debug();
+  }
   else 
   {
     goto command_error;
@@ -112,7 +118,7 @@ cli_command_core(cli_intf_t* intf, int argc, const char** argv)
 
 command_error:
   cli_printf(intf, "invalid argument!!!"CLI_EOL CLI_EOL);
-  cli_printf(intf, "%s status"CLI_EOL, argv[0]);
+  cli_printf(intf, "%s status|app_debug"CLI_EOL, argv[0]);
 }
 
 static void
@@ -250,6 +256,7 @@ __print_out_channel_status(cli_intf_t* intf, uint32_t chnl_num, channel_status_t
   else
   {
     cli_printf(intf, "eng value:    %.2f"CLI_EOL, status->eng_val.f);
+    cli_printf(intf, "raw sensor:   %.2f"CLI_EOL, status->raw_sensor_val);
   }
   cli_printf(intf, "sensor fault: %s"CLI_EOL, status->sensor_fault ? "fault" : "normal");
 }

@@ -131,11 +131,7 @@ channel_manager_init_channels(void)
 
   list_for_each_entry(chnl, &_channels, le)
   {
-    // initialize all channel values to init value
-    chnl->eng_value = chnl->init_value;
-
-    // update raw value depending on channel direction
-    channel_update_raw_value(chnl);
+    channel_set_eng_value(chnl, chnl->init_value);
   }
 }
 
@@ -210,13 +206,9 @@ channel_manager_set_eng_value(uint32_t chnl_num, channel_eng_value_t v)
     return;
   }
 
-  chnl->eng_value = v;
-  eng_v = chnl->eng_value;
+  channel_set_eng_value(chnl, v);
 
-  if(chnl->chnl_dir == channel_direction_out)
-  {
-    channel_update_raw_value(chnl);
-  }
+  eng_v = chnl->eng_value;
 
   channel_manager_chnl_put(chnl);
 
@@ -240,15 +232,15 @@ channel_manager_update_input(void)
     {
       chnl->raw_value = chnl->raw_value_queued;
 
-      channel_update_eng_value(chnl);
+      channel_update_input(chnl);
       chnl->raw_value_avail = FALSE;
     }
 
     eng_v = chnl->eng_value;
 
-    pthread_mutex_unlock(&_chnl_mgr_lock);
-
     publisher_exec_notify(&chnl->chnl_update, (void*)&eng_v);
+
+    pthread_mutex_unlock(&_chnl_mgr_lock);
   }
 }
 
@@ -256,6 +248,7 @@ void
 channel_manager_update_output(void)
 {
   channel_t*    chnl;
+  channel_eng_value_t   eng_v;
 
   TRACE(CHANNELM, "updating output\n");
   list_for_each_entry(chnl, &_out_channels, le_by_dir)
@@ -263,10 +256,12 @@ channel_manager_update_output(void)
     pthread_mutex_lock(&_chnl_mgr_lock);
     TRACE(CHANNELM, "updating output for channel %d\n", chnl->chnl_num);
 
-    chnl->raw_value_queued = chnl->raw_value;
+    channel_update_output(chnl);
 
-    // XXX review later
-    //publisher_exec_notify(&chnl->chnl_update, chnl);
+    chnl->raw_value_queued = chnl->raw_value;
+    eng_v = chnl->eng_value;
+
+    publisher_exec_notify(&chnl->chnl_update, (void*)&eng_v);
 
     pthread_mutex_unlock(&_chnl_mgr_lock);
   }
@@ -358,10 +353,11 @@ channel_manager_get_channel_stat(uint32_t chnl_num, channel_status_t* status)
     return -1;
   }
 
-  status->chnl_type     = chnl->chnl_type;
-  status->eng_val       = chnl->eng_value;
-  status->raw_val       = chnl->raw_value;
-  status->sensor_fault  = chnl->sensor_fault;
+  status->chnl_type       = chnl->chnl_type;
+  status->eng_val         = chnl->eng_value;
+  status->raw_sensor_val  = chnl->raw_sensor_value;
+  status->raw_val         = chnl->raw_value;
+  status->sensor_fault    = chnl->sensor_fault;
 
   channel_manager_chnl_put(chnl);
 
@@ -379,13 +375,12 @@ channel_manager_update_channel_config(uint32_t chnl_num, channel_runtime_config_
     return FALSE;
   }
 
-  chnl->eng_value       = cfg->init_value;
   chnl->init_value      = cfg->init_value;
   chnl->failsafe_value  = cfg->failsafe_value;
   chnl->min_val         = cfg->min_val;
   chnl->max_val         = cfg->max_val;
 
-  channel_update_raw_value(chnl);
+  channel_set_eng_value(chnl, cfg->init_value);
 
   channel_manager_chnl_put(chnl);
 
@@ -456,4 +451,24 @@ channel_manager_do_log(void)
   }
 
   pthread_mutex_unlock(&_chnl_mgr_trace_lock);
+}
+
+void
+channel_manager_bind_io_vars(io_var_t* io_vars, int num_io_vars)
+{
+  channel_t*    chnl;
+
+  for(int i = 0; i < num_io_vars; i++)
+  {
+    chnl = channel_manager_chnl_get(io_vars[i].chnl_num);
+    if(chnl == NULL)
+    {
+      TRACE(CHANNELM, "%s can't find channel %d\n", __func__, io_vars[i].chnl_num);
+      continue;
+    }
+
+    channel_set_io_var(chnl, &io_vars[i]);
+
+    channel_manager_chnl_put(chnl);
+  }
 }

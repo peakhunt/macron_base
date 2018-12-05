@@ -80,7 +80,8 @@ src/main/webserver_api.c                            \
 src/main/webserver_api_loggerif.c                   \
 src/main/cfg_mgr.c                                  \
 src/main/logger_sql3_common.c                       \
-src/main/logger.c
+src/main/logger.c                                   \
+src/app/app.c
 
 TEST_C_SOURCE =                                     \
 test/cmd_option_test.c                              \
@@ -113,6 +114,7 @@ C_INCLUDES =                              \
 -Isrc/modbus                              \
 -Isrc/core                                \
 -Isrc/main                                \
+-Isrc/app                                 \
 -Isrc/mongoose                            \
 -I$(LIBEV_DIR)/include                    \
 -I$(SQLITE3_DIR)/include

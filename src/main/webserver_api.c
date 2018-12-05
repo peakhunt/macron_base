@@ -220,11 +220,11 @@ webapi_get_channel_status(struct mg_connection* nc, struct http_message* hm, str
 
   if(status.chnl_type == channel_type_analog)
   {
-    sprintf(data, "{ \"revision\": %d, \"chnl_num\": %d, \"eng_val\": %.2f, \"raw_val\": %d }",
+    sprintf(data, "{ \"revision\": %d, \"chnl_num\": %d, \"eng_val\": %.2f, \"raw_val\": %.2f }",
         revision,
         chnl_num,
         status.eng_val.f,
-        status.raw_val);
+        status.raw_sensor_val);
   }
   else
   {
@@ -285,10 +285,10 @@ webapi_get_channel_status_ranged(struct mg_connection* nc, struct http_message* 
 
     if(status.chnl_type == channel_type_analog)
     {
-      mg_printf_http_chunk(nc, "{\"chnl_num\": %d, \"eng_val\": %.2f, \"raw_val\": %d }",
+      mg_printf_http_chunk(nc, "{\"chnl_num\": %d, \"eng_val\": %.2f, \"raw_val\": %.2f }",
           chnl_num,
           status.eng_val.f,
-          status.raw_val);
+          status.raw_sensor_val);
     }
     else
     {
