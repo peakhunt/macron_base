@@ -7,11 +7,12 @@
 #include "evloop_thread.h"
 #include "evloop_timer.h"
 
+#include "app_blink.h"
+
 static evloop_timer_t         _test_timer;
 
 static double io_var_for_ch11;
 static double io_var_for_ch22;
-static bool   io_var_for_ch23;
 static bool   io_var_ch1;
 
 static bool   up_inc = TRUE;
@@ -35,8 +36,6 @@ static void
 test_timer_expire(evloop_timer_t* t, void* arg)
 {
   TRACE(CORE_DRIVER, "test_timer_expire\n");
-
-  io_var_for_ch23 = !io_var_for_ch23;
 
   if(up_inc)
   {
@@ -70,7 +69,8 @@ app_init(void)
   alarm_manager_bind_alarm_vars(alarm_mappings, 1);
 
   io_var_for_ch22   = 15.5;
-  io_var_for_ch23   = TRUE;
+
+  app_blink_init();
 }
 
 void
@@ -83,6 +83,7 @@ app_start(void)
 void
 app_run(void)
 {
+  app_blink_run();
 }
 
 void
