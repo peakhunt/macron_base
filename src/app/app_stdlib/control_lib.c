@@ -1,6 +1,15 @@
 #include "control_lib.h"
 #include "time_util.h"
 
+#ifdef CONTROL_LIB_TEST
+extern unsigned long time_now_in_ms(void);
+extern unsigned long time_delta_in_ms(unsigned long start);
+
+#else
+#define time_now_in_ms      time_util_get_sys_clock_in_ms
+#define time_delta_in_ms    time_util_get_sys_clock_elapsed_in_ms
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // SR Latch
@@ -66,11 +75,11 @@ rs_latch(rs_latch_t* rs, bool set, bool reset)
     // if set, reset is first respected
     if(reset == FALSE)
     {
-      rs->q = FALSE;
+      rs->q = TRUE;
     }
     else
     {
-      rs->q = TRUE;
+      rs->q = FALSE;
     }
   }
 }
@@ -147,10 +156,10 @@ ton(ton_t* ton, bool in, uint32_t pt)
   if(ton->prev_in == FALSE && in == TRUE)
   {
     // rising edge
-    ton->start_time   = time_util_get_sys_clock_in_ms();
+    ton->start_time   = time_now_in_ms();
     ton->tmr_running  = TRUE;
   }
-  else  if(ton->prev_in == TRUE && in == FALSE)
+  else if(ton->prev_in == TRUE && in == FALSE)
   {
     // falling edge
     ton->tmr_running  = FALSE;
@@ -161,11 +170,54 @@ ton(ton_t* ton, bool in, uint32_t pt)
 
   if(ton->tmr_running)
   {
-    if(time_util_get_sys_clock_elapsed_in_ms(ton->start_time) >= pt)
+    if(time_delta_in_ms(ton->start_time) >= pt)
     {
       // timed out
       ton->q = TRUE;
       ton->tmr_running = FALSE;
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// TOFF
+//
+////////////////////////////////////////////////////////////////////////////////
+void
+toff_init(toff_t* toff)
+{
+  toff->q            = TRUE;
+  toff->prev_in      = FALSE;
+  toff->tmr_running  = FALSE;
+  toff->start_time   = 0;
+}
+
+void
+toff(toff_t* toff, bool in, uint32_t pt)
+{
+  if(toff->prev_in == TRUE && in == FALSE)
+  {
+    // falling edge
+    toff->start_time  = time_now_in_ms();
+    toff->tmr_running = TRUE;
+  }
+  else if(toff->prev_in == FALSE && in == TRUE)
+  {
+    // rising edge
+    toff->tmr_running = FALSE;
+    toff->q           = TRUE;
+  }
+
+  toff->prev_in = in;
+
+  if(toff->tmr_running)
+  {
+    if(time_delta_in_ms(toff->start_time) >= pt)
+    {
+      // timed out
+      toff->q             = FALSE;
+      toff->tmr_running   = FALSE;
     }
   }
 }

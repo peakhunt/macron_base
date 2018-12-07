@@ -131,4 +131,29 @@ extern void ton(ton_t* ton, bool in, uint32_t pt);
   ton(&__t, __in, __pt);\
   __q = __t.q;
 
+/*
+          ________
+   IN-----|      |
+          | TOFF |--- Q
+   PT-----________
+
+   IN   : if falling edge, starts increasing internal timer
+          if rising edge, stops and resets internal timer
+   PT   : maximum programmed time
+   Q    : TRUE if programmed time is not elapsed
+*/ 
+typedef struct
+{
+  bool            q;
+  bool            prev_in;
+  bool            tmr_running;
+  unsigned long   start_time;
+} toff_t;
+
+extern void toff_init(toff_t* toff);
+extern void toff(toff_t* toff, bool in, uint32_t pt);
+#define TOFF(__t, __in, __q, __pt)\
+  toff(&__t, __in, __pt);\
+  __q = __t.q;
+
 #endif /* !__CONTROL_LIB_DEF_H__ */
