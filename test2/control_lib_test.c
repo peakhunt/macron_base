@@ -295,6 +295,69 @@ test_toff(void)
   CU_ASSERT(t.tmr_running == FALSE);
 }
 
+static void
+test_tp(void)
+{
+  tp_t      t;
+
+  time_util_reset();
+
+  tp_init(&t);
+  CU_ASSERT(t.q == FALSE);
+
+  // start
+  tp(&t, TRUE, 10);
+  CU_ASSERT(t.q == TRUE);
+
+  time_util_inc(5);
+  tp(&t, TRUE, 10);
+  CU_ASSERT(t.q == TRUE);
+
+  // timeout
+  time_util_inc(5);
+  tp(&t, TRUE, 10);
+  CU_ASSERT(t.q == FALSE);
+  tp(&t, FALSE, 10);
+
+  time_util_inc(5);
+
+  // start again
+  tp(&t, TRUE, 10);
+  CU_ASSERT(t.q == TRUE);
+
+  // oscillation during running
+  time_util_inc(1);
+  tp(&t, FALSE, 10);
+  CU_ASSERT(t.q == TRUE);
+
+  time_util_inc(1);
+  tp(&t, TRUE, 10);
+  CU_ASSERT(t.q == TRUE);
+
+  time_util_inc(1);
+  tp(&t, FALSE, 10);
+  CU_ASSERT(t.q == TRUE);
+
+  time_util_inc(7);
+  // timeout
+  tp(&t, FALSE, 10);
+  CU_ASSERT(t.q == FALSE);
+
+  time_util_inc(5);
+  // start again
+  tp(&t, TRUE, 10);
+  CU_ASSERT(t.q == TRUE);
+
+  // timeout
+  time_util_inc(10);
+  tp(&t, TRUE, 10);
+  CU_ASSERT(t.q == FALSE);
+
+  time_util_inc(5);
+  tp(&t, FALSE, 10);
+  CU_ASSERT(t.q == FALSE);
+}
+
 void
 control_lib_test(CU_pSuite pSuite)
 {
@@ -304,4 +367,5 @@ control_lib_test(CU_pSuite pSuite)
   CU_add_test(pSuite, "ftrig", test_ftrig);
   CU_add_test(pSuite, "ton", test_ton);
   CU_add_test(pSuite, "toff", test_toff);
+  CU_add_test(pSuite, "tp", test_tp);
 }

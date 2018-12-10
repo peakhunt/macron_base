@@ -156,4 +156,31 @@ extern void toff(toff_t* toff, bool in, uint32_t pt);
   toff(&__t, __in, __pt);\
   __q = __t.q;
 
+
+/*
+          ________
+   IN-----|      |
+          |  TP  |--- Q
+   PT-----________
+
+   IN   : if rising edge, starts timer if not already running
+          if false and timer is elapsed, reset the internal timer
+          Any change on IN during counting has no effect.
+   PT   : maximum programmed time
+   Q    : TRUE if timer is running
+*/
+typedef struct
+{
+  bool            q;
+  bool            prev_in;
+  bool            tmr_running;
+  unsigned long   start_time;
+} tp_t;
+
+extern void tp_init(tp_t* tp);
+extern void tp(tp_t* tp, bool in, uint32_t pt);
+#define TP(__t, __in, __q, __pt)\
+  tp(&__t, __in, __pt);\
+  __q = __t.q;
+
 #endif /* !__CONTROL_LIB_DEF_H__ */

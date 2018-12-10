@@ -221,3 +221,38 @@ toff(toff_t* toff, bool in, uint32_t pt)
     }
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// TP
+//
+////////////////////////////////////////////////////////////////////////////////
+void
+tp_init(tp_t* tp)
+{
+  tp->q           = FALSE;
+  tp->prev_in     = FALSE;
+  tp->start_time  = 0;
+}
+
+void
+tp(tp_t* tp, bool in, uint32_t pt)
+{
+  if(tp->q == FALSE)
+  {
+    if(tp->prev_in == FALSE && in == TRUE)
+    {
+      tp->q = TRUE;
+      tp->start_time  = time_now_in_ms();
+    }
+  }
+  else
+  {
+    if(time_delta_in_ms(tp->start_time) >= pt)
+    {
+      tp->q = FALSE;
+    }
+  }
+
+  tp->prev_in = in;
+}
