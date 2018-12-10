@@ -289,6 +289,7 @@ blink(blink_t* bl, bool run, uint32_t cycle)
     if(time_delta_in_ms(bl->start_time) >= (cycle/2))
     {
       bl->q   = !bl->q;
+      bl->start_time  = time_now_in_ms();
     }
   }
 }
