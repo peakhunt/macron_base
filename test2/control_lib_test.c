@@ -358,6 +358,41 @@ test_tp(void)
   CU_ASSERT(t.q == FALSE);
 }
 
+static void
+test_blink(void)
+{
+  blink_t   bl;
+
+  time_util_reset();
+  blink_init(&bl);
+  CU_ASSERT(bl.q == FALSE);
+
+  time_util_inc(5);
+  CU_ASSERT(bl.q == FALSE);
+
+  time_util_inc(5);
+
+  // start blinking
+  blink(&bl, TRUE, 10);
+  CU_ASSERT(bl.q == FALSE);
+
+  time_util_inc(5);
+  blink(&bl, TRUE, 10);
+  CU_ASSERT(bl.q == TRUE);
+
+  time_util_inc(5);
+  blink(&bl, TRUE, 10);
+  CU_ASSERT(bl.q == FALSE);
+
+  time_util_inc(5);
+  blink(&bl, TRUE, 10);
+  CU_ASSERT(bl.q == TRUE);
+
+  // stop
+  blink(&bl, FALSE, 10);
+  CU_ASSERT(bl.q == FALSE);
+}
+
 void
 control_lib_test(CU_pSuite pSuite)
 {
@@ -368,4 +403,5 @@ control_lib_test(CU_pSuite pSuite)
   CU_add_test(pSuite, "ton", test_ton);
   CU_add_test(pSuite, "toff", test_toff);
   CU_add_test(pSuite, "tp", test_tp);
+  CU_add_test(pSuite, "blink", test_blink);
 }

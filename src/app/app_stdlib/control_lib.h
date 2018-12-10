@@ -183,4 +183,27 @@ extern void tp(tp_t* tp, bool in, uint32_t pt);
   tp(&__t, __in, __pt);\
   __q = __t.q;
 
+/*
+           ___________
+   RUN-----|         |
+           |  blink  |--- Q
+   CYCLE---___________
+
+  RUN : if true, starts blinking, if false, reset Q to false
+
+  CYCLE: one complete off/on period.
+*/
+typedef struct
+{
+  bool            q;
+  bool            running;
+  unsigned long   start_time;
+} blink_t;
+
+extern void blink_init(blink_t* bl);
+extern void blink(blink_t* bl, bool run, uint32_t cycle);
+#define BLINK(__bl, __run, __q, __cycle)\
+  blink(&__bl, __run, __cycle);\
+  __q = __bl.q;
+
 #endif /* !__CONTROL_LIB_DEF_H__ */

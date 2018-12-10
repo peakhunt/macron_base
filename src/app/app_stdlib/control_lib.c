@@ -256,3 +256,39 @@ tp(tp_t* tp, bool in, uint32_t pt)
 
   tp->prev_in = in;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// blink
+//
+////////////////////////////////////////////////////////////////////////////////
+void
+blink_init(blink_t* bl)
+{
+  bl->q       = FALSE;
+  bl->running = FALSE;
+}
+
+void
+blink(blink_t* bl, bool run, uint32_t cycle)
+{
+  if(run == TRUE && bl->running == FALSE)
+  {
+    bl->running     = TRUE;
+    bl->start_time  = time_now_in_ms();
+    bl->q           = FALSE;
+  }
+  else if(run == FALSE)
+  {
+    bl->running = FALSE;
+    bl->q       = FALSE;
+  }
+
+  if(bl->running)
+  {
+    if(time_delta_in_ms(bl->start_time) >= (cycle/2))
+    {
+      bl->q   = !bl->q;
+    }
+  }
+}
