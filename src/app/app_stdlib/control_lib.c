@@ -293,3 +293,41 @@ blink(blink_t* bl, bool run, uint32_t cycle)
     }
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// TMR
+//
+////////////////////////////////////////////////////////////////////////////////
+void
+TINIT(TMR_T* t)
+{
+  t->start    = 0;
+  t->running  = FALSE;
+}
+
+void
+TSTART(TMR_T* t)
+{
+  if(t->running == FALSE)
+  {
+    t->start    = time_now_in_ms();
+    t->running  = TRUE;
+  }
+}
+void
+TSTOP(TMR_T* t)
+{
+  t->start    = 0;
+  t->running  = FALSE;
+}
+
+unsigned long
+TELAPSED(TMR_T* t)
+{
+  if(t->running)
+  {
+    return time_delta_in_ms(t->start);
+  }
+  return 0;
+}

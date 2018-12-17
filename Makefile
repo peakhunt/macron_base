@@ -83,7 +83,8 @@ src/main/logger_sql3_common.c                       \
 src/main/logger.c                                   \
 src/app/app.c                                       \
 src/app/app_blink.c                                 \
-src/app/app_stdlib/control_lib.c
+src/app/app_stdlib/control_lib.c                    \
+src/app/app_stdlib/generic_starter.c
 
 TEST_C_SOURCE =                                     \
 test/cmd_option_test.c                              \

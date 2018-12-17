@@ -206,4 +206,18 @@ extern void blink(blink_t* bl, bool run, uint32_t cycle);
   blink(&__bl, __run, __cycle);\
   __q = __bl.q;
 
+/*
+   generic timer
+*/
+typedef struct
+{
+  unsigned long   start;
+  bool            running;
+} TMR_T;
+
+extern void TINIT(TMR_T* t);
+extern void TSTART(TMR_T* t);
+extern void TSTOP(TMR_T* t);
+extern unsigned long TELAPSED(TMR_T* t);
+
 #endif /* !__CONTROL_LIB_DEF_H__ */
