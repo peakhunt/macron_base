@@ -54,7 +54,7 @@ typedef struct
   unsigned long     FTR_TMR;  // failed to respond timer in ms
 } generic_starter_t;
 
-extern void generic_starter_init(generic_starter_t* gs);
+extern void generic_starter_init(generic_starter_t* gs, unsigned long FTR_TMR);
 extern void generic_starter_run(generic_starter_t* gs);
 
 #endif /* !__GENERIC_STARTER_DEF_H__ */

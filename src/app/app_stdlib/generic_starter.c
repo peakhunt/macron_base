@@ -3,7 +3,7 @@
 #define GENERIC_START_ALERT_TIMEOUT     2000
 
 void
-generic_starter_init(generic_starter_t* gs)
+generic_starter_init(generic_starter_t* gs, unsigned long FTR_TMR)
 {
   //
   // not necessary to initialize input but
@@ -40,6 +40,7 @@ generic_starter_init(generic_starter_t* gs)
 
   gs->state = generic_starter_state_stopped;
 
+  gs->FTR_TMR   = FTR_TMR;
   TINIT(&gs->ftr_tmr);
   TINIT(&gs->alert_tmr);
 }
