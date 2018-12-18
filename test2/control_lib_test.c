@@ -5,6 +5,7 @@
 #include "CUnit/Automated.h"
 
 #include "control_lib.h"
+#include "generic_starter.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -393,6 +394,262 @@ test_blink(void)
   CU_ASSERT(bl.q == FALSE);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//
+// generic starter
+//
+////////////////////////////////////////////////////////////////////////////////
+static void
+test_generic_starter(void)
+{
+  bool    in_running;               // running input signal
+  bool    in_stopped;               // stopped input signal
+  bool    in_start_req;             // start request
+  bool    in_stop_req;              // stop request
+  bool    in_start_IL;              // start interlock
+  bool    in_stop_IL;               // stop interlock
+
+  bool    out_start;                // physical start output
+  bool    out_stop;                 // physical stop output
+  bool    out_failed_to_start;      // failed to start
+  bool    out_failed_to_stop;       // failed to stop
+  bool    out_is_starting;          // starting output
+  bool    out_is_stopping;          // stopping output
+  bool    out_is_running;           // running output
+  bool    out_is_stopped;           // stopped output
+  bool    out_ux_start;             // unexpected start
+  bool    out_ux_stop;              // unexpected stop
+
+  generic_starter_t         pump_starter;
+
+  in_running    = FALSE;
+  in_stopped    = TRUE;
+  in_start_req  = FALSE;
+  in_stop_req   = FALSE;
+  in_start_IL   = FALSE;
+  in_stop_IL    = FALSE;
+
+
+  generic_starter_init(&pump_starter,
+      &in_running, &in_stopped, &in_start_req, &in_stop_req, &in_start_IL, &in_stop_IL,
+
+      &out_start, &out_stop, &out_failed_to_start, &out_failed_to_stop,
+      &out_is_starting, &out_is_stopping, &out_is_running, &out_is_stopped,
+      &out_ux_start, &out_ux_stop,
+      2000);
+
+  time_util_reset();
+
+  generic_starter_run(&pump_starter);
+
+  // device stopped
+  CU_ASSERT(out_start == FALSE);
+  CU_ASSERT(out_stop == FALSE);
+  CU_ASSERT(out_failed_to_start == FALSE);
+  CU_ASSERT(out_failed_to_stop == FALSE);
+  CU_ASSERT(out_is_starting == FALSE);
+  CU_ASSERT(out_is_stopping == FALSE);
+  CU_ASSERT(out_is_running == FALSE);
+  CU_ASSERT(out_is_stopped == TRUE);
+  CU_ASSERT(out_ux_start == FALSE);
+  CU_ASSERT(out_ux_stop == FALSE);
+
+  // start request
+  in_start_req    = TRUE;
+  in_start_IL     = TRUE;
+
+  generic_starter_run(&pump_starter);
+
+  // device starting
+  CU_ASSERT(out_start == TRUE);
+  CU_ASSERT(out_stop == FALSE);
+  CU_ASSERT(out_failed_to_start == FALSE);
+  CU_ASSERT(out_failed_to_stop == FALSE);
+  CU_ASSERT(out_is_starting == TRUE);
+  CU_ASSERT(out_is_stopping == FALSE);
+  CU_ASSERT(out_is_running == FALSE);
+  CU_ASSERT(out_is_stopped == FALSE);
+  CU_ASSERT(out_ux_start == FALSE);
+  CU_ASSERT(out_ux_stop == FALSE);
+
+  // simulate device running
+  in_start_req    = FALSE;
+  in_start_IL     = FALSE;
+  in_running      = TRUE;
+
+  generic_starter_run(&pump_starter);
+
+  // device running
+  CU_ASSERT(out_start == FALSE);
+  CU_ASSERT(out_stop == FALSE);
+  CU_ASSERT(out_failed_to_start == FALSE);
+  CU_ASSERT(out_failed_to_stop == FALSE);
+  CU_ASSERT(out_is_starting == FALSE);
+  CU_ASSERT(out_is_stopping == FALSE);
+  CU_ASSERT(out_is_running == TRUE);
+  CU_ASSERT(out_is_stopped == FALSE);
+  CU_ASSERT(out_ux_start == FALSE);
+  CU_ASSERT(out_ux_stop == FALSE);
+
+  // stop request
+  in_stop_req     = TRUE;
+  in_stop_IL      = TRUE;
+
+  generic_starter_run(&pump_starter);
+
+  // device running
+  CU_ASSERT(out_start == FALSE);
+  CU_ASSERT(out_stop == TRUE);
+  CU_ASSERT(out_failed_to_start == FALSE);
+  CU_ASSERT(out_failed_to_stop == FALSE);
+  CU_ASSERT(out_is_starting == FALSE);
+  CU_ASSERT(out_is_stopping == TRUE);
+  CU_ASSERT(out_is_running == FALSE);
+  CU_ASSERT(out_is_stopped == FALSE);
+  CU_ASSERT(out_ux_start == FALSE);
+  CU_ASSERT(out_ux_stop == FALSE);
+
+  // simulate device stopped
+  in_stop_req     = FALSE;
+  in_stop_IL      = FALSE;
+  in_running      = FALSE;
+  in_stopped      = TRUE;
+
+  generic_starter_run(&pump_starter);
+
+  // device stopped
+  CU_ASSERT(out_start == FALSE);
+  CU_ASSERT(out_stop == FALSE);
+  CU_ASSERT(out_failed_to_start == FALSE);
+  CU_ASSERT(out_failed_to_stop == FALSE);
+  CU_ASSERT(out_is_starting == FALSE);
+  CU_ASSERT(out_is_stopping == FALSE);
+  CU_ASSERT(out_is_running == FALSE);
+  CU_ASSERT(out_is_stopped == TRUE);
+  CU_ASSERT(out_ux_start == FALSE);
+  CU_ASSERT(out_ux_stop == FALSE);
+
+  //
+  // test device failed to start
+  //
+  in_start_req    = TRUE;
+  in_start_IL     = TRUE;
+
+  generic_starter_run(&pump_starter);
+
+  // device starting
+  CU_ASSERT(out_start == TRUE);
+  CU_ASSERT(out_stop == FALSE);
+  CU_ASSERT(out_failed_to_start == FALSE);
+  CU_ASSERT(out_failed_to_stop == FALSE);
+  CU_ASSERT(out_is_starting == TRUE);
+  CU_ASSERT(out_is_stopping == FALSE);
+  CU_ASSERT(out_is_running == FALSE);
+  CU_ASSERT(out_is_stopped == FALSE);
+  CU_ASSERT(out_ux_start == FALSE);
+  CU_ASSERT(out_ux_stop == FALSE);
+
+  time_util_inc(2001);
+
+  in_start_req    = FALSE;
+  in_start_IL     = TRUE;
+
+  generic_starter_run(&pump_starter);
+  CU_ASSERT(out_start == FALSE);
+  CU_ASSERT(out_stop == FALSE);
+  CU_ASSERT(out_failed_to_start == TRUE);
+  CU_ASSERT(out_failed_to_stop == FALSE);
+  CU_ASSERT(out_is_starting == FALSE);
+  CU_ASSERT(out_is_stopping == FALSE);
+  CU_ASSERT(out_is_running == FALSE);
+  CU_ASSERT(out_is_stopped == TRUE);
+  CU_ASSERT(out_ux_start == FALSE);
+  CU_ASSERT(out_ux_stop == FALSE);
+
+  // failed to stop should be reset in 2000ms
+  time_util_inc(2001);
+  generic_starter_run(&pump_starter);
+  CU_ASSERT(out_start == FALSE);
+  CU_ASSERT(out_stop == FALSE);
+  CU_ASSERT(out_failed_to_start == FALSE);
+  CU_ASSERT(out_failed_to_stop == FALSE);
+  CU_ASSERT(out_is_starting == FALSE);
+  CU_ASSERT(out_is_stopping == FALSE);
+  CU_ASSERT(out_is_running == FALSE);
+  CU_ASSERT(out_is_stopped == TRUE);
+  CU_ASSERT(out_ux_start == FALSE);
+  CU_ASSERT(out_ux_stop == FALSE);
+
+  //
+  // test device failed to stop
+  //
+  in_running      = TRUE;
+  in_stopped      = FALSE;
+
+  generic_starter_run(&pump_starter);
+
+  CU_ASSERT(out_start == FALSE);
+  CU_ASSERT(out_stop == FALSE);
+  CU_ASSERT(out_failed_to_start == FALSE);
+  CU_ASSERT(out_failed_to_stop == FALSE);
+  CU_ASSERT(out_is_starting == FALSE);
+  CU_ASSERT(out_is_stopping == FALSE);
+  CU_ASSERT(out_is_running == TRUE);
+  CU_ASSERT(out_is_stopped == FALSE);
+  CU_ASSERT(out_ux_start == TRUE);
+  CU_ASSERT(out_ux_stop == FALSE);
+
+  time_util_inc(2001);
+
+  // stop request
+  in_stop_req     = TRUE;
+  in_stop_IL      = TRUE;
+  generic_starter_run(&pump_starter);
+
+  CU_ASSERT(out_start == FALSE);
+  CU_ASSERT(out_stop == TRUE);
+  CU_ASSERT(out_failed_to_start == FALSE);
+  CU_ASSERT(out_failed_to_stop == FALSE);
+  CU_ASSERT(out_is_starting == FALSE);
+  CU_ASSERT(out_is_stopping == TRUE);
+  CU_ASSERT(out_is_running == FALSE);
+  CU_ASSERT(out_is_stopped == FALSE);
+  CU_ASSERT(out_ux_start == FALSE);
+  CU_ASSERT(out_ux_stop == FALSE);
+
+  // failed to stop
+  time_util_inc(2001);
+  in_stop_req     = FALSE;
+  in_stop_IL      = TRUE;
+
+  generic_starter_run(&pump_starter);
+  CU_ASSERT(out_start == FALSE);
+  CU_ASSERT(out_stop == FALSE);
+  CU_ASSERT(out_failed_to_start == FALSE);
+  CU_ASSERT(out_failed_to_stop == TRUE);
+  CU_ASSERT(out_is_starting == FALSE);
+  CU_ASSERT(out_is_stopping == FALSE);
+  CU_ASSERT(out_is_running == TRUE);
+  CU_ASSERT(out_is_stopped == FALSE);
+  CU_ASSERT(out_ux_start == FALSE);
+  CU_ASSERT(out_ux_stop == FALSE);
+
+  // alert timeout reset
+  time_util_inc(2001);
+
+  generic_starter_run(&pump_starter);
+  CU_ASSERT(out_start == FALSE);
+  CU_ASSERT(out_stop == FALSE);
+  CU_ASSERT(out_failed_to_start == FALSE);
+  CU_ASSERT(out_failed_to_stop == FALSE);
+  CU_ASSERT(out_is_starting == FALSE);
+  CU_ASSERT(out_is_stopping == FALSE);
+  CU_ASSERT(out_is_running == TRUE);
+  CU_ASSERT(out_is_stopped == FALSE);
+  CU_ASSERT(out_ux_start == FALSE);
+  CU_ASSERT(out_ux_stop == FALSE);
+}
+
 void
 control_lib_test(CU_pSuite pSuite)
 {
@@ -404,4 +661,5 @@ control_lib_test(CU_pSuite pSuite)
   CU_add_test(pSuite, "toff", test_toff);
   CU_add_test(pSuite, "tp", test_tp);
   CU_add_test(pSuite, "blink", test_blink);
+  CU_add_test(pSuite, "generic starter", test_generic_starter);
 }

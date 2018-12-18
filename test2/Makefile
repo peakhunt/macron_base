@@ -8,7 +8,8 @@ APP_SOURCES =                                       \
 
 TEST_C_SOURCE =                                     \
 ./test_main.c \
-./control_lib_test.c
+./control_lib_test.c \
+./generic_starter.c
 
 #######################################
 # include and lib setup
