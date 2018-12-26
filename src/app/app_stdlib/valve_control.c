@@ -68,7 +68,7 @@ valve_control_init(valve_control_t* v,
 void
 valve_control_run(valve_control_t* v)
 {
-  // based state
+  // bad state
   if(!(*v->in_opened) && !(*v->in_closed) && !(*v->in_opening) && !(*v->in_closing))
   {
     v->state = valve_control_state_indeterminate;
@@ -363,7 +363,7 @@ valve_control_run(valve_control_t* v)
       *v->out_fail_to_close   = FALSE;
       *v->out_fail_to_open    = FALSE;
 
-      TSTART(&v->alert_tmr);
+      TSTOP(&v->alert_tmr);
     }
   }
   else

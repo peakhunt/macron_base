@@ -9,7 +9,8 @@ APP_SOURCES =                                       \
 TEST_C_SOURCE =                                     \
 ./test_main.c \
 ./control_lib_test.c \
-./generic_starter.c
+./generic_starter.c \
+./valve_control.c
 
 #######################################
 # include and lib setup

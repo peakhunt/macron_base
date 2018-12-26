@@ -6,6 +6,7 @@
 
 #include "control_lib.h"
 #include "generic_starter.h"
+#include "valve_control.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -650,6 +651,452 @@ test_generic_starter(void)
   CU_ASSERT(out_ux_stop == FALSE);
 }
 
+static void
+test_valve_control(void)
+{
+  bool in_opened;
+  bool in_closed;
+  bool in_opening;
+  bool in_closing;
+  bool in_open_req;
+  bool in_close_req;
+  bool in_open_IL;
+  bool in_close_IL;
+
+  bool out_open_op;
+  bool out_close_op;
+  bool out_fail_to_open;
+  bool out_fail_to_close;
+  bool out_is_closing;
+  bool out_is_opening;
+  bool out_is_closed;
+  bool out_is_opened;
+  bool out_ux_open;
+  bool out_ux_close;
+  bool out_fault;
+
+  valve_control_t   v;
+
+  time_util_reset();
+
+  valve_control_init(&v,
+      &in_opened,
+      &in_closed,
+      &in_opening,
+      &in_closing,
+      &in_open_req,
+      &in_close_req,
+      &in_open_IL,
+      &in_close_IL,
+
+      &out_open_op,
+      &out_close_op,
+      &out_fail_to_open,
+      &out_fail_to_close,
+      &out_is_closing,
+      &out_is_opening,
+      &out_is_closed,
+      &out_is_opened,
+      &out_ux_open,
+      &out_ux_close,
+      &out_fault,
+      
+      2000);
+
+  // test 1. valve fault, both closed
+  in_opened = FALSE;
+  in_closed = FALSE;
+  in_opening = FALSE;
+  in_closing = FALSE;
+  in_open_req = FALSE;
+  in_close_req = FALSE;
+  in_open_IL = FALSE;
+  in_close_IL = FALSE;
+
+  valve_control_run(&v);
+
+  CU_ASSERT(v.state == valve_control_state_indeterminate);
+  CU_ASSERT(out_fault == TRUE);
+  CU_ASSERT(out_is_opening == FALSE);
+  CU_ASSERT(out_is_closing == FALSE);
+  CU_ASSERT(out_is_opened == FALSE);
+  CU_ASSERT(out_is_closed == FALSE);
+
+  time_util_inc(3000);
+  CU_ASSERT(out_fault == TRUE);
+
+  // test 2. valve opened
+  in_opened = TRUE;
+  in_closed = FALSE;
+  in_opening = FALSE;
+  in_closing = FALSE;
+  in_open_req = FALSE;
+  in_close_req = FALSE;
+  in_open_IL = FALSE;
+  in_close_IL = FALSE;
+
+  valve_control_run(&v);
+
+  CU_ASSERT(v.state == valve_control_state_opened);
+  CU_ASSERT(out_fault == FALSE);
+  CU_ASSERT(out_is_opening == FALSE);
+  CU_ASSERT(out_is_closing == FALSE);
+  CU_ASSERT(out_is_opened == TRUE);
+  CU_ASSERT(out_is_closed == FALSE);
+
+  // test 3. valve closed
+  in_opened = FALSE;
+  in_closed = TRUE;
+  in_opening = FALSE;
+  in_closing = FALSE;
+  in_open_req = FALSE;
+  in_close_req = FALSE;
+  in_open_IL = FALSE;
+  in_close_IL = FALSE;
+
+  valve_control_run(&v);
+
+  CU_ASSERT(v.state == valve_control_state_closed);
+  CU_ASSERT(out_fault == FALSE);
+  CU_ASSERT(out_is_opening == FALSE);
+  CU_ASSERT(out_is_closing == FALSE);
+  CU_ASSERT(out_is_opened == FALSE);
+  CU_ASSERT(out_is_closed == TRUE);
+
+  // test 4-1. try to open valve - success
+  in_opened = FALSE;
+  in_closed = TRUE;
+  in_opening = FALSE;
+  in_closing = FALSE;
+  in_open_req = TRUE;
+  in_close_req = FALSE;
+  in_open_IL = TRUE;
+  in_close_IL = FALSE;
+
+  valve_control_run(&v);
+
+  CU_ASSERT(v.state == valve_control_state_opening);
+  CU_ASSERT(out_fault == FALSE);
+  CU_ASSERT(out_open_op == TRUE);
+  CU_ASSERT(out_is_opening == TRUE);
+  CU_ASSERT(out_is_closing == FALSE);
+  CU_ASSERT(out_is_opened == FALSE);
+  CU_ASSERT(out_is_closed == FALSE);
+
+  // test 4-2. let some time pass before timeout
+  time_util_inc(1000);
+
+  in_opening = TRUE;
+  valve_control_run(&v);
+
+  CU_ASSERT(v.state == valve_control_state_opening);
+  CU_ASSERT(out_fault == FALSE);
+  CU_ASSERT(out_open_op == TRUE);
+  CU_ASSERT(out_is_opening == TRUE);
+  CU_ASSERT(out_is_closing == FALSE);
+  CU_ASSERT(out_is_opened == FALSE);
+  CU_ASSERT(out_is_closed == FALSE);
+
+  // test 4-3. finally valve opened
+  in_opened = TRUE;
+  in_closed = FALSE;
+  in_opening = TRUE;
+  in_closing = FALSE;
+  in_open_req = TRUE;
+  in_close_req = FALSE;
+  in_open_IL = TRUE;
+  in_close_IL = FALSE;
+
+  valve_control_run(&v);
+
+  CU_ASSERT(v.state == valve_control_state_opened);
+  CU_ASSERT(out_fault == FALSE);
+  CU_ASSERT(out_open_op == FALSE);
+  CU_ASSERT(out_is_opening == FALSE);
+  CU_ASSERT(out_is_closing == FALSE);
+  CU_ASSERT(out_is_opened == TRUE);
+  CU_ASSERT(out_is_closed == FALSE);
+
+  // test 5-1. try to close value
+  in_opened = TRUE;
+  in_closed = FALSE;
+  in_opening = FALSE;
+  in_closing = FALSE;
+  in_open_req = FALSE;
+  in_close_req = TRUE;
+  in_open_IL = FALSE;
+  in_close_IL = TRUE;
+
+  valve_control_run(&v);
+
+  CU_ASSERT(v.state == valve_control_state_closing);
+  CU_ASSERT(out_fault == FALSE);
+  CU_ASSERT(out_close_op == TRUE);
+  CU_ASSERT(out_is_opening == FALSE);
+  CU_ASSERT(out_is_closing == TRUE);
+  CU_ASSERT(out_is_opened == FALSE);
+  CU_ASSERT(out_is_closed == FALSE);
+
+  // test 5-2. let some time pass before timeout
+  time_util_inc(1000);
+
+  in_closing = TRUE;
+  valve_control_run(&v);
+
+  CU_ASSERT(v.state == valve_control_state_closing);
+  CU_ASSERT(out_fault == FALSE);
+  CU_ASSERT(out_close_op == TRUE);
+  CU_ASSERT(out_is_opening == FALSE);
+  CU_ASSERT(out_is_closing == TRUE);
+  CU_ASSERT(out_is_opened == FALSE);
+  CU_ASSERT(out_is_closed == FALSE);
+
+  // test 5-3. finally valve closed
+  in_opened = FALSE;
+  in_closed = TRUE;
+  in_opening = FALSE;
+  in_closing = TRUE;
+  in_open_req = FALSE;
+  in_close_req = FALSE;
+  in_open_IL = FALSE;
+  in_close_IL = TRUE;
+
+  valve_control_run(&v);
+
+  CU_ASSERT(v.state == valve_control_state_closed);
+  CU_ASSERT(out_fault == FALSE);
+  CU_ASSERT(out_close_op == FALSE);
+  CU_ASSERT(out_is_opening == FALSE);
+  CU_ASSERT(out_is_closing == FALSE);
+  CU_ASSERT(out_is_opened == FALSE);
+  CU_ASSERT(out_is_closed == TRUE);
+
+  // let it timeout to clear any alert signals
+  time_util_inc(3000);
+  in_opened = FALSE;
+  in_closed = TRUE;
+  in_opening = FALSE;
+  in_closing = FALSE;
+  in_open_req = FALSE;
+  in_close_req = FALSE;
+  in_open_IL = FALSE;
+  in_close_IL = TRUE;
+  valve_control_run(&v);
+
+  // test 6-1 open failure. re-close interlock ok
+  in_opened = FALSE;
+  in_closed = TRUE;
+  in_opening = FALSE;
+  in_closing = FALSE;
+  in_open_req = TRUE;
+  in_close_req = FALSE;
+  in_open_IL = TRUE;
+  in_close_IL = FALSE;
+
+  valve_control_run(&v);
+
+  CU_ASSERT(v.state == valve_control_state_opening);
+  CU_ASSERT(out_fault == FALSE);
+  CU_ASSERT(out_open_op == TRUE);
+  CU_ASSERT(out_is_opening == TRUE);
+  CU_ASSERT(out_is_closing == FALSE);
+  CU_ASSERT(out_is_opened == FALSE);
+  CU_ASSERT(out_is_closed == FALSE);
+
+  // test 6-2. let it timeout. valve failed to open. close IL met.
+  time_util_inc(3000);
+
+  in_opening = TRUE;
+  in_open_req = FALSE;
+  in_close_req  = FALSE;
+  in_open_IL = FALSE;
+  in_close_IL = TRUE;
+
+  valve_control_run(&v);
+
+  CU_ASSERT(v.state == valve_control_state_closing);
+  CU_ASSERT(out_fault == FALSE);
+  CU_ASSERT(out_open_op == FALSE);
+  CU_ASSERT(out_close_op == TRUE);
+  CU_ASSERT(out_is_opening == FALSE);
+  CU_ASSERT(out_is_closing == TRUE);
+  CU_ASSERT(out_is_opened == FALSE);
+  CU_ASSERT(out_is_closed == FALSE);
+  CU_ASSERT(out_fail_to_open == TRUE);
+
+  // test 6-3. valve closed 
+  in_closed = TRUE;
+  in_opening = FALSE;
+  in_open_req = FALSE;
+  in_close_req  = FALSE;
+  in_open_IL = FALSE;
+  in_close_IL = FALSE;
+
+  valve_control_run(&v);
+
+  CU_ASSERT(v.state == valve_control_state_closed);
+  CU_ASSERT(out_fault == FALSE);
+  CU_ASSERT(out_open_op == FALSE);
+  CU_ASSERT(out_close_op == FALSE);
+  CU_ASSERT(out_is_opening == FALSE);
+  CU_ASSERT(out_is_closing == FALSE);
+  CU_ASSERT(out_is_opened == FALSE);
+  CU_ASSERT(out_is_closed == TRUE);
+  CU_ASSERT(out_fail_to_open == TRUE);
+
+  // test 6-4. let alert timeout pass
+  time_util_inc(3000);
+  valve_control_run(&v);
+  CU_ASSERT(out_fail_to_open == FALSE);
+
+  // test 7-1.  open failure. re-close interlock not ok.
+  in_opened = FALSE;
+  in_closed = TRUE;
+  in_opening = FALSE;
+  in_closing = FALSE;
+  in_open_req = TRUE;
+  in_close_req = FALSE;
+  in_open_IL = TRUE;
+  in_close_IL = FALSE;
+
+  valve_control_run(&v);
+
+  CU_ASSERT(v.state == valve_control_state_opening);
+  CU_ASSERT(out_fault == FALSE);
+  CU_ASSERT(out_open_op == TRUE);
+  CU_ASSERT(out_is_opening == TRUE);
+  CU_ASSERT(out_is_closing == FALSE);
+  CU_ASSERT(out_is_opened == FALSE);
+  CU_ASSERT(out_is_closed == FALSE);
+
+  // test 7-2. let it timout. valve failed to open. close IL not met.
+  time_util_inc(3000);
+
+  in_opening = TRUE;
+  in_open_req = FALSE;
+  in_close_req  = FALSE;
+  in_open_IL = FALSE;
+  in_close_IL = FALSE;
+
+  valve_control_run(&v);
+
+  CU_ASSERT(v.state == valve_control_state_indeterminate);
+  CU_ASSERT(out_fault == TRUE);
+  CU_ASSERT(out_open_op == FALSE);
+  CU_ASSERT(out_close_op == FALSE);
+  CU_ASSERT(out_is_opening == FALSE);
+  CU_ASSERT(out_is_closing == FALSE);
+  CU_ASSERT(out_is_opened == FALSE);
+  CU_ASSERT(out_is_closed == FALSE);
+  CU_ASSERT(out_fail_to_open == TRUE);
+
+  // test 7-3. let alert timeout. value is still closed
+  time_util_inc(3000);
+
+  valve_control_run(&v);
+
+  CU_ASSERT(v.state == valve_control_state_closed);
+  CU_ASSERT(out_fault == FALSE);
+  CU_ASSERT(out_open_op == FALSE);
+  CU_ASSERT(out_close_op == FALSE);
+  CU_ASSERT(out_is_opening == FALSE);
+  CU_ASSERT(out_is_closing == FALSE);
+  CU_ASSERT(out_is_opened == FALSE);
+  CU_ASSERT(out_is_closed == TRUE);
+  CU_ASSERT(out_fail_to_open == FALSE);
+
+  // test 8-1 close failure - open valve first
+  in_opened = FALSE;
+  in_closed = TRUE;
+  in_opening = FALSE;
+  in_closing = FALSE;
+  in_open_req = TRUE;
+  in_close_req = FALSE;
+  in_open_IL = TRUE;
+  in_close_IL = FALSE;
+
+  valve_control_run(&v);
+
+  in_opened = TRUE;
+  in_closed = FALSE;
+  in_opening = TRUE;
+  in_closing = FALSE;
+  in_open_req = TRUE;
+  in_close_req = FALSE;
+  in_open_IL = TRUE;
+  in_close_IL = FALSE;
+
+  valve_control_run(&v);
+
+  CU_ASSERT(v.state == valve_control_state_opened);
+  CU_ASSERT(out_fault == FALSE);
+  CU_ASSERT(out_open_op == FALSE);
+  CU_ASSERT(out_is_opening == FALSE);
+  CU_ASSERT(out_is_closing == FALSE);
+  CU_ASSERT(out_is_opened == TRUE);
+  CU_ASSERT(out_is_closed == FALSE);
+
+  // test 8-2 close failure - close valve now 
+  in_opened = TRUE;
+  in_closed = FALSE;
+  in_opening = FALSE;
+  in_closing = FALSE;
+  in_open_req = FALSE;
+  in_close_req = TRUE;
+  in_open_IL = FALSE;
+  in_close_IL = TRUE;
+
+  valve_control_run(&v);
+
+  CU_ASSERT(v.state == valve_control_state_closing);
+  CU_ASSERT(out_fault == FALSE);
+  CU_ASSERT(out_close_op == TRUE);
+  CU_ASSERT(out_is_opening == FALSE);
+  CU_ASSERT(out_is_closing == TRUE);
+  CU_ASSERT(out_is_opened == FALSE);
+  CU_ASSERT(out_is_closed == FALSE);
+
+  // test 8-3 close failure - let it timeout with close IL not met
+  time_util_inc(3000);
+
+  in_closing = FALSE;
+  in_close_IL = FALSE;
+  valve_control_run(&v);
+
+  CU_ASSERT(v.state == valve_control_state_indeterminate);
+  CU_ASSERT(out_fault == TRUE);
+  CU_ASSERT(out_close_op == FALSE);
+  CU_ASSERT(out_is_opening == FALSE);
+  CU_ASSERT(out_is_closing == FALSE);
+  CU_ASSERT(out_is_opened == FALSE);
+  CU_ASSERT(out_is_closed == FALSE);
+  CU_ASSERT(out_fail_to_close == TRUE);
+
+  // value signal is still in open state
+  valve_control_run(&v);
+  CU_ASSERT(v.state == valve_control_state_opened);
+  CU_ASSERT(out_fault == FALSE);
+  CU_ASSERT(out_close_op == FALSE);
+  CU_ASSERT(out_is_opening == FALSE);
+  CU_ASSERT(out_is_closing == FALSE);
+  CU_ASSERT(out_is_opened == TRUE);
+  CU_ASSERT(out_is_closed == FALSE);
+  CU_ASSERT(out_fail_to_close == TRUE);
+
+  // test 8-4 let fail to close timeout
+  time_util_inc(3000);
+
+  valve_control_run(&v);
+  CU_ASSERT(v.state == valve_control_state_opened);
+  CU_ASSERT(out_fault == FALSE);
+  CU_ASSERT(out_close_op == FALSE);
+  CU_ASSERT(out_is_opening == FALSE);
+  CU_ASSERT(out_is_closing == FALSE);
+  CU_ASSERT(out_is_opened == TRUE);
+  CU_ASSERT(out_is_closed == FALSE);
+  CU_ASSERT(out_fail_to_close == FALSE);
+}
+
 void
 control_lib_test(CU_pSuite pSuite)
 {
@@ -662,4 +1109,5 @@ control_lib_test(CU_pSuite pSuite)
   CU_add_test(pSuite, "tp", test_tp);
   CU_add_test(pSuite, "blink", test_blink);
   CU_add_test(pSuite, "generic starter", test_generic_starter);
+  CU_add_test(pSuite, "valve control", test_valve_control);
 }
