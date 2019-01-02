@@ -56,6 +56,10 @@ export default new Router({
       component: require('@/components/MimicDemo').default
     },
     {
+      path: '/options',
+      component: require('@/components/Options').default
+    },
+    {
       path: '*',
       redirect: '/'
     }

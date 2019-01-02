@@ -14,6 +14,7 @@
             :to="item.to"
             :key="i"
             v-for="(item, i) in items"
+            :disabled="disableMenu"
             exact
           >
             <v-list-tile-action>
@@ -86,6 +87,8 @@
         console.log('initializing server poller')
         serverPoller.initPoller(this.$store.getters.channelList, this.$store.getters.alarmList)
         serverPoller.start(this)
+
+        this.disableMenu = false
       },
       systemConfigReloadComplete: function () {
         EventBus.$off('systemConfigLoadComplete', this.systemConfigReloadComplete)
@@ -95,6 +98,8 @@
 
         router.push(this.savedPath)
         this.savedPath = null
+
+        this.disableMenu = false
       },
       configUpdateDetected: function () {
         // this is a message from poller
@@ -108,12 +113,24 @@
         this.savedPath = this.$route.path
         EventBus.$on('systemConfigLoadComplete', this.systemConfigReloadComplete)
 
+        this.disableMenu = true
+
         router.push('/system-loading-view')
+      },
+      systemRestarting: function () {
+        this.disableMenu = false
+        serverPoller.stop(this)
+      },
+      gotoCommOptions: function () {
+        this.disableMenu = true
+        router.push('/options')
       }
     },
     created () {
       console.log('1:' + this.$route.path)
       EventBus.$on('systemConfigLoadComplete', this.systemConfigLoadComplete)
+      EventBus.$on('systemRestarting', this.systemRestarting)
+      EventBus.$on('gotoCommOptions', this.gotoCommOptions)
 
       this.tickTimer = setInterval(() => {
         global.tick500ms = !global.tick500ms
@@ -137,6 +154,7 @@
       clipped: true,
       drawer: true,
       fixed: false,
+      disableMenu: true,
       items: [
         { icon: 'apps', title: 'Welcome', to: '/' },
         { icon: 'bubble_chart', title: 'Inspire', to: '/inspire' },
@@ -146,7 +164,8 @@
         { icon: 'apps', title: 'Signal Trace', to: '/signal-trace' },
         { icon: 'apps', title: 'Alarm Log', to: '/alarm-log' },
         { icon: 'apps', title: 'Widget Demo', to: '/widget-demo' },
-        { icon: 'apps', title: 'Mimic Demo', to: '/mimic-demo' }
+        { icon: 'apps', title: 'Mimic Demo', to: '/mimic-demo' },
+        { icon: 'apps', title: 'Options', to: '/options' }
       ],
       miniVariant: false,
       right: true,

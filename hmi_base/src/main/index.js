@@ -22,6 +22,7 @@ function createWindow () {
    * set appConfig global
    */
   global.appConfig = appConfig.get()
+  global.saveAppConfig = appConfig.save
 
   /**
    * Initial window options

@@ -1,8 +1,9 @@
 const storage = require('electron-storage')
 var macronConfig
 
+const configFile = 'macron_base/macron_base.json'
+
 function loadAppConfig (app, cb) {
-  var configFile = 'macron_base/macron_base.json'
   var defaultData = {
     schema: {
       version: 1.0
@@ -64,9 +65,22 @@ function loadAppConfig (app, cb) {
   })
 }
 
+function saveAppConfig (data, cb) {
+  storage.set(configFile, data, (err) => {
+    if (err) {
+      console.error('failed to set config file:' + configFile)
+      cb()
+    } else {
+      console.log('done setting config file')
+      cb()
+    }
+  })
+}
+
 module.exports = {
   load: loadAppConfig,
   get: function () {
     return macronConfig
-  }
+  },
+  save: saveAppConfig
 }

@@ -32,6 +32,7 @@
         <v-card-actions>
           <v-spacer/>
           <v-btn color="red darken-1" flat @click.native="retry()">Retry</v-btn>
+          <v-btn color="red darken-1" flat @click.native="comm_options()">Comm Options</v-btn>
           <v-btn color="red darken-1" flat @click.native="exit()">Exit</v-btn>
         </v-card-actions>
       </v-card>
@@ -111,6 +112,9 @@
       },
       exit: function () {
         utils.quit()
+      },
+      comm_options: function () {
+        EventBus.$emit('gotoCommOptions')
       }
     },
     created () {
