@@ -87,8 +87,6 @@
         console.log('initializing server poller')
         serverPoller.initPoller(this.$store.getters.channelList, this.$store.getters.alarmList)
         serverPoller.start(this)
-
-        this.disableMenu = false
       },
       systemConfigReloadComplete: function () {
         EventBus.$off('systemConfigLoadComplete', this.systemConfigReloadComplete)
@@ -98,8 +96,6 @@
 
         router.push(this.savedPath)
         this.savedPath = null
-
-        this.disableMenu = false
       },
       configUpdateDetected: function () {
         // this is a message from poller
@@ -113,17 +109,23 @@
         this.savedPath = this.$route.path
         EventBus.$on('systemConfigLoadComplete', this.systemConfigReloadComplete)
 
-        this.disableMenu = true
-
         router.push('/system-loading-view')
       },
       systemRestarting: function () {
-        this.disableMenu = false
+        this.restarting = true
         serverPoller.stop(this)
       },
       gotoCommOptions: function () {
-        this.disableMenu = true
         router.push('/options')
+      }
+    },
+    computed: {
+      disableMenu: function () {
+        if (this.$store.getters.isSysConfigLoaded === false ||
+            this.restarting === true) {
+          return true
+        }
+        return false
       }
     },
     created () {
@@ -154,7 +156,7 @@
       clipped: true,
       drawer: true,
       fixed: false,
-      disableMenu: true,
+      restarting: false,
       items: [
         { icon: 'apps', title: 'Welcome', to: '/' },
         { icon: 'bubble_chart', title: 'Inspire', to: '/inspire' },

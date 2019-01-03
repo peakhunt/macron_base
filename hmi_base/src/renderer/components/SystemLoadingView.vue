@@ -81,6 +81,8 @@
       loadSysConfig: function () {
         var self = this
 
+        this.$store.commit('SET_SYSTEM_CONFIG_NOT_LOADED')
+
         serverAPI.loadSystemConfig((err, data) => {
           if (err) {
             console.log('failed to retrieve system config')
@@ -99,6 +101,7 @@
             self.populateStore(data.data)
             self.dialog = false
             router.push('/')
+            this.$store.commit('SET_SYSTEM_CONFIG_LOADED')
             EventBus.$emit('systemConfigLoadComplete')
           }, 10)
         })
