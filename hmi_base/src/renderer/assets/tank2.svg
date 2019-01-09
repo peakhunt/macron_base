@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="92.066818mm"
+   height="160.72942mm"
+   viewBox="0 0 326.22101 569.51367"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="tank2.svg">
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.1596551"
+     inkscape:cx="90.847063"
+     inkscape:cy="288.57645"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1435"
+     inkscape:window-height="858"
+     inkscape:window-x="278"
+     inkscape:window-y="24"
+     inkscape:window-maximized="0"
+     units="mm"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient4353"
+       inkscape:collect="always">
+      <stop
+         id="stop4355"
+         offset="0"
+         style="stop-color:#0000ff;stop-opacity:1;" />
+      <stop
+         id="stop4357"
+         offset="1"
+         style="stop-color:#0000ff;stop-opacity:0;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4299"
+       inkscape:collect="always">
+      <stop
+         id="stop4301"
+         offset="0"
+         style="stop-color:#999999;stop-opacity:1;" />
+      <stop
+         id="stop4303"
+         offset="1"
+         style="stop-color:#999999;stop-opacity:0;" />
+    </linearGradient>
+    <linearGradient
+       gradientTransform="matrix(0.76537976,0,0,0.71406781,234.26257,416.94993)"
+       gradientUnits="userSpaceOnUse"
+       y2="409.67935"
+       x2="939.02509"
+       y1="513.33789"
+       x1="166.46289"
+       id="linearGradient4305"
+       xlink:href="#linearGradient4299"
+       inkscape:collect="always" />
+    <linearGradient
+       gradientTransform="matrix(0.76868167,0,0,0.71406781,234.34127,415.4522)"
+       gradientUnits="userSpaceOnUse"
+       y2="20.313412"
+       x2="1231.0975"
+       y1="515.43536"
+       x1="167.68292"
+       id="linearGradient4359"
+       xlink:href="#linearGradient4353"
+       inkscape:collect="always" />
+  </defs>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="Layer 1">
+    <path
+       id="rect4234"
+       d="M163.3444601 0.0C120.1468201 -6.00000000048e-05 78.7183141 2.84403 48.1727671 7.9066C17.6272201 12.96917 0.46677938 19.83551 0.46656018 26.99511C0.47746918 27.57627 0.60160748 28.15722 0.83878018 28.73705C0.83878018 28.73705 0.46656018 28.73705 0.46656018 28.73705C0.46656018 28.73705 0.46656018 540.97469 0.46656018 540.97469C0.2223599 541.48802 0.0668262 542.0024 0.000150199999983 542.51721C-0.00181980000002 549.677 17.1574441 556.54366 47.7029041 561.60652C78.2483641 566.66938 119.6777401 569.51368 162.8765501 569.51369C250.7169801 569.49769 322.6575801 557.94004 325.4898601 543.38888C325.4898601 543.38888 326.2208501 543.38888 326.2208501 543.38888C326.2208501 543.38888 326.2208501 28.73705 326.2208501 28.73705C326.2208501 28.73705 325.6946501 28.73705 325.6946501 28.73705C325.9832101 28.15749 326.1587001 27.57654 326.2208501 26.99511C326.2203901 12.08611 253.2983101 9.99999984685e-06 163.3444601 -1.42108547152e-13C163.3444601 -1.42108547152e-13 163.3444601 -1.42108547152e-13 163.3444601 -1.42108547152e-13"
+       style="opacity:0.94999994;fill:url(#linearGradient4305);fill-opacity:1" />
+    <path
+       style="opacity:0.95;fill:url(#linearGradient4359);fill-opacity:1"
+       d="M0.0 34.3977C0.0 34.3977 326.2210001 34.3977 326.2210001 34.3977C326.2210001 34.3977 326.2210001 535.11599 326.2210001 535.11599C326.2210001 535.11599 2.39808173319e-14 535.11599 2.39808173319e-14 535.11599C2.39808173319e-14 535.11599 2.39808173319e-14 34.3977 2.39808173319e-14 34.3977"
+       id="liquidLevel" />
+  </g>
+</svg>

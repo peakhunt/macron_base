@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="92.066734mm"
+   height="160.72942mm"
+   viewBox="0 0 326.22071 569.51367"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="tank3.svg">
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.82"
+     inkscape:cx="107.31365"
+     inkscape:cy="262.36115"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1449"
+     inkscape:window-height="839"
+     inkscape:window-x="361"
+     inkscape:window-y="133"
+     inkscape:window-maximized="0"
+     units="mm"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient4353"
+       inkscape:collect="always">
+      <stop
+         id="stop4355"
+         offset="0"
+         style="stop-color:#0000ff;stop-opacity:1;" />
+      <stop
+         id="stop4357"
+         offset="1"
+         style="stop-color:#0000ff;stop-opacity:0;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4299"
+       inkscape:collect="always">
+      <stop
+         id="stop4301"
+         offset="0"
+         style="stop-color:#999999;stop-opacity:1;" />
+      <stop
+         id="stop4303"
+         offset="1"
+         style="stop-color:#999999;stop-opacity:0;" />
+    </linearGradient>
+    <linearGradient
+       gradientTransform="matrix(0.76537976,0,0,0.71406781,235.66342,313.75684)"
+       gradientUnits="userSpaceOnUse"
+       y2="409.67935"
+       x2="939.02509"
+       y1="513.33789"
+       x1="166.46289"
+       id="linearGradient4305"
+       xlink:href="#linearGradient4299"
+       inkscape:collect="always" />
+    <linearGradient
+       gradientTransform="matrix(0.76537976,0,0,0.71406781,235.43012,312.25912)"
+       gradientUnits="userSpaceOnUse"
+       y2="20.313412"
+       x2="1231.0975"
+       y1="515.43536"
+       x1="167.68292"
+       id="linearGradient4359"
+       xlink:href="#linearGradient4353"
+       inkscape:collect="always" />
+  </defs>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="Layer 1">
+    <path
+       id="rect4234"
+       d="M163.34431 0.0C120.146673366 -5.97819119434e-05 78.7181639753 2.84402894934 48.1726171465 7.90659665591C17.6270703177 12.9691643625 0.466629225149 19.8355100306 0.46641 26.99511C0.477319250621 27.5762693533 0.601457276021 28.1572187703 0.83863 28.73705C0.83863 28.73705 0.46641 28.73705 0.46641 28.73705C0.46641 28.73705 0.46641 540.97468 0.46641 540.97468C0.222209664211 541.488010839 0.0666760270621 542.002394635 0.0 542.5172C-0.00197309290536 549.67699426 17.1572942654 556.543654214 47.7027542905 561.606511083C78.2482143155 566.669367953 119.677591062 569.513673853 162.8764 569.51368C250.716826818 569.497721073 322.657427011 557.940029324 325.48971 543.38887C325.48971 543.38887 326.2207 543.38887 326.2207 543.38887C326.2207 543.38887 326.2207 28.73705 326.2207 28.73705C326.2207 28.73705 325.6945 28.73705 325.6945 28.73705C325.98305672 28.1574942561 326.158548289 27.5765444603 326.2207 26.9951100003C326.220243488 12.0861099749 253.298157766 1.37301461791e-05 163.34431 -1.70530256582e-13C163.34431 -1.70530256582e-13 163.34431 0.0 163.34431 0.0"
+       style="fill:url(#linearGradient4305);fill-opacity:1" />
+    <rect
+       transform="matrix(1.000000,0.000000,0.000000,1.000000,-363.070750,-395.558050)"
+       inkscape:label="#rect4234-5"
+       y="429.95575"
+       x="363.77124"
+       height="500.71829"
+       width="324.8197"
+       id="liquidLevel"
+       style="fill:url(#linearGradient4359);fill-opacity:1" />
+  </g>
+</svg>
