@@ -167,6 +167,7 @@
         { icon: 'apps', title: 'Alarm Log', to: '/alarm-log' },
         { icon: 'apps', title: 'Widget Demo', to: '/widget-demo' },
         { icon: 'apps', title: 'Mimic Demo', to: '/mimic-demo' },
+        { icon: 'apps', title: 'SVG Icon Demo', to: '/svgicon-test' },
         { icon: 'apps', title: 'Options', to: '/options' }
       ],
       miniVariant: false,

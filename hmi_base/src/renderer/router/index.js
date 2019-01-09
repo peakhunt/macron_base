@@ -56,6 +56,10 @@ export default new Router({
       component: require('@/components/MimicDemo').default
     },
     {
+      path: '/svgicon-test',
+      component: require('@/components/SVGIconTest').default
+    },
+    {
       path: '/options',
       component: require('@/components/Options').default
     },
